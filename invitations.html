@@ -1,3 +1,5 @@
+# invitations.html
+
 ```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -12,14 +14,7 @@
 <title>إدارة الدعوات</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="config.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<!-- قراءة Excel و CSV -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 
 <style>
 
@@ -28,424 +23,87 @@
 }
 
 body {
+
     margin: 0;
-    padding: 25px 15px;
+
     font-family: Arial, sans-serif;
-    background: #f7f3ef;
+
+    background: #f8f6f3;
+
     color: #222;
 }
 
-.page {
-    width: 100%;
-    max-width: 1100px;
-    margin: auto;
+.container {
+
+    max-width: 700px;
+
+    margin: 40px auto;
+
+    padding: 20px;
+}
+
+.box {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.06);
 }
 
 h1 {
-    text-align: center;
-    margin: 10px 0;
-}
-
-#message {
-    text-align: center;
-    color: #777;
-    margin: 15px 0;
-}
-
-
-/* =========================
-   الأزرار العلوية
-========================= */
-
-.top-buttons {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 12px;
-
-    flex-wrap: wrap;
-
-    margin: 25px 0;
-}
-
-
-.main-button,
-.secondary-button {
-
-    border: none;
-
-    padding: 13px 25px;
-
-    border-radius: 12px;
-
-    font-size: 16px;
-
-    cursor: pointer;
-}
-
-
-.main-button {
-
-    background: #222;
-
-    color: white;
-}
-
-
-.secondary-button {
-
-    background: white;
-
-    color: #222;
-
-    border: 1px solid #ddd;
-}
-
-
-.main-button:hover,
-.secondary-button:hover {
-
-    opacity: 0.9;
-
-}
-
-
-/* =========================
-   الدعوات
-========================= */
-
-#invitations {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(280px, 1fr));
-
-    gap: 20px;
-
-    margin-top: 25px;
-}
-
-
-.card {
-
-    background: white;
-
-    padding: 25px;
-
-    border-radius: 22px;
-
-    text-align: center;
-
-    box-shadow:
-        0 5px 20px rgba(0,0,0,0.07);
-}
-
-
-.card h2 {
-
-    margin-top: 0;
-
-}
-
-
-.qr {
-
-    display: flex;
-
-    justify-content: center;
-
-    margin: 20px 0;
-}
-
-
-.used {
-
-    color: #c0392b;
-
-    font-weight: bold;
-}
-
-
-.unused {
-
-    color: #287a4b;
-
-    font-weight: bold;
-}
-
-
-.buttons {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-
-    margin-top: 15px;
-}
-
-
-.edit-button {
-
-    border: none;
-
-    background: #eee;
-
-    color: #222;
-
-    padding: 10px;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    font-size: 14px;
-}
-
-
-.edit-button:hover {
-
-    background: #ddd;
-
-}
-
-
-.open-button {
-
-    display: block;
-
-    padding: 11px;
-
-    background: #222;
-
-    color: white;
-
-    text-decoration: none;
-
-    border-radius: 10px;
-
-    margin-top: 5px;
-}
-
-
-/* =========================
-   النوافذ
-========================= */
-
-.modal {
-
-    display: none;
-
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,0.45);
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-    z-index: 999;
-}
-
-
-.modal.show {
-
-    display: flex;
-
-}
-
-
-.modal-box {
-
-    width: 100%;
-
-    max-width: 450px;
-
-    background: white;
-
-    border-radius: 22px;
-
-    padding: 28px;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,0.15);
-}
-
-
-.modal-box h2 {
 
     text-align: center;
 
     margin-top: 0;
 
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
-
-.modal-description {
+.subtitle {
 
     text-align: center;
-
-    color: #777;
-
-    line-height: 1.8;
-
-    font-size: 14px;
-
-    margin-bottom: 20px;
-}
-
-
-.file-box {
-
-    display: block;
-
-    border: 2px dashed #ddd;
-
-    border-radius: 15px;
-
-    padding: 25px;
-
-    text-align: center;
-
-    cursor: pointer;
-
-    background: #fafafa;
-}
-
-
-.file-box:hover {
-
-    border-color: #999;
-
-}
-
-
-.file-box input {
-
-    display: none;
-
-}
-
-
-.file-title {
-
-    font-weight: bold;
-
-    margin-bottom: 8px;
-}
-
-
-.file-hint {
 
     color: #888;
 
-    font-size: 13px;
-
-    line-height: 1.7;
-}
-
-
-.selected-file {
-
-    margin-top: 12px;
+    margin-bottom: 30px;
 
     font-size: 14px;
-
-    color: #287a4b;
-
-    text-align: center;
 }
 
+.event-info {
 
-.table-example {
+    background: #f7f5f2;
 
-    background: #f7f3ef;
+    padding: 18px;
 
-    border-radius: 12px;
+    border-radius: 14px;
 
-    padding: 12px;
-
-    margin-top: 15px;
-
-    font-size: 13px;
+    margin-bottom: 25px;
 
     line-height: 1.8;
 }
 
+.event-info strong {
 
-.modal-buttons {
-
-    display: flex;
-
-    gap: 10px;
-
-    margin-top: 20px;
+    font-size: 18px;
 }
 
-
-.save-button,
-.cancel-button {
-
-    flex: 1;
-
-    padding: 12px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    font-size: 15px;
-}
-
-
-.save-button {
-
-    background: #222;
-
-    color: white;
-}
-
-
-.cancel-button {
-
-    background: #eee;
-
-    color: #222;
-}
-
-
-/* =========================
-   الحقول
-========================= */
-
-.field {
-
-    margin-bottom: 18px;
-}
-
-
-.field label {
+label {
 
     display: block;
+
+    margin-top: 18px;
 
     margin-bottom: 8px;
 
     font-weight: bold;
 }
 
-
-.field input {
+input {
 
     width: 100%;
 
@@ -457,43 +115,165 @@ h1 {
 
     font-size: 16px;
 
-    outline: none;
+    background: white;
 }
 
+input:focus {
 
-@media (max-width: 600px) {
+    outline: none;
 
-    body {
+    border-color: #888;
+}
 
-        padding: 20px 12px;
+button {
 
-    }
+    width: 100%;
 
-    #invitations {
+    margin-top: 15px;
 
-        grid-template-columns: 1fr;
+    padding: 14px;
 
-    }
+    border: 0;
 
-    .card {
+    border-radius: 12px;
 
-        padding: 22px 18px;
+    background: #222;
 
-    }
+    color: white;
 
-    .top-buttons {
+    font-size: 16px;
 
-        flex-direction: column;
+    cursor: pointer;
+}
 
-    }
+button:hover {
 
-    .main-button,
-    .secondary-button {
+    opacity: 0.9;
+}
 
-        width: 100%;
+button:disabled {
 
-    }
+    opacity: 0.5;
 
+    cursor: not-allowed;
+}
+
+.add-box {
+
+    border-top: 1px solid #eee;
+
+    margin-top: 30px;
+
+    padding-top: 25px;
+}
+
+.invitation {
+
+    background: #faf9f7;
+
+    border: 1px solid #eee;
+
+    border-radius: 15px;
+
+    padding: 18px;
+
+    margin-top: 15px;
+}
+
+.invitation-name {
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.invitation-info {
+
+    color: #777;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+.invitation-actions {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 12px;
+}
+
+.small-button {
+
+    flex: 1;
+
+    margin-top: 0;
+
+    padding: 10px;
+
+    font-size: 14px;
+}
+
+.delete-button {
+
+    background: #a94442;
+}
+
+.save-button {
+
+    background: #287a4b;
+}
+
+.empty {
+
+    text-align: center;
+
+    color: #999;
+
+    padding: 30px 10px;
+}
+
+.next-button {
+
+    margin-top: 30px;
+
+    background: #222;
+
+    font-size: 17px;
+
+    padding: 16px;
+}
+
+.message {
+
+    text-align: center;
+
+    margin-top: 15px;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+.success {
+
+    color: #287a4b;
+}
+
+.error {
+
+    color: #c0392b;
+}
+
+.loading {
+
+    text-align: center;
+
+    color: #888;
 }
 
 </style>
@@ -504,1664 +284,787 @@ h1 {
 <body>
 
 
-<div class="page">
+<div class="container">
+
+<div class="box">
 
 
 <h1>
-    دعوات الحفل 🎟️
+إدارة الدعوات
 </h1>
 
-
-<div id="message">
-    جاري تحميل الدعوات...
+<div class="subtitle">
+أضيفي أسماء المدعوين وعدد المرافقين لكل دعوة
 </div>
 
 
-<div class="top-buttons">
+<div id="eventInfo"
+     class="event-info">
 
-    <button
-        class="main-button"
-        onclick="openUploadModal()">
-
-        📥 رفع جدول المدعوين
-
-    </button>
-
-
-    <button
-        class="secondary-button"
-        onclick="openAddGuest()">
-
-        ➕ إضافة دعوة يدويًا
-
-    </button>
+    جاري تحميل بيانات الحفل...
 
 </div>
-
-
-<div id="invitations"></div>
-
-
-</div>
-
 
 
 <!-- =========================
-     نافذة رفع الجدول
+     إضافة مدعو
+========================= -->
+
+<div class="add-box">
+
+<h3>
+إضافة مدعو
+</h3>
+
+
+<label>
+اسم المدعو
+</label>
+
+<input
+    id="guestName"
+    type="text"
+    placeholder="مثال: نورة محمد"
+>
+
+
+<label>
+عدد المرافقين
+</label>
+
+<input
+    id="companionCount"
+    type="number"
+    min="0"
+    max="3"
+    step="1"
+    value="0"
+    placeholder="0"
+>
+
+
+<div class="message">
+يمكن إضافة من 0 إلى 3 مرافقين.
+<br>
+إذا كانت الدعوة للمدعو فقط اتركي العدد 0.
+</div>
+
+
+<button
+    id="addButton"
+    type="button"
+    onclick="addInvitation()">
+
+    إضافة الدعوة
+
+</button>
+
+
+<div id="message"></div>
+
+</div>
+
+
+<!-- =========================
+     قائمة الدعوات
 ========================= -->
 
 <div
-    id="uploadModal"
-    class="modal">
+    id="invitationsList"
+    style="margin-top:30px;">
 
-
-    <div class="modal-box">
-
-
-        <h2>
-            رفع جدول المدعوين
-        </h2>
-
-
-        <div class="modal-description">
-
-            ارفعي جدول المدعوين بأي ترتيب تقريبًا.
-
-            <br>
-
-            النظام يبحث تلقائيًا عن
-            <strong>اسم المدعو</strong>
-            و
-            <strong>عدد المرافقين</strong>.
-
-        </div>
-
-
-        <label class="file-box">
-
-            <input
-                type="file"
-                id="guestFile"
-                accept=".xlsx,.xls,.csv,.txt"
-                onchange="showSelectedFile()"
-            >
-
-
-            <div class="file-title">
-
-                📄 اختاري ملف الجدول
-
-            </div>
-
-
-            <div class="file-hint">
-
-                Excel XLSX أو XLS أو CSV
-
-                <br>
-
-                اسم المدعو + عدد المرافقين
-
-            </div>
-
-        </label>
-
-
-        <div
-            id="selectedFile"
-            class="selected-file">
-        </div>
-
-
-        <div class="table-example">
-
-            <strong>
-                مثال:
-            </strong>
-
-            <br>
-
-            اسم المدعو | عدد المرافقين
-
-            <br>
-
-            سارة أحمد | 0
-
-            <br>
-
-            نورة محمد | 2
-
-            <br>
-
-            ريم خالد | 1
-
-        </div>
-
-
-        <div class="modal-buttons">
-
-
-            <button
-                class="cancel-button"
-                onclick="closeUploadModal()">
-
-                إلغاء
-
-            </button>
-
-
-            <button
-                class="save-button"
-                onclick="importGuests()">
-
-                استيراد المدعوين
-
-            </button>
-
-
-        </div>
-
-
+    <div class="loading">
+        جاري تحميل الدعوات...
     </div>
 
 </div>
 
 
-
 <!-- =========================
-     نافذة إضافة دعوة يدويًا
+     الانتقال للتصميم
 ========================= -->
 
-<div
-    id="addModal"
-    class="modal">
+<button
+    id="designButton"
+    class="next-button"
+    type="button"
+    onclick="goToDesign()">
 
+    الانتقال إلى تصميم الدعوات
 
-    <div class="modal-box">
+</button>
 
-
-        <h2>
-            إضافة دعوة
-        </h2>
-
-
-        <div class="field">
-
-            <label>
-                اسم المدعو
-            </label>
-
-
-            <input
-                type="text"
-                id="guestNameInput"
-                placeholder="مثال: سارة"
-            >
-
-        </div>
-
-
-        <div class="field">
-
-            <label>
-                عدد المرافقين
-            </label>
-
-
-            <input
-                type="number"
-                id="guestCountInput"
-                min="0"
-                step="1"
-                value="0"
-            >
-
-        </div>
-
-
-        <div class="modal-buttons">
-
-
-            <button
-                class="cancel-button"
-                onclick="closeAddGuest()">
-
-                إلغاء
-
-            </button>
-
-
-            <button
-                class="save-button"
-                onclick="addGuest()">
-
-                إضافة الدعوة
-
-            </button>
-
-
-        </div>
-
-
-    </div>
 
 </div>
 
+</div>
 
 
 <script>
 
 
-let currentEventId = null;
+/* =========================
+   متغيرات
+========================= */
+
+let eventId = null;
+
+let eventData = null;
+
+let invitations = [];
 
 
-/* =====================================================
-   فتح وإغلاق نافذة رفع الملف
-===================================================== */
+/* =========================
+   قراءة event_id
+========================= */
 
-function openUploadModal() {
-
-    document
-        .getElementById("uploadModal")
-        .classList.add("show");
-
-}
-
-
-function closeUploadModal() {
-
-    document
-        .getElementById("uploadModal")
-        .classList.remove("show");
-
-    document
-        .getElementById("guestFile")
-        .value = "";
-
-    document
-        .getElementById("selectedFile")
-        .innerText = "";
-
-}
-
-
-function showSelectedFile() {
-
-    const file =
-        document
-            .getElementById("guestFile")
-            .files[0];
-
-
-    document
-        .getElementById("selectedFile")
-        .innerText =
-            file
-                ? `تم اختيار: ${file.name}`
-                : "";
-
-}
-
-
-/* =====================================================
-   تنظيف النص
-===================================================== */
-
-function normalizeText(value) {
-
-    return String(value ?? "")
-
-        .replace(/\uFEFF/g, "")
-
-        .replace(/[\u200B-\u200D\u2060]/g, "")
-
-        .replace(/[ًٌٍَُِّْـ]/g, "")
-
-        .replace(/[أإآ]/g, "ا")
-
-        .replace(/ة/g, "ه")
-
-        .replace(/ى/g, "ي")
-
-        .replace(/ؤ/g, "و")
-
-        .replace(/ئ/g, "ي")
-
-        .replace(/\s+/g, " ")
-
-        .trim()
-
-        .toLowerCase();
-
-}
-
-
-/* =====================================================
-   البحث عن عمود الاسم
-===================================================== */
-
-function isNameHeader(value) {
-
-    const text =
-        normalizeText(value);
-
-
-    if (!text) {
-
-        return false;
-
-    }
-
-
-    const names = [
-
-        "اسم المدعو",
-        "اسم المدعوه",
-        "اسم الضيف",
-        "اسم الضيفه",
-        "اسم",
-        "الاسم",
-        "المدعو",
-        "المدعوه",
-        "الضيف",
-        "الضيفه",
-        "guest name",
-        "guest_name",
-        "guest",
-        "name"
-
-    ];
-
-
-    return names.some(
-        name => {
-
-            const normalizedName =
-                normalizeText(name);
-
-            return (
-                text === normalizedName ||
-                text.includes(normalizedName) ||
-                normalizedName.includes(text)
-            );
-
-        }
+const params =
+    new URLSearchParams(
+        window.location.search
     );
 
+eventId =
+    params.get("event_id");
+
+
+/* =========================
+   التحقق
+========================= */
+
+if (!eventId) {
+
+    document.getElementById(
+        "eventInfo"
+    ).innerHTML = `
+
+        <div class="error">
+            لم يتم العثور على الحفل.
+        </div>
+
+    `;
+
 }
 
 
-/* =====================================================
-   البحث عن عمود المرافقين
-===================================================== */
+/* =========================
+   تحميل الحفل
+========================= */
 
-function isCompanionHeader(value) {
+async function loadEvent() {
 
-    const text =
-        normalizeText(value);
+    if (!eventId) return;
 
 
-    if (!text) {
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
 
-        return false;
+        .from("events")
 
+        .select("*")
+
+        .eq("id", eventId)
+
+        .single();
+
+
+    if (error || !data) {
+
+        console.error(error);
+
+        document.getElementById(
+            "eventInfo"
+        ).innerHTML = `
+
+            <div class="error">
+                تعذر تحميل بيانات الحفل.
+            </div>
+
+        `;
+
+        return;
     }
 
 
-    const names = [
-
-        "عدد المرافقين",
-        "عدد مرافقين",
-        "المرافقين",
-        "مرافقين",
-        "المرافق",
-        "مرافق",
-        "عدد المرافق",
-        "companions",
-        "companion",
-        "companion count",
-        "companion_count"
-
-    ];
+    eventData = data;
 
 
-    return names.some(
-        name => {
+    document.getElementById(
+        "eventInfo"
+    ).innerHTML = `
 
-            const normalizedName =
-                normalizeText(name);
+        <strong>
+            ${escapeHtml(data.event_name)}
+        </strong>
 
-            return (
-                text === normalizedName ||
-                text.includes(normalizedName) ||
-                normalizedName.includes(text)
-            );
+        <br>
 
-        }
-    );
+        التاريخ:
+        ${escapeHtml(data.event_date)}
+
+        <br>
+
+        وقت الدخول:
+        ${escapeHtml(data.start_time)}
+        -
+        ${escapeHtml(data.end_time)}
+
+    `;
+
+
+    loadInvitations();
 
 }
 
 
-/* =====================================================
-   العثور على صف العناوين
-===================================================== */
+/* =========================
+   تحميل الدعوات
+========================= */
 
-function findHeaderRow(matrix) {
+async function loadInvitations() {
 
-    for (
-        let rowIndex = 0;
-        rowIndex < Math.min(matrix.length, 30);
-        rowIndex++
-    ) {
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
 
-        const row =
-            matrix[rowIndex] || [];
+        .from("invitations")
 
+        .select("*")
 
-        let hasName =
-            false;
+        .eq("event_id", eventId)
 
-        let hasCompanion =
-            false;
-
-
-        for (
-            let colIndex = 0;
-            colIndex < row.length;
-            colIndex++
-        ) {
-
-            const value =
-                row[colIndex];
-
-
-            if (isNameHeader(value)) {
-
-                hasName = true;
-
-            }
-
-
-            if (isCompanionHeader(value)) {
-
-                hasCompanion = true;
-
-            }
-
-        }
-
-
-        if (
-            hasName ||
-            hasCompanion
-        ) {
-
-            return rowIndex;
-
-        }
-
-    }
-
-
-    return -1;
-
-}
-
-
-/* =====================================================
-   إيجاد أرقام الأعمدة
-===================================================== */
-
-function findColumnIndexes(headerRow) {
-
-    let nameIndex = -1;
-
-    let companionIndex = -1;
-
-
-    for (
-        let i = 0;
-        i < headerRow.length;
-        i++
-    ) {
-
-        if (
-            nameIndex === -1 &&
-            isNameHeader(headerRow[i])
-        ) {
-
-            nameIndex = i;
-
-        }
-
-
-        if (
-            companionIndex === -1 &&
-            isCompanionHeader(headerRow[i])
-        ) {
-
-            companionIndex = i;
-
-        }
-
-    }
-
-
-    return {
-
-        nameIndex,
-        companionIndex
-
-    };
-
-}
-
-
-/* =====================================================
-   تحويل الملف إلى جدول
-===================================================== */
-
-async function readGuestFile(file) {
-
-    const data =
-        await file.arrayBuffer();
-
-
-    const workbook =
-        XLSX.read(
-            data,
+        .order(
+            "invitation_number",
             {
-                type: "array",
-                cellDates: false,
-                raw: false
+                ascending: true
             }
         );
+
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "invitationsList"
+        ).innerHTML = `
+
+            <div class="error">
+                تعذر تحميل الدعوات.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    invitations = data || [];
+
+
+    renderInvitations();
+
+}
+
+
+/* =========================
+   عرض الدعوات
+========================= */
+
+function renderInvitations() {
+
+    const list =
+        document.getElementById(
+            "invitationsList"
+        );
+
+
+    if (!invitations.length) {
+
+        list.innerHTML = `
+
+            <div class="empty">
+                لم تتم إضافة أسماء بعد.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML = `
+
+        <h3>
+            الدعوات
+            (${invitations.length})
+        </h3>
+
+        ${invitations
+            .map(
+                invitation =>
+                    renderInvitation(invitation)
+            )
+            .join("")
+        }
+
+    `;
+
+}
+
+
+/* =========================
+   بطاقة الدعوة
+========================= */
+
+function renderInvitation(invitation) {
+
+    const guestName =
+        invitation.guest_name ||
+        "بدون اسم";
+
+
+    const companionCount =
+        Math.max(
+            Number(
+                invitation.guest_count || 1
+            ) - 1,
+            0
+        );
+
+
+    const totalAllowed =
+        Number(
+            invitation.guest_count || 1
+        );
+
+
+    const checkedIn =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    return `
+
+        <div
+            class="invitation"
+            id="invitation-${invitation.id}">
+
+            <div class="invitation-name">
+
+                ${escapeHtml(guestName)}
+
+            </div>
+
+
+            <div class="invitation-info">
+
+                المرافقون:
+                ${companionCount}
+
+                <br>
+
+                إجمالي الأشخاص المسموح:
+                ${totalAllowed}
+
+                <br>
+
+                تم الدخول:
+                ${checkedIn}
+
+            </div>
+
+
+            <div class="invitation-actions">
+
+                <button
+                    class="small-button save-button"
+                    onclick="editInvitation('${invitation.id}')">
+
+                    تعديل
+
+                </button>
+
+
+                <button
+                    class="small-button delete-button"
+                    onclick="deleteInvitation('${invitation.id}')">
+
+                    حذف
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   إضافة دعوة
+========================= */
+
+async function addInvitation() {
+
+    const nameInput =
+        document.getElementById(
+            "guestName"
+        );
+
+
+    const companionInput =
+        document.getElementById(
+            "companionCount"
+        );
+
+
+    const name =
+        nameInput.value.trim();
+
+
+    const companions =
+        Number(
+            companionInput.value
+        );
+
+
+    if (!name) {
+
+        showMessage(
+            "فضلاً اكتبي اسم المدعو.",
+            "error"
+        );
+
+        return;
+    }
 
 
     if (
-        !workbook.SheetNames ||
-        workbook.SheetNames.length === 0
+        !Number.isInteger(companions) ||
+        companions < 0 ||
+        companions > 3
     ) {
 
-        throw new Error(
-            "لم يتم العثور على ورقة داخل الملف."
+        showMessage(
+            "عدد المرافقين يجب أن يكون من 0 إلى 3.",
+            "error"
         );
 
+        return;
     }
 
 
-    /*
-       نستخدم أول ورقة
-    */
-
-    const sheet =
-        workbook.Sheets[
-            workbook.SheetNames[0]
-        ];
-
-
-    /*
-       نحول الورقة إلى مصفوفة
-       بدل sheet_to_json مباشرة.
-
-       هذه النقطة مهمة جدًا لأنها
-       تسمح لنا بالبحث عن العناوين
-       حتى لو كانت ليست في الصف الأول.
-    */
-
-    const matrix =
-        XLSX.utils.sheet_to_json(
-            sheet,
-            {
-                header: 1,
-                defval: "",
-                raw: false
-            }
-        );
-
-
-    return matrix;
-
-}
-
-
-/* =====================================================
-   استيراد المدعوين
-===================================================== */
-
-async function importGuests() {
-
-    const fileInput =
+    const button =
         document.getElementById(
-            "guestFile"
+            "addButton"
         );
 
 
-    const file =
-        fileInput.files[0];
+    button.disabled = true;
 
-
-    if (!file) {
-
-        alert(
-            "فضلاً اختاري ملف الجدول أولاً"
-        );
-
-        return;
-
-    }
-
-
-    if (!currentEventId) {
-
-        alert(
-            "لم يتم العثور على رقم الحفل"
-        );
-
-        return;
-
-    }
+    button.innerText =
+        "جاري الإضافة...";
 
 
     try {
 
 
-        /* قراءة الملف */
+        /* =========================
+           رقم داخلي فقط
+           لا يظهر للضيف
+        ========================= */
 
-        const matrix =
-            await readGuestFile(file);
-
-
-        if (
-            !matrix ||
-            matrix.length === 0
-        ) {
-
-            alert(
-                "الجدول فارغ ❌"
-            );
-
-            return;
-
-        }
-
-
-        /* البحث عن صف العناوين */
-
-        const headerRowIndex =
-            findHeaderRow(matrix);
-
-
-        if (
-            headerRowIndex === -1
-        ) {
-
-            /*
-               عرض أول صفوف الملف
-               للمساعدة في اكتشاف المشكلة.
-            */
-
-            const preview =
-                matrix
-                    .slice(0, 10)
-                    .map(row =>
-                        row
-                            .filter(value =>
-                                String(value)
-                                    .trim() !== ""
+        const nextNumber =
+            invitations.length
+                ? Math.max(
+                    ...invitations.map(
+                        item =>
+                            Number(
+                                item.invitation_number || 0
                             )
-                            .join(" | ")
                     )
-                    .filter(Boolean)
-                    .join("\n");
+                ) + 1
+                : 1;
 
 
-            alert(
-                "لم أجد عناوين الأعمدة.\n\n" +
-                "تأكدي أن الجدول يحتوي على:\n" +
-                "اسم المدعو\n" +
-                "عدد المرافقين\n\n" +
-                "البيانات التي قرأها النظام:\n" +
-                (preview || "لا توجد بيانات مقروءة")
-            );
+        /* =========================
+           إجمالي الأشخاص
+           المدعو + المرافقين
+        ========================= */
 
-            return;
-
-        }
-
-
-        /* تحديد الأعمدة */
-
-        const headerRow =
-            matrix[headerRowIndex];
+        const totalAllowed =
+            1 + companions;
 
 
         const {
-            nameIndex,
-            companionIndex
-        } =
-            findColumnIndexes(
-                headerRow
-            );
-
-
-        if (
-            nameIndex === -1
-        ) {
-
-            alert(
-                "لم أجد عمود اسم المدعو ❌"
-            );
-
-            return;
-
-        }
-
-
-        /*
-           إذا لم يوجد عمود المرافقين
-           نعتبر جميع الدعوات = 0 مرافق.
-        */
-
-        const hasCompanionColumn =
-            companionIndex !== -1;
-
-
-        /* استخراج الصفوف */
-
-        const guestRows = [];
-
-
-        for (
-            let i = headerRowIndex + 1;
-            i < matrix.length;
-            i++
-        ) {
-
-            const row =
-                matrix[i] || [];
-
-
-            const name =
-                String(
-                    row[nameIndex] ?? ""
-                ).trim();
-
-
-            /*
-               تجاهل الصفوف الفارغة
-            */
-
-            if (!name) {
-
-                continue;
-
-            }
-
-
-            let companions = 0;
-
-
-            if (
-                hasCompanionColumn
-            ) {
-
-                const rawValue =
-                    row[companionIndex];
-
-
-                /*
-                   الفراغ = 0
-                */
-
-                if (
-                    rawValue !== "" &&
-                    rawValue !== null &&
-                    rawValue !== undefined
-                ) {
-
-                    companions =
-                        Number(
-                            String(rawValue)
-                                .replace(/[^\d-]/g, "")
-                        );
-
-                }
-
-            }
-
-
-            if (
-                !Number.isInteger(
-                    companions
-                ) ||
-                companions < 0
-            ) {
-
-                alert(
-                    `عدد المرافقين غير صحيح عند الصف رقم ${i + 1}`
-                );
-
-                return;
-
-            }
-
-
-            guestRows.push({
-
-                name,
-                companions
-
-            });
-
-        }
-
-
-        if (
-            guestRows.length === 0
-        ) {
-
-            alert(
-                "لم يتم العثور على أسماء مدعوين في الجدول ❌"
-            );
-
-            return;
-
-        }
-
-
-        /* تحميل الدعوات */
-
-        const {
-            data: invitations,
-            error: invitationError
+            data,
+            error
         } =
             await supabaseClient
-
-                .from("invitations")
-
-                .select("*")
-
-                .eq(
-                    "event_id",
-                    currentEventId
-                )
-
-                .order(
-                    "invitation_number",
-                    {
-                        ascending: true
-                    }
-                );
-
-
-        if (
-            invitationError
-        ) {
-
-            console.error(
-                invitationError
-            );
-
-            alert(
-                "حدث خطأ أثناء تحميل الدعوات ❌"
-            );
-
-            return;
-
-        }
-
-
-        if (
-            !invitations ||
-            invitations.length === 0
-        ) {
-
-            alert(
-                "لا توجد دعوات لهذا الحفل."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            guestRows.length >
-            invitations.length
-        ) {
-
-            alert(
-
-                `عدد الأسماء في الجدول (${guestRows.length}) أكبر من عدد الدعوات الموجودة (${invitations.length}).`
-
-            );
-
-            return;
-
-        }
-
-
-        /* تأكيد */
-
-        const confirmed =
-            confirm(
-
-                `تم العثور على ${guestRows.length} مدعو.\n\n` +
-
-                `سيتم ربط الأسماء بأول ${guestRows.length} دعوة حسب الترتيب.\n\n` +
-
-                `هل تريدين المتابعة؟`
-
-            );
-
-
-        if (!confirmed) {
-
-            return;
-
-        }
-
-
-        let updated = 0;
-
-
-        /* تحديث الدعوات */
-
-        for (
-            let i = 0;
-            i < guestRows.length;
-            i++
-        ) {
-
-            const guest =
-                guestRows[i];
-
-
-            const invitation =
-                invitations[i];
-
-
-            const totalPeople =
-                1 +
-                guest.companions;
-
-
-            const {
-                error: updateError
-            } =
-                await supabaseClient
-
-                    .from("invitations")
-
-                    .update({
-
-                        guest_name:
-                            guest.name,
-
-                        guest_count:
-                            totalPeople
-
-                    })
-
-                    .eq(
-                        "id",
-                        invitation.id
-                    );
-
-
-            if (
-                updateError
-            ) {
-
-                console.error(
-                    updateError
-                );
-
-                alert(
-
-                    `حدث خطأ عند تحديث الدعوة رقم ${invitation.invitation_number}`
-
-                );
-
-                return;
-
-            }
-
-
-            updated++;
-
-        }
-
-
-        closeUploadModal();
-
-
-        alert(
-
-            `تم استيراد ${updated} مدعو بنجاح ✅`
-
-        );
-
-
-        loadInvitations();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        alert(
-
-            "تعذر قراءة الملف ❌\n\n" +
-
-            "تأكدي أن الملف Excel أو CSV صالح."
-
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   إضافة دعوة يدويًا
-===================================================== */
-
-function openAddGuest() {
-
-    document
-        .getElementById("addModal")
-        .classList.add("show");
-
-}
-
-
-function closeAddGuest() {
-
-    document
-        .getElementById("addModal")
-        .classList.remove("show");
-
-    document
-        .getElementById("guestNameInput")
-        .value = "";
-
-    document
-        .getElementById("guestCountInput")
-        .value = "0";
-
-}
-
-
-async function addGuest() {
-
-    const name =
-        document
-            .getElementById(
-                "guestNameInput"
-            )
-            .value
-            .trim();
-
-
-    const companions =
-        Number(
-            document
-                .getElementById(
-                    "guestCountInput"
-                )
-                .value
-        );
-
-
-    if (
-        !Number.isInteger(
-            companions
-        ) ||
-        companions < 0
-    ) {
-
-        alert(
-            "عدد المرافقين يجب أن يكون 0 أو أكثر"
-        );
-
-        return;
-
-    }
-
-
-    const {
-        data: existingInvitations,
-        error: countError
-    } =
-        await supabaseClient
-
-            .from("invitations")
-
-            .select(
-                "invitation_number"
-            )
-
-            .eq(
-                "event_id",
-                currentEventId
-            );
-
-
-    if (
-        countError
-    ) {
-
-        console.error(
-            countError
-        );
-
-        alert(
-            "حدث خطأ أثناء إنشاء الدعوة"
-        );
-
-        return;
-
-    }
-
-
-    let nextNumber = 1;
-
-
-    if (
-        existingInvitations &&
-        existingInvitations.length > 0
-    ) {
-
-        const numbers =
-            existingInvitations
-
-                .map(
-                    item =>
-                        Number(
-                            item.invitation_number
-                        )
-                )
-
-                .filter(
-                    number =>
-                        Number.isFinite(
-                            number
-                        )
-                );
-
-
-        if (
-            numbers.length > 0
-        ) {
-
-            nextNumber =
-                Math.max(
-                    ...numbers
-                ) + 1;
-
-        }
-
-    }
-
-
-    const qrCode =
-        crypto.randomUUID();
-
-
-    const {
-        error
-    } =
-        await supabaseClient
 
             .from("invitations")
 
             .insert({
 
                 event_id:
-                    currentEventId,
+                    eventId,
+
+                guest_name:
+                    name,
 
                 invitation_number:
                     nextNumber,
 
-                guest_name:
-                    name || null,
-
                 guest_count:
-                    1 + companions,
+                    totalAllowed,
 
                 checked_in:
                     0,
 
                 qr_code:
-                    qrCode,
+                    crypto.randomUUID(),
 
                 used:
                     false
 
-            });
+            })
+
+            .select()
+
+            .single();
 
 
-    if (
-        error
-    ) {
+        if (error) {
 
-        console.error(
-            error
-        );
+            console.error(error);
 
-        alert(
-            "حدث خطأ أثناء إضافة الدعوة ❌"
-        );
-
-        return;
-
-    }
-
-
-    alert(
-        "تمت إضافة الدعوة بنجاح ✅"
-    );
-
-
-    closeAddGuest();
-
-    loadInvitations();
-
-}
-
-
-/* =====================================================
-   تحميل الدعوات
-===================================================== */
-
-async function loadInvitations() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-
-    currentEventId =
-        params.get(
-            "event_id"
-        );
-
-
-    if (
-        !currentEventId
-    ) {
-
-        document
-            .getElementById(
-                "message"
-            )
-            .innerText =
-                "رقم الحفل غير موجود";
-
-        return;
-
-    }
-
-
-    const {
-        data: invitations,
-        error
-    } =
-        await supabaseClient
-
-            .from("invitations")
-
-            .select("*")
-
-            .eq(
-                "event_id",
-                currentEventId
-            )
-
-            .order(
-                "invitation_number",
-                {
-                    ascending: true
-                }
+            showMessage(
+                "حدث خطأ أثناء إضافة الدعوة.",
+                "error"
             );
 
-
-    if (
-        error
-    ) {
-
-        console.error(
-            error
-        );
-
-        document
-            .getElementById(
-                "message"
-            )
-            .innerText =
-                "حدث خطأ أثناء تحميل الدعوات ❌";
-
-        return;
-
-    }
-
-
-    document
-        .getElementById(
-            "message"
-        )
-        .innerText =
-            `عدد الدعوات: ${invitations.length}`;
-
-
-    const container =
-        document
-            .getElementById(
-                "invitations"
-            );
-
-
-    container.innerHTML = "";
-
-
-    invitations.forEach(
-        invitation => {
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "card";
-
-
-            const guestName =
-                invitation.guest_name ||
-                "بدون اسم";
-
-
-            const totalPeople =
-                Number(
-                    invitation.guest_count
-                ) || 1;
-
-
-            const companions =
-                Math.max(
-                    0,
-                    totalPeople - 1
-                );
-
-
-            card.innerHTML = `
-
-                <h2>
-                    ${escapeHtml(
-                        guestName
-                    )}
-                </h2>
-
-                <p>
-                    رقم الدعوة:
-                    ${invitation.invitation_number}
-                </p>
-
-                <p>
-                    المدعو الأساسي:
-                    1
-                </p>
-
-                <p>
-                    عدد المرافقين:
-                    ${companions}
-                </p>
-
-                <p>
-                    إجمالي المسموح:
-                    ${totalPeople}
-                </p>
-
-                <p class="${
-                    invitation.used
-                        ? "used"
-                        : "unused"
-                }">
-
-                    ${
-                        invitation.used
-                            ? "مستخدمة ❌"
-                            : "غير مستخدمة ✅"
-                    }
-
-                </p>
-
-                <div
-                    class="buttons">
-
-                    <button
-                        class="edit-button"
-                        onclick="editGuestName(
-                            '${invitation.id}',
-                            '${escapeJs(
-                                invitation.guest_name || ""
-                            )}'
-                        )">
-
-                        تعديل اسم المدعو
-
-                    </button>
-
-
-                    <button
-                        class="edit-button"
-                        onclick="editCompanions(
-                            '${invitation.id}',
-                            ${companions}
-                        )">
-
-                        تعديل عدد المرافقين
-
-                    </button>
-
-                </div>
-
-            `;
-
-
-            const qr =
-                document.createElement(
-                    "div"
-                );
-
-
-            qr.className =
-                "qr";
-
-
-            new QRCode(
-                qr,
-                {
-
-                    text:
-                        `${window.location.origin}/verify.html?code=${encodeURIComponent(
-                            invitation.qr_code
-                        )}`,
-
-                    width:
-                        180,
-
-                    height:
-                        180
-
-                }
-            );
-
-
-            card.appendChild(
-                qr
-            );
-
-
-            const openButton =
-                document.createElement(
-                    "a"
-                );
-
-
-            openButton.className =
-                "open-button";
-
-
-            openButton.innerText =
-                "فتح الدعوة";
-
-
-            openButton.href =
-                `invitation.html?code=${encodeURIComponent(
-                    invitation.qr_code
-                )}`;
-
-
-            card.appendChild(
-                openButton
-            );
-
-
-            container.appendChild(
-                card
-            );
-
+            return;
         }
-    );
+
+
+        invitations.push(data);
+
+
+        nameInput.value = "";
+
+        companionInput.value = "0";
+
+
+        renderInvitations();
+
+
+        showMessage(
+            "تمت إضافة الدعوة بنجاح 🤍",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "حدث خطأ غير متوقع.",
+            "error"
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerText =
+            "إضافة الدعوة";
+
+    }
 
 }
 
 
-/* =====================================================
-   تعديل الاسم
-===================================================== */
+/* =========================
+   تعديل الدعوة
+========================= */
 
-async function editGuestName(
-    id,
-    currentName
-) {
+async function editInvitation(id) {
+
+    const invitation =
+        invitations.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!invitation) return;
+
+
+    const currentName =
+        invitation.guest_name || "";
+
+
+    const currentCompanions =
+        Math.max(
+            Number(
+                invitation.guest_count || 1
+            ) - 1,
+            0
+        );
+
 
     const newName =
         prompt(
-            "اكتبي اسم المدعو:",
+            "اسم المدعو:",
             currentName
         );
 
 
-    if (
-        newName === null
-    ) {
-
-        return;
-
-    }
+    if (newName === null) return;
 
 
-    const name =
+    const cleanName =
         newName.trim();
 
 
-    const {
-        error
-    } =
-        await supabaseClient
-
-            .from("invitations")
-
-            .update({
-
-                guest_name:
-                    name || null
-
-            })
-
-            .eq(
-                "id",
-                id
-            );
-
-
-    if (
-        error
-    ) {
-
-        console.error(
-            error
-        );
+    if (!cleanName) {
 
         alert(
-            "حدث خطأ أثناء تعديل الاسم"
+            "اسم المدعو لا يمكن أن يكون فارغًا."
         );
 
         return;
-
     }
 
 
-    loadInvitations();
-
-}
-
-
-/* =====================================================
-   تعديل المرافقين
-===================================================== */
-
-async function editCompanions(
-    id,
-    currentCompanions
-) {
-
-    const newValue =
+    const newCompanions =
         prompt(
-            "اكتبي عدد المرافقين:",
+            "عدد المرافقين (من 0 إلى 3):",
             currentCompanions
         );
 
 
-    if (
-        newValue === null
-    ) {
-
-        return;
-
-    }
+    if (newCompanions === null) return;
 
 
     const companions =
         Number(
-            newValue
+            newCompanions
         );
 
 
     if (
-        !Number.isInteger(
-            companions
-        ) ||
-        companions < 0
+        !Number.isInteger(companions) ||
+        companions < 0 ||
+        companions > 3
     ) {
 
         alert(
-            "اكتبي عددًا صحيحًا 0 أو أكثر"
+            "عدد المرافقين يجب أن يكون من 0 إلى 3."
         );
 
         return;
-
     }
+
+
+    const totalAllowed =
+        1 + companions;
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+        .from("invitations")
+
+        .update({
+
+            guest_name:
+                cleanName,
+
+            guest_count:
+                totalAllowed
+
+        })
+
+        .eq("id", id)
+
+        .select()
+
+        .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "حدث خطأ أثناء تعديل الدعوة."
+        );
+
+        return;
+    }
+
+
+    invitations =
+        invitations.map(
+            item =>
+                item.id === id
+                    ? data
+                    : item
+        );
+
+
+    renderInvitations();
+
+
+    showMessage(
+        "تم تعديل الدعوة بنجاح 🤍",
+        "success"
+    );
+
+}
+
+
+/* =========================
+   حذف الدعوة
+========================= */
+
+async function deleteInvitation(id) {
+
+    const invitation =
+        invitations.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!invitation) return;
+
+
+    const name =
+        invitation.guest_name ||
+        "هذه الدعوة";
+
+
+    const confirmed =
+        confirm(
+            `هل أنتِ متأكدة من حذف دعوة "${name}"؟`
+        );
+
+
+    if (!confirmed) return;
 
 
     const {
@@ -2169,46 +1072,113 @@ async function editCompanions(
     } =
         await supabaseClient
 
-            .from("invitations")
+        .from("invitations")
 
-            .update({
+        .delete()
 
-                guest_count:
-                    1 + companions
-
-            })
-
-            .eq(
-                "id",
-                id
-            );
+        .eq("id", id);
 
 
-    if (
-        error
-    ) {
+    if (error) {
 
-        console.error(
-            error
-        );
+        console.error(error);
 
         alert(
-            "حدث خطأ أثناء تعديل عدد المرافقين"
+            "حدث خطأ أثناء حذف الدعوة."
         );
 
         return;
-
     }
 
 
-    loadInvitations();
+    invitations =
+        invitations.filter(
+            item =>
+                item.id !== id
+        );
+
+
+    renderInvitations();
+
+
+    showMessage(
+        "تم حذف الدعوة.",
+        "success"
+    );
 
 }
 
 
-/* =====================================================
-   حماية النصوص
-===================================================== */
+/* =========================
+   الانتقال للتصميم
+========================= */
+
+function goToDesign() {
+
+    if (!eventId) {
+
+        alert(
+            "لم يتم العثور على الحفل."
+        );
+
+        return;
+    }
+
+
+    if (!invitations.length) {
+
+        alert(
+            "أضيفي دعوة واحدة على الأقل قبل الانتقال للتصميم."
+        );
+
+        return;
+    }
+
+
+    window.location.href =
+        `design.html?event_id=${encodeURIComponent(eventId)}`;
+
+}
+
+
+/* =========================
+   الرسائل
+========================= */
+
+function showMessage(
+    message,
+    type
+) {
+
+    const element =
+        document.getElementById(
+            "message"
+        );
+
+
+    element.className =
+        `message ${type}`;
+
+
+    element.innerHTML =
+        message;
+
+
+    setTimeout(() => {
+
+        element.innerHTML = "";
+
+        element.className =
+            "message";
+
+    }, 3000);
+
+}
+
+
+/* =========================
+   حماية النص
+========================= */
 
 function escapeHtml(text) {
 
@@ -2242,83 +1212,13 @@ function escapeHtml(text) {
 }
 
 
-function escapeJs(text) {
+/* =========================
+   تشغيل الصفحة
+========================= */
 
-    return String(text)
-
-        .replaceAll(
-            "\\",
-            "\\\\"
-        )
-
-        .replaceAll(
-            "'",
-            "\\'"
-        )
-
-        .replaceAll(
-            "\n",
-            "\\n"
-        )
-
-        .replaceAll(
-            "\r",
-            "\\r"
-        );
-
-}
-
-
-/* =====================================================
-   التشغيل
-===================================================== */
-
-loadInvitations();
-
-
-/* إغلاق النوافذ عند الضغط خارجها */
-
-document
-    .getElementById(
-        "uploadModal"
-    )
-    .addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target === this
-            ) {
-
-                closeUploadModal();
-
-            }
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "addModal"
-    )
-    .addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target === this
-            ) {
-
-                closeAddGuest();
-
-            }
-
-        }
-    );
+loadEvent();
 
 </script>
-
 
 </body>
 
