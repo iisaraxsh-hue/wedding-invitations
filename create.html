@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -98,18 +99,13 @@
 
 </head>
 
-
 <body>
-
 
 <div class="container">
 
     <div class="box">
 
         <h1>إنشاء دعوة</h1>
-
-
-        <!-- اسم الحفل -->
 
         <label>
             اسم الحفل
@@ -121,9 +117,6 @@
             placeholder="مثال: حفل زفاف سارة"
         >
 
-
-        <!-- تاريخ الحفل -->
-
         <label>
             تاريخ الحفل
         </label>
@@ -132,9 +125,6 @@
             id="eventDate"
             type="date"
         >
-
-
-        <!-- بداية الدخول -->
 
         <label>
             وقت بداية الدخول
@@ -145,9 +135,6 @@
             type="time"
         >
 
-
-        <!-- نهاية الدخول -->
-
         <label>
             وقت انتهاء الدخول
         </label>
@@ -156,9 +143,6 @@
             id="endTime"
             type="time"
         >
-
-
-        <!-- عدد الدعوات -->
 
         <label>
             عدد الدعوات المطلوبة
@@ -172,9 +156,6 @@
             placeholder="مثال: 100"
         >
 
-
-        <!-- عدد المرافقين -->
-
         <label>
             عدد المرافقين
         </label>
@@ -183,17 +164,23 @@
             id="defaultCompanionCount"
             type="number"
             min="0"
+            max="3"
             step="1"
             value="0"
             placeholder="0"
         >
 
         <div class="hint">
-            اتركي العدد 0 إذا كانت الدعوة للمدعو فقط.
+            عدد المرافقين من 0 إلى 3 فقط.
+            <br>
+            0 مرافق = شخص واحد.
+            <br>
+            1 مرافق = شخصان.
+            <br>
+            2 مرافقين = 3 أشخاص.
+            <br>
+            3 مرافقين = 4 أشخاص.
         </div>
-
-
-        <!-- زر التوليد -->
 
         <button
             id="generateButton"
@@ -283,11 +270,6 @@ async function createEvent() {
             );
 
 
-        /*
-           إذا تركت الخانة فارغة
-           نعتبر عدد المرافقين = 0
-        */
-
         const companionInput =
             document
                 .getElementById(
@@ -304,7 +286,7 @@ async function createEvent() {
 
 
         /* =========================
-           التحقق
+           التحقق من البيانات
         ========================= */
 
         if (!eventName) {
@@ -362,15 +344,20 @@ async function createEvent() {
         }
 
 
+        /* =========================
+           الحد الأقصى للمرافقين
+        ========================= */
+
         if (
             !Number.isInteger(
                 defaultCompanionCount
             ) ||
-            defaultCompanionCount < 0
+            defaultCompanionCount < 0 ||
+            defaultCompanionCount > 3
         ) {
 
             alert(
-                "عدد المرافقين يجب أن يكون 0 أو أكثر"
+                "عدد المرافقين يجب أن يكون من 0 إلى 3 فقط."
             );
 
             return;
@@ -445,16 +432,12 @@ async function createEvent() {
             /*
                المدعو الأساسي = 1
 
-               المرافقون = العدد الذي
-               أدخله المستخدم
-
-               مثال:
+               المرافقون من 0 إلى 3
 
                0 مرافق = 1 شخص
-
                1 مرافق = 2 أشخاص
-
                2 مرافقين = 3 أشخاص
+               3 مرافقين = 4 أشخاص
             */
 
             const totalAllowed =
@@ -467,36 +450,17 @@ async function createEvent() {
                 event_id:
                     event.id,
 
-                /*
-                   الاسم سيتم إضافته
-                   لاحقًا
-                */
-
                 guest_name:
                     null,
 
                 invitation_number:
                     i,
 
-                /*
-                   إجمالي الأشخاص
-                   المسموح لهم بالدخول
-                */
-
                 guest_count:
                     totalAllowed,
 
-                /*
-                   عدد الأشخاص الذين
-                   دخلوا حتى الآن
-                */
-
                 checked_in:
                     0,
-
-                /*
-                   QR مستقل لكل دعوة
-                */
 
                 qr_code:
                     crypto.randomUUID(),
@@ -572,7 +536,10 @@ async function createEvent() {
 
 }
 
+
 </script>
 
 </body>
+
 </html>
+```
