@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -6,8 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>إنشاء الدعوات</title>
 
@@ -74,15 +72,11 @@
             line-height: 1.6;
         }
 
-        .limit-message {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            background: #fff0f0;
-            color: #c0392b;
-            font-size: 14px;
-            text-align: center;
+        .limit {
+            margin-top: 8px;
+            color: #b06a00;
+            font-size: 13px;
+            font-weight: bold;
         }
 
         button {
@@ -110,7 +104,9 @@
 
 </head>
 
+
 <body>
+
 
 <div class="container">
 
@@ -196,27 +192,17 @@
             max="3"
             step="1"
             value="0"
-            inputmode="numeric"
+            placeholder="0"
         >
 
         <div class="hint">
-            الحد الأقصى للمرافقين هو 3.
-            <br>
-            0 مرافق = شخص واحد.
-            <br>
-            1 مرافق = شخصان.
-            <br>
-            2 مرافقين = 3 أشخاص.
-            <br>
-            3 مرافقين = 4 أشخاص كحد أقصى.
+            0 = المدعو فقط، 1 = المدعو + مرافق،
+            2 = المدعو + مرافقين،
+            3 = المدعو + 3 مرافقين.
         </div>
 
-        <div
-            id="limitMessage"
-            class="limit-message">
-
-            الحد الأقصى للمرافقين هو 3 فقط.
-
+        <div class="limit">
+            الحد الأقصى للمرافقين: 3 فقط
         </div>
 
 
@@ -236,87 +222,6 @@
 
 
 <script>
-
-
-/* =========================
-   عناصر الصفحة
-========================= */
-
-const companionInput =
-    document.getElementById(
-        "defaultCompanionCount"
-    );
-
-const limitMessage =
-    document.getElementById(
-        "limitMessage"
-    );
-
-
-/* =========================
-   منع كتابة أكثر من 3
-========================= */
-
-companionInput.addEventListener(
-    "input",
-    function () {
-
-        let value =
-            this.value.trim();
-
-        /*
-           إذا كانت القيمة أكبر من 3
-           نعيدها مباشرة إلى 3
-        */
-
-        if (
-            value !== "" &&
-            Number(value) > 3
-        ) {
-
-            this.value = "3";
-
-            limitMessage.style.display =
-                "block";
-
-        } else {
-
-            limitMessage.style.display =
-                "none";
-        }
-
-    }
-);
-
-
-/* =========================
-   منع الأسهم من تجاوز 3
-========================= */
-
-companionInput.addEventListener(
-    "change",
-    function () {
-
-        let value =
-            Number(this.value);
-
-        if (value > 3) {
-
-            this.value = "3";
-
-            limitMessage.style.display =
-                "block";
-
-        }
-
-        if (value < 0) {
-
-            this.value = "0";
-
-        }
-
-    }
-);
 
 
 /* =========================
@@ -391,18 +296,19 @@ async function createEvent() {
             );
 
 
-        /* =========================
-           قراءة المرافقين
-        ========================= */
-
-        const companionValue =
-            companionInput.value.trim();
+        const companionInput =
+            document
+                .getElementById(
+                    "defaultCompanionCount"
+                )
+                .value
+                .trim();
 
 
         const defaultCompanionCount =
-            companionValue === ""
+            companionInput === ""
                 ? 0
-                : Number(companionValue);
+                : Number(companionInput);
 
 
         /* =========================
@@ -457,7 +363,7 @@ async function createEvent() {
         ) {
 
             alert(
-                "فضلاً اكتبي عدد الدعوات"
+                "فضلاً اكتبي عدد الدعوات بشكل صحيح"
             );
 
             return;
@@ -465,7 +371,7 @@ async function createEvent() {
 
 
         /* =========================
-           حماية نهائية للمرافقين
+           منع أكثر من 3 مرافقين
         ========================= */
 
         if (
@@ -475,7 +381,7 @@ async function createEvent() {
         ) {
 
             alert(
-                "عدد المرافقين يجب أن يكون رقمًا صحيحًا."
+                "عدد المرافقين يجب أن يكون رقمًا صحيحًا"
             );
 
             return;
@@ -487,7 +393,7 @@ async function createEvent() {
         ) {
 
             alert(
-                "عدد المرافقين لا يمكن أن يكون أقل من 0."
+                "عدد المرافقين لا يمكن أن يكون أقل من 0"
             );
 
             return;
@@ -499,26 +405,39 @@ async function createEvent() {
         ) {
 
             alert(
-                "الحد الأقصى للمرافقين هو 3 فقط."
+                "الحد الأقصى للمرافقين هو 3 فقط ❌"
             );
-
-            companionInput.value = "3";
 
             return;
         }
 
 
         /* =========================
-           حساب العدد المسموح
+           التحقق من الوقت
+        ========================= */
+
+        if (
+            endTime <= startTime
+        ) {
+
+            alert(
+                "وقت انتهاء الدخول يجب أن يكون بعد وقت البداية"
+            );
+
+            return;
+        }
+
+
+        /* =========================
+           إجمالي الأشخاص
         ========================= */
 
         const totalAllowed =
-            1 +
-            defaultCompanionCount;
+            1 + defaultCompanionCount;
 
 
         /*
-           النتيجة:
+           أمثلة:
 
            0 مرافق = 1 شخص
 
@@ -574,7 +493,7 @@ async function createEvent() {
             );
 
             alert(
-                "حدث خطأ أثناء إنشاء الحفل"
+                "حدث خطأ أثناء إنشاء الحفل ❌"
             );
 
             return;
@@ -600,38 +519,47 @@ async function createEvent() {
                 event_id:
                     event.id,
 
+
                 guest_name:
                     null,
+
 
                 invitation_number:
                     i,
 
+
                 /*
-                   العدد النهائي المسموح
-                   بالدخول لهذه الدعوة
+                   إجمالي الأشخاص المسموح
+                   لهم بالدخول
+
+                   المدعو الأساسي
+                   +
+                   المرافقين
                 */
 
                 guest_count:
                     totalAllowed,
 
+
                 /*
-                   عدد من دخلوا حتى الآن
+                   عدد الأشخاص الذين
+                   دخلوا فعليًا
                 */
 
                 checked_in:
                     0,
 
+
                 /*
-                   QR مستقل
-                   لكل دعوة
+                   كود QR خاص بالدعوة
                 */
 
                 qr_code:
                     crypto.randomUUID(),
 
+
                 /*
-                   تصبح true فقط
-                   عند اكتمال العدد
+                   الدعوة لم تستخدم بعد
                 */
 
                 used:
@@ -666,7 +594,7 @@ async function createEvent() {
             );
 
             alert(
-                "تم إنشاء الحفل لكن حدث خطأ في إنشاء الدعوات"
+                "تم إنشاء الحفل لكن حدث خطأ في إنشاء الدعوات ❌"
             );
 
             return;
@@ -688,7 +616,9 @@ async function createEvent() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
         alert(
             "حدث خطأ غير متوقع ❌"
@@ -705,36 +635,8 @@ async function createEvent() {
 
 }
 
-
-/* =========================
-   منع لصق رقم أكبر من 3
-========================= */
-
-companionInput.addEventListener(
-    "paste",
-    function () {
-
-        setTimeout(() => {
-
-            const value =
-                Number(this.value);
-
-            if (value > 3) {
-
-                this.value = "3";
-
-                limitMessage.style.display =
-                    "block";
-            }
-
-        }, 0);
-
-    }
-);
-
 </script>
 
 </body>
 
 </html>
-```
