@@ -3,8 +3,11 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>التحقق من الدعوة</title>
 
@@ -12,137 +15,226 @@
     <script src="config.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
 
         body {
+
             margin: 0;
+
             min-height: 100vh;
+
             font-family: Arial, sans-serif;
+
             background: #f7f3ef;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
             padding: 20px;
         }
 
         .box {
+
             width: 100%;
+
             max-width: 430px;
+
             background: white;
+
             border-radius: 25px;
+
             padding: 35px 25px;
+
             text-align: center;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.08);
         }
 
         h1 {
+
             margin-top: 0;
+
             margin-bottom: 25px;
         }
 
         .guest-name {
+
             font-size: 28px;
+
             font-weight: bold;
+
             margin-bottom: 15px;
         }
 
         .event-name {
+
             color: #777;
+
             margin-bottom: 25px;
         }
 
         .message {
+
             font-size: 22px;
+
             font-weight: bold;
+
             line-height: 1.8;
+
             margin: 20px 0 10px;
         }
 
         .sub-message {
+
             font-size: 17px;
+
             line-height: 1.8;
+
             color: #666;
         }
 
         .success {
+
             color: #287a4b;
         }
 
         .warning {
+
             color: #b06a00;
         }
 
         .danger {
+
             color: #c0392b;
         }
 
         .countdown {
+
             font-size: 30px;
+
             font-weight: bold;
+
             margin: 20px 0;
         }
 
         .info {
+
             background: #f7f7f7;
+
             border-radius: 15px;
+
             padding: 18px;
+
             margin: 25px 0;
         }
 
         .info p {
+
             margin: 8px 0;
+
             font-size: 17px;
         }
 
-        .checkin-button {
-            width: 100%;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 18px;
-            cursor: pointer;
-            background: #222;
-            color: white;
-            margin-top: 15px;
+        .buttons {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+
+            margin-top: 25px;
         }
 
-        .checkin-button:disabled {
+        button {
+
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 15px 8px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            background: #222;
+
+            color: white;
+        }
+
+        button:hover {
+
+            opacity: 0.9;
+        }
+
+        button:disabled {
+
             background: #ccc;
+
             cursor: not-allowed;
+
+            opacity: 0.6;
         }
 
         .error {
+
             color: #c0392b;
+
             font-weight: bold;
+
             font-size: 19px;
+
             line-height: 1.8;
         }
 
         .loading {
+
             color: #777;
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <div class="box">
 
-    <h1>التحقق من الدعوة 🎟️</h1>
+    <h1>
+        التحقق من الدعوة 🎟️
+    </h1>
 
     <div id="content">
+
         <p class="loading">
             جاري التحقق من الدعوة...
         </p>
+
     </div>
 
 </div>
 
+
 <script>
 
+
+/* =========================
+   متغيرات
+========================= */
+
 let invitation = null;
+
 let countdownTimer = null;
 
 
@@ -153,63 +245,81 @@ let countdownTimer = null;
 async function loadInvitation() {
 
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
+
 
     const code =
         params.get("code");
 
+
     if (!code) {
 
         showError(
-            "عذرًا، هذا الكود غير صحيح<br>يرجى التحقق من الكود."
+            "عذرًا، هذا الكود غير صحيح<br>" +
+            "يرجى التحقق من الكود."
         );
 
         return;
     }
 
-    const { data, error } =
-        await supabaseClient
 
-            .from("invitations")
+    const {
+        data,
+        error
+    } = await supabaseClient
 
-            .select(`
-                *,
-                events (
-                    event_name,
-                    event_date,
-                    start_time,
-                    end_time
-                )
-            `)
+        .from("invitations")
 
-            .eq("qr_code", code)
+        .select(`
+            *,
+            events (
+                event_name,
+                event_date,
+                start_time,
+                end_time
+            )
+        `)
 
-            .single();
+        .eq(
+            "qr_code",
+            code
+        )
+
+        .single();
+
 
     if (error || !data) {
 
         console.error(error);
 
         showError(
-            "عذرًا، هذا الكود غير صحيح<br>يرجى التحقق من الكود."
+            "عذرًا، هذا الكود غير صحيح<br>" +
+            "يرجى التحقق من الكود."
         );
 
         return;
     }
 
+
     invitation = data;
+
 
     checkEventTime();
 }
 
 
 /* =========================
-   التحقق من الوقت
+   التحقق من وقت المناسبة
 ========================= */
 
 function checkEventTime() {
 
-    if (!invitation || !invitation.events) {
+    if (
+        !invitation ||
+        !invitation.events
+    ) {
 
         showError(
             "تعذر العثور على بيانات المناسبة."
@@ -218,22 +328,30 @@ function checkEventTime() {
         return;
     }
 
-    const event = invitation.events;
+
+    const event =
+        invitation.events;
+
 
     const start =
         new Date(
             `${event.event_date}T${event.start_time}`
         );
 
+
     const end =
         new Date(
             `${event.event_date}T${event.end_time}`
         );
 
-    const now = new Date();
+
+    const now =
+        new Date();
 
 
-    /* قبل الدخول */
+    /* =========================
+       قبل وقت الدخول
+    ========================= */
 
     if (now < start) {
 
@@ -243,7 +361,9 @@ function checkEventTime() {
     }
 
 
-    /* بعد انتهاء الدخول */
+    /* =========================
+       بعد انتهاء الدخول
+    ========================= */
 
     if (now >= end) {
 
@@ -253,7 +373,9 @@ function checkEventTime() {
     }
 
 
-    /* وقت الدخول */
+    /* =========================
+       وقت الدخول
+    ========================= */
 
     showDuringMessage();
 }
@@ -265,16 +387,24 @@ function checkEventTime() {
 
 function showBeforeMessage(start) {
 
-    clearInterval(countdownTimer);
+    clearInterval(
+        countdownTimer
+    );
 
-    document.getElementById("content").innerHTML = `
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
 
         <div class="message warning">
             أهلًا بك 🤍
         </div>
 
         <div class="sub-message">
-            موعدنا لم يحن بعد، ننتظرك في الوقت المحدد
+
+            موعدنا لم يحن بعد،
+            ننتظرك في الوقت المحدد
+
         </div>
 
         <div
@@ -283,14 +413,21 @@ function showBeforeMessage(start) {
         </div>
     `;
 
+
     updateCountdown(start);
 
+
     countdownTimer =
-        setInterval(() => {
+        setInterval(
 
-            updateCountdown(start);
+            () => {
 
-        }, 1000);
+                updateCountdown(start);
+
+            },
+
+            1000
+        );
 }
 
 
@@ -301,23 +438,34 @@ function showBeforeMessage(start) {
 function updateCountdown(start) {
 
     const countdown =
-        document.getElementById("countdown");
+        document.getElementById(
+            "countdown"
+        );
+
 
     if (!countdown) return;
 
-    const now = new Date();
+
+    const now =
+        new Date();
+
 
     const difference =
         start - now;
 
+
     if (difference <= 0) {
 
-        clearInterval(countdownTimer);
+        clearInterval(
+            countdownTimer
+        );
+
 
         checkEventTime();
 
         return;
     }
+
 
     const hours =
         Math.floor(
@@ -325,22 +473,42 @@ function updateCountdown(start) {
             (1000 * 60 * 60)
         );
 
+
     const minutes =
         Math.floor(
-            (difference %
-            (1000 * 60 * 60)) /
+
+            (
+                difference %
+                (1000 * 60 * 60)
+            )
+
+            /
+
             (1000 * 60)
         );
 
+
     const seconds =
         Math.floor(
-            (difference %
-            (1000 * 60)) /
+
+            (
+                difference %
+                (1000 * 60)
+            )
+
+            /
+
             1000
         );
 
+
     countdown.innerHTML =
-        `${hours} ساعة ${minutes} دقيقة ${seconds} ثانية`;
+
+        `${hours} ساعة ` +
+
+        `${minutes} دقيقة ` +
+
+        `${seconds} ثانية`;
 }
 
 
@@ -350,36 +518,61 @@ function updateCountdown(start) {
 
 function showDuringMessage() {
 
-    clearInterval(countdownTimer);
+    clearInterval(
+        countdownTimer
+    );
+
 
     const allowed =
-        Number(invitation.guest_count || 0);
-
-    const checkedIn =
-        Number(invitation.checked_in || 0);
-
-    const remaining =
-        Math.max(
-            allowed - checkedIn,
-            0
+        Number(
+            invitation.guest_count || 0
         );
 
 
-    /* إذا اكتمل العدد */
+    const checkedIn =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    const remaining =
+        Math.max(
+
+            allowed - checkedIn,
+
+            0
+
+        );
+
+
+    /* =========================
+       العدد مكتمل
+    ========================= */
 
     if (remaining <= 0) {
 
-        document.getElementById("content").innerHTML = `
+        document.getElementById(
+            "content"
+        ).innerHTML = `
 
             <div class="message danger">
+
                 اكتمل عدد الدخول
+
             </div>
 
             <div class="sub-message">
-                تم تسجيل دخول جميع الأشخاص المسموح لهم بهذه الدعوة.
-                <br>
+
+                تم تسجيل دخول جميع
+                الأشخاص المسموح لهم
+                بهذه الدعوة.
+
+                <br><br>
+
                 لا يمكن استخدام الرمز مرة أخرى.
+
             </div>
+
         `;
 
         return;
@@ -387,7 +580,9 @@ function showDuringMessage() {
 
 
     const guestName =
+
         invitation.guest_name &&
+
         invitation.guest_name !== "مدعو"
 
             ? invitation.guest_name
@@ -396,210 +591,317 @@ function showDuringMessage() {
 
 
     const eventName =
+
         invitation.events.event_name || "";
 
 
-    document.getElementById("content").innerHTML = `
+    document.getElementById(
+        "content"
+    ).innerHTML = `
 
         <div class="guest-name">
+
             ${escapeHtml(guestName)}
+
         </div>
+
 
         <div class="event-name">
+
             ${escapeHtml(eventName)}
+
         </div>
+
 
         <div class="message success">
+
             يا هلا ومرحبًا 🤍
+
         </div>
 
+
         <div class="sub-message">
-            الدعوة صحيحة ويمكن تسجيل الدخول
+
+            الدعوة صحيحة،
+            اختاري عدد الأشخاص الحاضرين
+
         </div>
+
 
         <div class="info">
 
             <p>
+
                 العدد المسموح:
-                <strong>${allowed}</strong>
+
+                <strong>
+                    ${allowed}
+                </strong>
+
                 أشخاص
+
             </p>
 
+
             <p>
+
                 تم الدخول:
-                <strong>${checkedIn}</strong>
+
+                <strong>
+                    ${checkedIn}
+                </strong>
+
                 أشخاص
+
             </p>
 
+
             <p>
+
                 المتبقي:
-                <strong>${remaining}</strong>
+
+                <strong>
+                    ${remaining}
+                </strong>
+
                 أشخاص
+
             </p>
 
         </div>
 
-        <button
-            id="checkInButton"
-            class="checkin-button"
-            onclick="checkIn()">
 
-            تسجيل دخول شخص واحد
-        </button>
+        <div class="buttons">
+
+            ${createButton(1, remaining)}
+
+            ${createButton(2, remaining)}
+
+            ${createButton(3, remaining)}
+
+        </div>
+
     `;
 }
 
 
 /* =========================
-   تسجيل دخول شخص واحد
+   إنشاء أزرار الدخول
 ========================= */
 
-async function checkIn() {
+function createButton(
+    number,
+    remaining
+) {
 
-    if (!invitation) return;
+    if (number > remaining) {
 
+        return `
 
-    const button =
-        document.getElementById(
-            "checkInButton"
-        );
+            <button disabled>
 
+                دخول ${number}
 
-    if (button) {
+            </button>
 
-        button.disabled = true;
-
-        button.innerText =
-            "جاري تسجيل الدخول...";
+        `;
     }
 
 
-    try {
+    return `
 
-        const allowed =
-            Number(
-                invitation.guest_count || 0
-            );
+        <button
+            onclick="checkIn(${number})">
 
-        const current =
-            Number(
-                invitation.checked_in || 0
-            );
+            دخول ${number}
 
+        </button>
 
-        /* حماية من تجاوز العدد */
-
-        if (current >= allowed) {
-
-            showDuringMessage();
-
-            return;
-        }
-
-
-        const newCheckedIn =
-            current + 1;
-
-
-        const fullyUsed =
-            newCheckedIn >= allowed;
-
-
-        /*
-           التحديث لا يتم إلا إذا كان
-           checked_in ما زال بنفس الرقم.
-
-           هذا يمنع تجاوز العدد عند
-           وجود محاولتين في نفس الوقت.
-        */
-
-        const { data, error } =
-            await supabaseClient
-
-                .from("invitations")
-
-                .update({
-
-                    checked_in:
-                        newCheckedIn,
-
-                    used:
-                        fullyUsed
-
-                })
-
-                .eq("id", invitation.id)
-
-                .eq("checked_in", current)
-
-                .select()
-
-                .single();
-
-
-        if (error || !data) {
-
-            console.error(error);
-
-            alert(
-                "تعذر تسجيل الدخول. ربما تم تسجيل شخص آخر في نفس اللحظة."
-            );
-
-            await reloadInvitation();
-
-            return;
-        }
-
-
-        invitation =
-            {
-                ...invitation,
-                ...data
-            };
-
-
-        alert(
-            "تم تسجيل دخول شخص واحد ✅"
-        );
-
-
-        showDuringMessage();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            "حدث خطأ أثناء تسجيل الدخول ❌"
-        );
-
-        if (button) {
-
-            button.disabled = false;
-
-            button.innerText =
-                "تسجيل دخول شخص واحد";
-        }
-    }
+    `;
 }
 
 
 /* =========================
-   إعادة تحميل الدعوة
+   تسجيل الدخول
+========================= */
+
+async function checkIn(number) {
+
+    if (!invitation) return;
+
+
+    const allowed =
+        Number(
+            invitation.guest_count || 0
+        );
+
+
+    const current =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    const remaining =
+        allowed - current;
+
+
+    /* =========================
+       حماية من تجاوز العدد
+    ========================= */
+
+    if (
+        number < 1 ||
+        number > remaining
+    ) {
+
+        alert(
+            "لا يمكن تجاوز عدد الأشخاص المسموح به."
+        );
+
+        return;
+    }
+
+
+    /* =========================
+       تعطيل الأزرار
+    ========================= */
+
+    document
+        .querySelectorAll(
+            "button"
+        )
+        .forEach(
+            button => {
+
+                button.disabled =
+                    true;
+
+            }
+        );
+
+
+    const newCheckedIn =
+        current + number;
+
+
+    const fullyUsed =
+        newCheckedIn >= allowed;
+
+
+    /*
+       نحدّث العدد فقط إذا كان
+       الرقم الحالي لم يتغير.
+
+       هذا يساعد على منع تسجيل
+       عدد زائد عند المسح المتزامن.
+    */
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("invitations")
+
+            .update({
+
+                checked_in:
+                    newCheckedIn,
+
+                used:
+                    fullyUsed
+
+            })
+
+            .eq(
+                "id",
+                invitation.id
+            )
+
+            .eq(
+                "checked_in",
+                current
+            )
+
+            .select()
+            .single();
+
+
+    /* =========================
+       فشل التحديث
+    ========================= */
+
+    if (
+        error ||
+        !data
+    ) {
+
+        console.error(error);
+
+
+        alert(
+            "تعذر تسجيل الدخول. " +
+            "قد يكون تم تسجيل دخول " +
+            "شخص آخر في نفس اللحظة."
+        );
+
+
+        await reloadInvitation();
+
+        return;
+    }
+
+
+    /* =========================
+       تحديث البيانات
+    ========================= */
+
+    invitation.checked_in =
+        data.checked_in;
+
+
+    invitation.used =
+        data.used;
+
+
+    /* =========================
+       رسالة النجاح
+    ========================= */
+
+    alert(
+        `تم تسجيل دخول ${number} شخص ✅`
+    );
+
+
+    showDuringMessage();
+}
+
+
+/* =========================
+   إعادة تحميل البيانات
 ========================= */
 
 async function reloadInvitation() {
 
-    const code =
+    const params =
         new URLSearchParams(
             window.location.search
-        ).get("code");
+        );
+
+
+    const code =
+        params.get("code");
+
 
     if (!code) return;
 
 
-    const { data, error } =
+    const {
+        data,
+        error
+    } =
         await supabaseClient
 
             .from("invitations")
@@ -614,14 +916,22 @@ async function reloadInvitation() {
                 )
             `)
 
-            .eq("qr_code", code)
+            .eq(
+                "qr_code",
+                code
+            )
 
             .single();
 
 
-    if (!error && data) {
+    if (
+        !error &&
+        data
+    ) {
 
-        invitation = data;
+        invitation =
+            data;
+
 
         showDuringMessage();
     }
@@ -629,22 +939,34 @@ async function reloadInvitation() {
 
 
 /* =========================
-   بعد انتهاء الوقت
+   بعد انتهاء وقت الدخول
 ========================= */
 
 function showAfterMessage() {
 
-    clearInterval(countdownTimer);
+    clearInterval(
+        countdownTimer
+    );
 
-    document.getElementById("content").innerHTML = `
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
 
         <div class="message danger">
+
             انتهى وقت الدخول
+
         </div>
 
+
         <div class="sub-message">
-            شكرًا لحضورك ومشاركتنا هذه المناسبة الجميلة 🤍
+
+            شكرًا لحضورك
+            ومشاركتنا هذه المناسبة الجميلة 🤍
+
         </div>
+
     `;
 }
 
@@ -655,13 +977,21 @@ function showAfterMessage() {
 
 function showError(message) {
 
-    clearInterval(countdownTimer);
+    clearInterval(
+        countdownTimer
+    );
 
-    document.getElementById("content").innerHTML = `
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
 
         <p class="error">
+
             ${message}
+
         </p>
+
     `;
 }
 
@@ -674,15 +1004,30 @@ function escapeHtml(text) {
 
     return String(text)
 
-        .replaceAll("&", "&amp;")
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
 
-        .replaceAll("<", "&lt;")
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
 
-        .replaceAll(">", "&gt;")
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
 
-        .replaceAll('"', "&quot;")
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
 
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
 
 
