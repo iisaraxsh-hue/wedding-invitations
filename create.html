@@ -186,12 +186,12 @@
             min="0"
             max="3"
             step="1"
-            placeholder="اختياري — 0 إلى 3"
+            value="0"
+            placeholder="0"
         >
 
         <div class="hint">
-            اتركي الخانة فارغة إذا لم يوجد مرافقون.
-            الحد الأقصى للمرافقين هو 3.
+            اتركي العدد 0 إذا كانت الدعوة للمدعو فقط.
         </div>
 
 
@@ -285,30 +285,18 @@ async function createEvent() {
             );
 
 
-        /*
-           خانة المرافقين اختيارية.
-
-           إذا كانت فارغة:
-           = 0 مرافق
-        */
-
-        const companionInput =
-            document
-                .getElementById(
-                    "defaultCompanionCount"
-                )
-                .value
-                .trim();
-
-
         const defaultCompanionCount =
-            companionInput === ""
-                ? 0
-                : Number(companionInput);
+            Number(
+                document
+                    .getElementById(
+                        "defaultCompanionCount"
+                    )
+                    .value || 0
+            );
 
 
         /* =========================
-           التحقق من البيانات
+           التحقق
         ========================= */
 
         if (!eventName) {
@@ -352,18 +340,6 @@ async function createEvent() {
 
 
         if (
-            startTime >= endTime
-        ) {
-
-            alert(
-                "وقت انتهاء الدخول يجب أن يكون بعد وقت البداية"
-            );
-
-            return;
-        }
-
-
-        if (
             !Number.isInteger(
                 invitationCount
             ) ||
@@ -378,31 +354,16 @@ async function createEvent() {
         }
 
 
-        /* =========================
-           التحقق من المرافقين
-        ========================= */
-
         if (
             !Number.isInteger(
                 defaultCompanionCount
             ) ||
-            defaultCompanionCount < 0
-        ) {
-
-            alert(
-                "عدد المرافقين يجب أن يكون 0 أو أكثر"
-            );
-
-            return;
-        }
-
-
-        if (
+            defaultCompanionCount < 0 ||
             defaultCompanionCount > 3
         ) {
 
             alert(
-                "الحد الأقصى للمرافقين هو 3 فقط ❌"
+                "عدد المرافقين يجب أن يكون من 0 إلى 3 فقط"
             );
 
             return;
@@ -467,19 +428,6 @@ async function createEvent() {
         const invitations = [];
 
 
-        /*
-           المدعو الأساسي = 1
-
-           المرافقون = العدد المختار
-
-           مثال:
-           0 مرافق = 1 شخص
-           1 مرافق = 2 أشخاص
-           2 مرافقين = 3 أشخاص
-           3 مرافقين = 4 أشخاص
-        */
-
-
         const totalAllowed =
             1 +
             defaultCompanionCount;
@@ -490,7 +438,6 @@ async function createEvent() {
             i <= invitationCount;
             i++
         ) {
-
 
             invitations.push({
 
