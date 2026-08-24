@@ -3,218 +3,246 @@
 <html lang="ar" dir="rtl">
 
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<title>إنشاء الدعوات</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 
-    <title>إنشاء الدعوات</title>
+<style>
+* {
+    box-sizing: border-box;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8f6f3;
+    color: #222;
+}
 
-    <style>
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+}
 
-        * {
-            box-sizing: border-box;
-        }
+.box {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f8f6f3;
-            color: #222;
-        }
+h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
 
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-        }
+label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
 
-        .box {
-            background: white;
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-        }
+input,
+select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+}
 
-        h1 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #888;
+}
 
-        label {
-            display: block;
-            margin-top: 18px;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+.hint {
+    margin-top: 7px;
+    color: #888;
+    font-size: 13px;
+    line-height: 1.6;
+}
 
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            background: white;
-        }
+button {
+    width: 100%;
+    margin-top: 30px;
+    padding: 16px;
+    border: 0;
+    border-radius: 12px;
+    background: #222;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+}
 
-        input:focus {
-            outline: none;
-            border-color: #888;
-        }
+button:hover {
+    opacity: 0.9;
+}
 
-        .hint {
-            margin-top: 7px;
-            color: #888;
-            font-size: 13px;
-            line-height: 1.6;
-        }
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
-        button {
-            width: 100%;
-            margin-top: 30px;
-            padding: 16px;
-            border: 0;
-            border-radius: 12px;
-            background: #222;
-            color: white;
-            font-size: 17px;
-            cursor: pointer;
-        }
+.message {
+    text-align: center;
+    margin-top: 18px;
+    line-height: 1.7;
+}
 
-        button:hover {
-            opacity: 0.9;
-        }
+.error {
+    color: #c0392b;
+}
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+.success {
+    color: #287a4b;
+}
 
-    </style>
+@media (max-width: 600px) {
+
+    .container {
+        margin: 15px auto;
+        padding: 12px;
+    }
+
+    .box {
+        padding: 22px;
+    }
+}
+</style>
 
 </head>
 
-
 <body>
-
 
 <div class="container">
 
-    <div class="box">
+<div class="box">
 
-        <h1>إنشاء دعوة</h1>
+<h1>إنشاء دعوة</h1>
 
+<!-- اسم الحفل -->
 
-        <!-- اسم الحفل -->
+<label>
+اسم الحفل
+</label>
 
-        <label>
-            اسم الحفل
-        </label>
-
-        <input
-            id="eventName"
-            type="text"
-            placeholder="مثال: حفل زفاف سارة"
-        >
-
-
-        <!-- تاريخ الحفل -->
-
-        <label>
-            تاريخ الحفل
-        </label>
-
-        <input
-            id="eventDate"
-            type="date"
-        >
+<input
+    id="eventName"
+    type="text"
+    placeholder="مثال: حفل زفاف سارة"
+>
 
 
-        <!-- بداية الدخول -->
+<!-- تاريخ الحفل -->
 
-        <label>
-            وقت بداية الدخول
-        </label>
+<label>
+تاريخ الحفل
+</label>
 
-        <input
-            id="startTime"
-            type="time"
-        >
-
-
-        <!-- نهاية الدخول -->
-
-        <label>
-            وقت انتهاء الدخول
-        </label>
-
-        <input
-            id="endTime"
-            type="time"
-        >
+<input
+    id="eventDate"
+    type="date"
+>
 
 
-        <!-- عدد الدعوات -->
+<!-- بداية الدخول -->
 
-        <label>
-            عدد الدعوات المطلوبة
-        </label>
+<label>
+وقت بداية الدخول
+</label>
 
-        <input
-            id="invitationCount"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="مثال: 100"
-        >
+<input
+    id="startTime"
+    type="time"
+>
 
 
-        <!-- عدد المرافقين -->
+<!-- نهاية الدخول -->
 
-        <label>
-            عدد المرافقين
-        </label>
+<label>
+وقت انتهاء الدخول
+</label>
 
-        <input
-            id="defaultCompanionCount"
-            type="number"
-            min="0"
-            max="3"
-            step="1"
-            value="0"
-            placeholder="0"
-        >
-
-        <div class="hint">
-            اتركي العدد 0 إذا كانت الدعوة للمدعو فقط.
-        </div>
+<input
+    id="endTime"
+    type="time"
+>
 
 
-        <!-- زر التوليد -->
+<!-- عدد الدعوات -->
 
-        <button
-            id="generateButton"
-            type="button">
+<label>
+عدد الدعوات
+</label>
 
-            توليد الدعوات
+<input
+    id="invitationCount"
+    type="number"
+    min="1"
+    step="1"
+    placeholder="مثال: 100"
+>
 
-        </button>
+<div class="hint">
+اكتبي العدد الإجمالي للدعوات التي تريدين إنشاءها.
+</div>
 
-    </div>
+
+<!-- المرافقين -->
+
+<label>
+عدد المرافقين الافتراضي
+</label>
+
+<input
+    id="defaultCompanionCount"
+    type="number"
+    min="0"
+    step="1"
+    value="0"
+    placeholder="0"
+>
+
+<div class="hint">
+هذا الخيار اختياري. يمكنك تركه 0 ثم تحديد المرافقين لكل مدعو لاحقًا بشكل منفصل.
+</div>
+
+
+<!-- زر التوليد -->
+
+<button
+    id="generateButton"
+    type="button">
+
+توليد الدعوات
+
+</button>
+
+
+<div
+    id="message"
+    class="message">
+</div>
+
+</div>
 
 </div>
 
 
 <script>
 
-
 /* =========================
-   زر التوليد
+   بدء الزر
 ========================= */
 
 document
@@ -236,7 +264,6 @@ async function createEvent() {
             "generateButton"
         );
 
-
     button.disabled = true;
 
     button.innerText =
@@ -244,7 +271,6 @@ async function createEvent() {
 
 
     try {
-
 
         /* =========================
            قراءة البيانات
@@ -301,8 +327,9 @@ async function createEvent() {
 
         if (!eventName) {
 
-            alert(
-                "فضلاً اكتبي اسم الحفل"
+            showMessage(
+                "فضلاً اكتبي اسم الحفل.",
+                "error"
             );
 
             return;
@@ -311,8 +338,9 @@ async function createEvent() {
 
         if (!eventDate) {
 
-            alert(
-                "فضلاً اختاري تاريخ الحفل"
+            showMessage(
+                "فضلاً اختاري تاريخ الحفل.",
+                "error"
             );
 
             return;
@@ -321,8 +349,9 @@ async function createEvent() {
 
         if (!startTime) {
 
-            alert(
-                "فضلاً اختاري وقت بداية الدخول"
+            showMessage(
+                "فضلاً اختاري وقت بداية الدخول.",
+                "error"
             );
 
             return;
@@ -331,8 +360,9 @@ async function createEvent() {
 
         if (!endTime) {
 
-            alert(
-                "فضلاً اختاري وقت انتهاء الدخول"
+            showMessage(
+                "فضلاً اختاري وقت انتهاء الدخول.",
+                "error"
             );
 
             return;
@@ -346,8 +376,9 @@ async function createEvent() {
             invitationCount < 1
         ) {
 
-            alert(
-                "فضلاً اكتبي عدد الدعوات"
+            showMessage(
+                "فضلاً اكتبي عدد الدعوات.",
+                "error"
             );
 
             return;
@@ -358,12 +389,12 @@ async function createEvent() {
             !Number.isInteger(
                 defaultCompanionCount
             ) ||
-            defaultCompanionCount < 0 ||
-            defaultCompanionCount > 3
+            defaultCompanionCount < 0
         ) {
 
-            alert(
-                "عدد المرافقين يجب أن يكون من 0 إلى 3 فقط"
+            showMessage(
+                "عدد المرافقين يجب أن يكون 0 أو أكثر.",
+                "error"
             );
 
             return;
@@ -413,8 +444,9 @@ async function createEvent() {
                 eventError
             );
 
-            alert(
-                "حدث خطأ أثناء إنشاء الحفل"
+            showMessage(
+                "حدث خطأ أثناء إنشاء الحفل.",
+                "error"
             );
 
             return;
@@ -426,11 +458,6 @@ async function createEvent() {
         ========================= */
 
         const invitations = [];
-
-
-        const totalAllowed =
-            1 +
-            defaultCompanionCount;
 
 
         for (
@@ -450,8 +477,14 @@ async function createEvent() {
                 invitation_number:
                     i,
 
+                /*
+                   عدد الأشخاص في الدعوة:
+                   المدعو نفسه + المرافقين
+                */
+
                 guest_count:
-                    totalAllowed,
+                    1 +
+                    defaultCompanionCount,
 
                 checked_in:
                     0,
@@ -490,8 +523,9 @@ async function createEvent() {
                 invitationsError
             );
 
-            alert(
-                "تم إنشاء الحفل لكن حدث خطأ في إنشاء الدعوات"
+            showMessage(
+                "تم إنشاء الحفل لكن حدث خطأ أثناء إنشاء الدعوات.",
+                "error"
             );
 
             return;
@@ -502,24 +536,37 @@ async function createEvent() {
            نجاح
         ========================= */
 
-        alert(
-            `تم إنشاء الحفل وتوليد ${invitationCount} دعوة 🎉`
+        showMessage(
+            `تم إنشاء ${invitationCount} دعوة بنجاح 🎉`,
+            "success"
         );
 
 
-        window.location.href =
-            `invitations.html?event_id=${event.id}`;
+        setTimeout(
+            function() {
+
+                window.location.href =
+                    `invitations.html?event_id=${encodeURIComponent(event.id)}`;
+
+            },
+            700
+        );
 
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
-        alert(
-            "حدث خطأ غير متوقع ❌"
+        showMessage(
+            "حدث خطأ غير متوقع ❌",
+            "error"
         );
 
-    } finally {
+    }
+
+    finally {
 
         button.disabled = false;
 
@@ -527,6 +574,29 @@ async function createEvent() {
             "توليد الدعوات";
 
     }
+
+}
+
+
+/* =========================
+   الرسائل
+========================= */
+
+function showMessage(
+    text,
+    type
+) {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    message.innerText =
+        text;
+
+    message.className =
+        "message " + type;
 
 }
 
