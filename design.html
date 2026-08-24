@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -12,6 +13,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+
+<!-- QR -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
 
 <style>
 
@@ -69,15 +74,25 @@ label {
 }
 
 input[type="file"],
-input[type="number"] {
+input[type="number"],
+input[type="color"],
+select {
     width: 100%;
     padding: 13px;
     border: 1px solid #ddd;
     border-radius: 10px;
     font-size: 15px;
+    background: white;
 }
 
-input:focus {
+input[type="color"] {
+    height: 48px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+input:focus,
+select:focus {
     outline: none;
     border-color: #888;
 }
@@ -129,7 +144,7 @@ button:disabled {
     display: inline-block;
     line-height: 0;
     user-select: none;
-    max-width: 100%;
+    touch-action: none;
 }
 
 #designImage {
@@ -146,8 +161,8 @@ button:disabled {
 .draggable {
     position: absolute;
     cursor: move;
-    border: 2px dashed rgba(0,0,0,0.55);
-    background: rgba(255,255,255,0.72);
+    border: 2px dashed rgba(0,0,0,0.45);
+    background: rgba(255,255,255,0.65);
     z-index: 5;
     user-select: none;
     line-height: normal;
@@ -159,6 +174,7 @@ button:disabled {
     font-size: 22px;
     font-weight: bold;
     white-space: nowrap;
+    transform-origin: top left;
 }
 
 #qrElement {
@@ -175,6 +191,7 @@ button:disabled {
 
 .selected {
     border-color: #222;
+    box-shadow: 0 0 0 2px rgba(34,34,34,0.08);
 }
 
 
@@ -200,36 +217,55 @@ button:disabled {
 
 
 /* =========================
-   أزرار المحاذاة
+   المحاذاة
 ========================= */
+
+.alignment-box {
+    margin-top: 12px;
+    background: #faf9f7;
+    padding: 15px;
+    border-radius: 12px;
+}
 
 .alignment-title {
     font-size: 13px;
     font-weight: bold;
-    margin-top: 18px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .alignment-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    gap: 7px;
 }
 
 .alignment-buttons button {
     margin-top: 0;
     padding: 10px 5px;
     font-size: 13px;
-    background: #777;
+    background: #333;
 }
 
-.alignment-buttons button.active {
-    background: #222;
+
+/* =========================
+   اللون والخط
+========================= */
+
+.style-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
 }
 
-.center-button {
-    margin-top: 8px !important;
-    background: #555 !important;
+.color-control {
+    background: #faf9f7;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.color-control label {
+    font-size: 13px;
 }
 
 
@@ -249,7 +285,6 @@ button:disabled {
     position: relative;
     display: inline-block;
     line-height: 0;
-    max-width: 100%;
 }
 
 #previewImage {
@@ -299,6 +334,10 @@ button:disabled {
 }
 
 
+/* =========================
+   الهاتف
+========================= */
+
 @media (max-width: 600px) {
 
     .container {
@@ -311,6 +350,10 @@ button:disabled {
     }
 
     .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .style-grid {
         grid-template-columns: 1fr;
     }
 
@@ -360,8 +403,6 @@ button:disabled {
 <div class="hint">
 
 ارفعي تصميم الدعوة بصيغة PNG أو JPG أو WEBP.
-
-إذا سبق وحفظتِ التصميم، سيتم استرجاعه تلقائيًا.
 
 </div>
 
@@ -425,9 +466,7 @@ button:disabled {
 <div class="controls">
 
 
-<!-- =========================
-     تحكم الاسم
-========================= -->
+<!-- الاسم -->
 
 <div class="control-box">
 
@@ -452,6 +491,8 @@ button:disabled {
 </button>
 
 
+<div class="alignment-box">
+
 <div class="alignment-title">
 محاذاة الاسم أفقيًا
 </div>
@@ -459,24 +500,24 @@ button:disabled {
 <div class="alignment-buttons">
 
 <button
-    id="nameAlignRight"
-    type="button">
+    type="button"
+    onclick="alignElement('name','left')">
 
 يمين
 
 </button>
 
 <button
-    id="nameAlignCenter"
-    type="button">
+    type="button"
+    onclick="alignElement('name','center')">
 
 وسط
 
 </button>
 
 <button
-    id="nameAlignLeft"
-    type="button">
+    type="button"
+    onclick="alignElement('name','right')">
 
 يسار
 
@@ -485,31 +526,34 @@ button:disabled {
 </div>
 
 
-<div class="alignment-title">
-محاذاة الاسم عموديًا
+<div class="alignment-title"
+     style="margin-top:12px;">
+
+محاذاة الاسم رأسيًا
+
 </div>
 
 <div class="alignment-buttons">
 
 <button
-    id="nameAlignTop"
-    type="button">
+    type="button"
+    onclick="alignElement('name','top')">
 
 أعلى
 
 </button>
 
 <button
-    id="nameAlignVerticalCenter"
-    type="button">
+    type="button"
+    onclick="alignElement('name','middle')">
 
 وسط
 
 </button>
 
 <button
-    id="nameAlignBottom"
-    type="button">
+    type="button"
+    onclick="alignElement('name','bottom')">
 
 أسفل
 
@@ -517,22 +561,12 @@ button:disabled {
 
 </div>
 
-
-<button
-    id="centerNameButton"
-    class="center-button"
-    type="button">
-
-توسيط الاسم بالكامل
-
-</button>
+</div>
 
 </div>
 
 
-<!-- =========================
-     تحكم QR
-========================= -->
+<!-- QR -->
 
 <div class="control-box">
 
@@ -557,6 +591,8 @@ button:disabled {
 </button>
 
 
+<div class="alignment-box">
+
 <div class="alignment-title">
 محاذاة QR أفقيًا
 </div>
@@ -564,24 +600,24 @@ button:disabled {
 <div class="alignment-buttons">
 
 <button
-    id="qrAlignRight"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','left')">
 
 يمين
 
 </button>
 
 <button
-    id="qrAlignCenter"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','center')">
 
 وسط
 
 </button>
 
 <button
-    id="qrAlignLeft"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','right')">
 
 يسار
 
@@ -590,31 +626,34 @@ button:disabled {
 </div>
 
 
-<div class="alignment-title">
-محاذاة QR عموديًا
+<div class="alignment-title"
+     style="margin-top:12px;">
+
+محاذاة QR رأسيًا
+
 </div>
 
 <div class="alignment-buttons">
 
 <button
-    id="qrAlignTop"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','top')">
 
 أعلى
 
 </button>
 
 <button
-    id="qrAlignVerticalCenter"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','middle')">
 
 وسط
 
 </button>
 
 <button
-    id="qrAlignBottom"
-    type="button">
+    type="button"
+    onclick="alignElement('qr','bottom')">
 
 أسفل
 
@@ -622,15 +661,83 @@ button:disabled {
 
 </div>
 
+</div>
 
-<button
-    id="centerQrButton"
-    class="center-button"
-    type="button">
+</div>
 
-توسيط QR بالكامل
+</div>
 
-</button>
+
+<!-- =========================
+     الخط والألوان
+========================= -->
+
+<div class="style-grid">
+
+
+<div class="color-control">
+
+<label>
+خط الاسم
+</label>
+
+<select id="nameFont">
+
+<option value="Arial">
+Arial
+</option>
+
+<option value="Tahoma">
+Tahoma
+</option>
+
+<option value="'Trebuchet MS'">
+Trebuchet
+</option>
+
+<option value="Georgia">
+Georgia
+</option>
+
+<option value="'Times New Roman'">
+Times New Roman
+</option>
+
+<option value="'Courier New'">
+Courier New
+</option>
+
+</select>
+
+</div>
+
+
+<div class="color-control">
+
+<label>
+لون الاسم
+</label>
+
+<input
+    id="nameColor"
+    type="color"
+    value="#222222"
+>
+
+</div>
+
+
+<div class="color-control">
+
+<label>
+لون QR / الباركود
+</label>
+
+<input
+    id="qrColor"
+    type="color"
+    value="#000000"
+>
 
 </div>
 
@@ -639,10 +746,10 @@ button:disabled {
 
 <div class="hint">
 
-اسحبي الاسم والـ QR داخل التصميم إلى المكان الذي تريدينه.
-يمكنك أيضًا استخدام أزرار المحاذاة والتوسيط.
+التغييرات تُحفظ تلقائيًا أثناء العمل، ويمكنك العودة للصفحة لاحقًا لإكمال التصميم.
 
 </div>
+
 
 </div>
 
@@ -743,7 +850,7 @@ button:disabled {
 
 
 /* =========================
-   المتغيرات
+   الحدث
 ========================= */
 
 const params =
@@ -756,13 +863,17 @@ const eventId =
     params.get("event_id");
 
 
+/* =========================
+   بيانات التصميم
+========================= */
+
 let designData = {
 
     image: null,
 
-    nameX: 0.5,
+    nameX: 0.50,
 
-    nameY: 0.5,
+    nameY: 0.50,
 
     qrX: 0.75,
 
@@ -772,134 +883,141 @@ let designData = {
 
     qrSize: 110,
 
-    nameHorizontalAlign: "custom",
+    nameFont: "Arial",
 
-    nameVerticalAlign: "custom",
+    nameColor: "#222222",
 
-    qrHorizontalAlign: "custom",
-
-    qrVerticalAlign: "custom"
+    qrColor: "#000000"
 
 };
 
+
+/* =========================
+   السحب
+========================= */
 
 let activeElement = null;
 
 let dragging = false;
 
-let offsetX = 0;
+let dragStartX = 0;
 
-let offsetY = 0;
+let dragStartY = 0;
+
+let startLeft = 0;
+
+let startTop = 0;
 
 
 /* =========================
-   التحقق
+   بدء الصفحة
 ========================= */
 
-if (!eventId) {
+document.addEventListener(
+    "DOMContentLoaded",
+    initPage
+);
 
-    showMessage(
-        "رابط الحفل غير صحيح.",
-        "error"
-    );
+
+async function initPage() {
+
+    if (!eventId) {
+
+        showMessage(
+            "رابط الحفل غير صحيح.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    /*
+       أول شيء نحاول استرجاع
+       التصميم السابق.
+    */
+
+    loadSavedDesign();
 
 }
 
 
 /* =========================
-   QR تجريبي
-========================= */
-
-const demoQR =
-    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=DEMO";
-
-
-document.getElementById(
-    "qrImage"
-).src = demoQR;
-
-
-document.getElementById(
-    "previewQrImage"
-).src = demoQR;
-
-
-/* =========================
-   تشغيل الصفحة
-========================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    loadSavedDesign
-);
-
-
-/* =========================
-   تحميل التصميم المحفوظ
+   استرجاع التصميم السابق
 ========================= */
 
 function loadSavedDesign() {
 
-    if (!eventId) {
-        return;
-    }
-
-
-    const saved =
-        localStorage.getItem(
-            `invitation_design_${eventId}`
-        );
-
-
-    if (!saved) {
-        return;
-    }
-
-
     try {
 
-        const savedData =
+        const saved =
+            localStorage.getItem(
+                `invitation_design_${eventId}`
+            );
+
+
+        if (!saved) {
+
+            return;
+
+        }
+
+
+        const parsed =
             JSON.parse(saved);
 
 
         if (
-            savedData &&
-            savedData.image
+            !parsed ||
+            !parsed.image
         ) {
 
-            designData = {
-
-                ...designData,
-
-                ...savedData
-
-            };
-
-
-            document.getElementById(
-                "nameSize"
-            ).value =
-                designData.nameSize;
-
-
-            document.getElementById(
-                "qrSize"
-            ).value =
-                designData.qrSize;
-
-
-            loadImageIntoDesign(
-                designData.image,
-                true
-            );
-
-
-            showMessage(
-                "تم استرجاع التصميم السابق 🤍",
-                "success"
-            );
+            return;
 
         }
+
+
+        designData = {
+
+            ...designData,
+
+            ...parsed
+
+        };
+
+
+        document.getElementById(
+            "nameSize"
+        ).value =
+            designData.nameSize;
+
+
+        document.getElementById(
+            "qrSize"
+        ).value =
+            designData.qrSize;
+
+
+        document.getElementById(
+            "nameFont"
+        ).value =
+            designData.nameFont;
+
+
+        document.getElementById(
+            "nameColor"
+        ).value =
+            designData.nameColor;
+
+
+        document.getElementById(
+            "qrColor"
+        ).value =
+            designData.qrColor;
+
+
+        showSavedDesign();
 
     }
 
@@ -916,11 +1034,57 @@ function loadSavedDesign() {
 
 
 /* =========================
-   رفع التصميم
+   عرض التصميم المحفوظ
+========================= */
+
+function showSavedDesign() {
+
+    const image =
+        document.getElementById(
+            "designImage"
+        );
+
+
+    const previewImage =
+        document.getElementById(
+            "previewImage"
+        );
+
+
+    image.src =
+        designData.image;
+
+
+    previewImage.src =
+        designData.image;
+
+
+    image.onload =
+        function() {
+
+            showDesignSections();
+
+            applyAllStyles();
+
+            positionElements();
+
+            updatePreview();
+
+            updateQR();
+
+        };
+
+}
+
+
+/* =========================
+   رفع تصميم جديد
 ========================= */
 
 document
-    .getElementById("designFile")
+    .getElementById(
+        "designFile"
+    )
     .addEventListener(
         "change",
         loadDesign
@@ -934,14 +1098,18 @@ function loadDesign(event) {
 
 
     if (!file) {
+
         return;
+
     }
 
 
     const allowedTypes = [
+
         "image/png",
         "image/jpeg",
         "image/webp"
+
     ];
 
 
@@ -957,6 +1125,7 @@ function loadDesign(event) {
         );
 
         return;
+
     }
 
 
@@ -967,51 +1136,57 @@ function loadDesign(event) {
     reader.onload =
         function(e) {
 
-            /*
-               عند رفع تصميم جديد
-               نبدأ بإعدادات جديدة.
-            */
-
             designData.image =
                 e.target.result;
 
 
-            designData.nameX =
-                0.5;
+            /*
+               عند رفع تصميم جديد
+               لا نعيد العناصر للصفر
+               إذا كان هناك تصميم سابق.
+            */
+
+            const image =
+                document.getElementById(
+                    "designImage"
+                );
 
 
-            designData.nameY =
-                0.5;
+            const previewImage =
+                document.getElementById(
+                    "previewImage"
+                );
 
 
-            designData.qrX =
-                0.75;
+            image.src =
+                designData.image;
 
 
-            designData.qrY =
-                0.75;
+            previewImage.src =
+                designData.image;
 
 
-            designData.nameHorizontalAlign =
-                "custom";
+            image.onload =
+                function() {
 
+                    showDesignSections();
 
-            designData.nameVerticalAlign =
-                "custom";
+                    applyAllStyles();
 
+                    positionElements();
 
-            designData.qrHorizontalAlign =
-                "custom";
+                    updatePreview();
 
+                    updateQR();
 
-            designData.qrVerticalAlign =
-                "custom";
+                    autoSave();
 
+                    showMessage(
+                        "تم تحميل التصميم 🤍",
+                        "success"
+                    );
 
-            loadImageIntoDesign(
-                designData.image,
-                false
-            );
+                };
 
         };
 
@@ -1022,68 +1197,105 @@ function loadDesign(event) {
 
 
 /* =========================
-   تحميل الصورة داخل التصميم
+   إظهار الأقسام
 ========================= */
 
-function loadImageIntoDesign(
-    imageData,
-    restoring
-) {
+function showDesignSections() {
 
-    const image =
+    document.getElementById(
+        "canvasWrapper"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "controlsSection"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "previewSection"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "buttonsSection"
+    ).style.display =
+        "block";
+
+}
+
+
+/* =========================
+   تطبيق كل الإعدادات
+========================= */
+
+function applyAllStyles() {
+
+    const name =
         document.getElementById(
-            "designImage"
+            "nameElement"
         );
 
 
-    const previewImage =
+    const previewName =
         document.getElementById(
-            "previewImage"
+            "previewName"
         );
 
 
-    image.onload =
-        function() {
-
-            document.getElementById(
-                "canvasWrapper"
-            ).style.display =
-                "block";
+    name.style.fontSize =
+        designData.nameSize + "px";
 
 
-            document.getElementById(
-                "controlsSection"
-            ).style.display =
-                "block";
+    previewName.style.fontSize =
+        designData.nameSize + "px";
 
 
-            document.getElementById(
-                "previewSection"
-            ).style.display =
-                "block";
+    name.style.fontFamily =
+        designData.nameFont;
 
 
-            document.getElementById(
-                "buttonsSection"
-            ).style.display =
-                "block";
+    previewName.style.fontFamily =
+        designData.nameFont;
 
 
-            positionElements();
-
-            updatePreview();
-
-            updateAlignmentButtons();
-
-        };
+    name.style.color =
+        designData.nameColor;
 
 
-    image.src =
-        imageData;
+    previewName.style.color =
+        designData.nameColor;
 
 
-    previewImage.src =
-        imageData;
+    const qr =
+        document.getElementById(
+            "qrElement"
+        );
+
+
+    qr.style.width =
+        designData.qrSize + "px";
+
+
+    qr.style.height =
+        designData.qrSize + "px";
+
+
+    const previewQr =
+        document.getElementById(
+            "previewQr"
+        );
+
+
+    previewQr.style.width =
+        designData.qrSize + "px";
+
+
+    previewQr.style.height =
+        designData.qrSize + "px";
 
 }
 
@@ -1101,10 +1313,13 @@ function positionElements() {
 
 
     if (
+        !canvas ||
         !canvas.clientWidth ||
         !canvas.clientHeight
     ) {
+
         return;
+
     }
 
 
@@ -1120,319 +1335,39 @@ function positionElements() {
         );
 
 
-    name.style.fontSize =
-        designData.nameSize +
-        "px";
-
-
-    qr.style.width =
-        designData.qrSize +
-        "px";
-
-
-    qr.style.height =
-        designData.qrSize +
-        "px";
-
-
     /*
-       إذا كانت هناك محاذاة محفوظة
-       نعيد حساب مكان العنصر بناءً عليها.
+       الموضع هنا دائمًا
+       نسبة من التصميم نفسه.
     */
 
-    applySavedAlignment(
-        "name"
-    );
+    name.style.left =
+        (
+            designData.nameX * 100
+        ) + "%";
 
 
-    applySavedAlignment(
-        "qr"
-    );
+    name.style.top =
+        (
+            designData.nameY * 100
+        ) + "%";
 
 
-    /*
-       إذا لم توجد محاذاة،
-       نستخدم المكان المحفوظ.
-    */
-
-    if (
-        designData.nameHorizontalAlign ===
-        "custom"
-    ) {
-
-        name.style.left =
-            (
-                designData.nameX *
-                canvas.clientWidth
-            ) + "px";
-
-    }
+    qr.style.left =
+        (
+            designData.qrX * 100
+        ) + "%";
 
 
-    if (
-        designData.nameVerticalAlign ===
-        "custom"
-    ) {
-
-        name.style.top =
-            (
-                designData.nameY *
-                canvas.clientHeight
-            ) + "px";
-
-    }
-
-
-    if (
-        designData.qrHorizontalAlign ===
-        "custom"
-    ) {
-
-        qr.style.left =
-            (
-                designData.qrX *
-                canvas.clientWidth
-            ) + "px";
-
-    }
-
-
-    if (
-        designData.qrVerticalAlign ===
-        "custom"
-    ) {
-
-        qr.style.top =
-            (
-                designData.qrY *
-                canvas.clientHeight
-            ) + "px";
-
-    }
-
-
-    updateDataFromElementPosition();
+    qr.style.top =
+        (
+            designData.qrY * 100
+        ) + "%";
 
 }
 
 
 /* =========================
-   تطبيق المحاذاة المحفوظة
-========================= */
-
-function applySavedAlignment(
-    elementType
-) {
-
-    const canvas =
-        document.getElementById(
-            "designCanvas"
-        );
-
-
-    let element;
-
-    let horizontal;
-
-    let vertical;
-
-
-    if (
-        elementType ===
-        "name"
-    ) {
-
-        element =
-            document.getElementById(
-                "nameElement"
-            );
-
-
-        horizontal =
-            designData.nameHorizontalAlign;
-
-
-        vertical =
-            designData.nameVerticalAlign;
-
-    }
-
-    else {
-
-        element =
-            document.getElementById(
-                "qrElement"
-            );
-
-
-        horizontal =
-            designData.qrHorizontalAlign;
-
-
-        vertical =
-            designData.qrVerticalAlign;
-
-    }
-
-
-    const width =
-        element.offsetWidth;
-
-
-    const height =
-        element.offsetHeight;
-
-
-    const canvasWidth =
-        canvas.clientWidth;
-
-
-    const canvasHeight =
-        canvas.clientHeight;
-
-
-    /*
-       أفقي
-    */
-
-    if (
-        horizontal ===
-        "right"
-    ) {
-
-        element.style.left =
-            (
-                canvasWidth -
-                width
-            ) + "px";
-
-    }
-
-
-    if (
-        horizontal ===
-        "center"
-    ) {
-
-        element.style.left =
-            (
-                (canvasWidth - width) /
-                2
-            ) + "px";
-
-    }
-
-
-    if (
-        horizontal ===
-        "left"
-    ) {
-
-        element.style.left =
-            "0px";
-
-    }
-
-
-    /*
-       عمودي
-    */
-
-    if (
-        vertical ===
-        "top"
-    ) {
-
-        element.style.top =
-            "0px";
-
-    }
-
-
-    if (
-        vertical ===
-        "center"
-    ) {
-
-        element.style.top =
-            (
-                (canvasHeight - height) /
-                2
-            ) + "px";
-
-    }
-
-
-    if (
-        vertical ===
-        "bottom"
-    ) {
-
-        element.style.top =
-            (
-                canvasHeight - height
-            ) + "px";
-
-    }
-
-}
-
-
-/* =========================
-   تحديث بيانات المواقع
-========================= */
-
-function updateDataFromElementPosition() {
-
-    const canvas =
-        document.getElementById(
-            "designCanvas"
-        );
-
-
-    const name =
-        document.getElementById(
-            "nameElement"
-        );
-
-
-    const qr =
-        document.getElementById(
-            "qrElement"
-        );
-
-
-    if (
-        canvas.clientWidth &&
-        canvas.clientHeight
-    ) {
-
-        designData.nameX =
-            name.offsetLeft /
-            canvas.clientWidth;
-
-
-        designData.nameY =
-            name.offsetTop /
-            canvas.clientHeight;
-
-
-        designData.qrX =
-            qr.offsetLeft /
-            canvas.clientWidth;
-
-
-        designData.qrY =
-            qr.offsetTop /
-            canvas.clientHeight;
-
-    }
-
-}
-
-
-/* =========================
-   السحب بالماوس
+   نظام السحب الجديد
 ========================= */
 
 document
@@ -1440,8 +1375,8 @@ document
         "nameElement"
     )
     .addEventListener(
-        "mousedown",
-        startDrag
+        "pointerdown",
+        startPointerDrag
     );
 
 
@@ -1450,118 +1385,14 @@ document
         "qrElement"
     )
     .addEventListener(
-        "mousedown",
-        startDrag
+        "pointerdown",
+        startPointerDrag
     );
 
 
-document.addEventListener(
-    "mousemove",
-    drag
-);
-
-
-document.addEventListener(
-    "mouseup",
-    stopDrag
-);
-
-
-/* =========================
-   دعم اللمس
-========================= */
-
-document
-    .getElementById(
-        "nameElement"
-    )
-    .addEventListener(
-        "touchstart",
-        startTouch,
-        {
-            passive: false
-        }
-    );
-
-
-document
-    .getElementById(
-        "qrElement"
-    )
-    .addEventListener(
-        "touchstart",
-        startTouch,
-        {
-            passive: false
-        }
-    );
-
-
-document.addEventListener(
-    "touchmove",
-    moveTouch,
-    {
-        passive: false
-    }
-);
-
-
-document.addEventListener(
-    "touchend",
-    stopDrag
-);
-
-
-/* =========================
-   بدء السحب
-========================= */
-
-function startDrag(event) {
-
-    activeElement =
-        event.currentTarget;
-
-
-    dragging = true;
-
-
-    const rect =
-        activeElement.getBoundingClientRect();
-
-
-    offsetX =
-        event.clientX -
-        rect.left;
-
-
-    offsetY =
-        event.clientY -
-        rect.top;
-
-
-    activeElement.classList.add(
-        "selected"
-    );
-
-
-    setCustomAlignment(
-        activeElement
-    );
-
-}
-
-
-/* =========================
-   بدء اللمس
-========================= */
-
-function startTouch(event) {
+function startPointerDrag(event) {
 
     event.preventDefault();
-
-
-    const touch =
-        event.touches[0];
 
 
     activeElement =
@@ -1570,92 +1401,6 @@ function startTouch(event) {
 
     dragging = true;
 
-
-    const rect =
-        activeElement.getBoundingClientRect();
-
-
-    offsetX =
-        touch.clientX -
-        rect.left;
-
-
-    offsetY =
-        touch.clientY -
-        rect.top;
-
-
-    activeElement.classList.add(
-        "selected"
-    );
-
-
-    setCustomAlignment(
-        activeElement
-    );
-
-}
-
-
-/* =========================
-   السحب
-========================= */
-
-function drag(event) {
-
-    if (
-        !dragging ||
-        !activeElement
-    ) {
-        return;
-    }
-
-
-    moveElement(
-        event.clientX,
-        event.clientY
-    );
-
-}
-
-
-/* =========================
-   حركة اللمس
-========================= */
-
-function moveTouch(event) {
-
-    if (
-        !dragging ||
-        !activeElement
-    ) {
-        return;
-    }
-
-
-    event.preventDefault();
-
-
-    const touch =
-        event.touches[0];
-
-
-    moveElement(
-        touch.clientX,
-        touch.clientY
-    );
-
-}
-
-
-/* =========================
-   تحريك العنصر
-========================= */
-
-function moveElement(
-    clientX,
-    clientY
-) {
 
     const canvas =
         document.getElementById(
@@ -1667,24 +1412,110 @@ function moveElement(
         canvas.getBoundingClientRect();
 
 
+    const elementRect =
+        activeElement.getBoundingClientRect();
+
+
+    dragStartX =
+        event.clientX;
+
+
+    dragStartY =
+        event.clientY;
+
+
+    startLeft =
+        elementRect.left -
+        canvasRect.left;
+
+
+    startTop =
+        elementRect.top -
+        canvasRect.top;
+
+
+    activeElement.classList.add(
+        "selected"
+    );
+
+
+    activeElement.setPointerCapture(
+        event.pointerId
+    );
+
+}
+
+
+document.addEventListener(
+    "pointermove",
+    movePointerDrag
+);
+
+
+document.addEventListener(
+    "pointerup",
+    stopPointerDrag
+);
+
+
+function movePointerDrag(event) {
+
+    if (
+        !dragging ||
+        !activeElement
+    ) {
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "designCanvas"
+        );
+
+
+    const canvasRect =
+        canvas.getBoundingClientRect();
+
+
+    /*
+       مقدار الحركة الفعلية
+       بالنسبة لحجم الشاشة.
+    */
+
+    const deltaX =
+        event.clientX -
+        dragStartX;
+
+
+    const deltaY =
+        event.clientY -
+        dragStartY;
+
+
     let x =
-        clientX -
-        canvasRect.left -
-        offsetX;
+        startLeft +
+        deltaX;
 
 
     let y =
-        clientY -
-        canvasRect.top -
-        offsetY;
+        startTop +
+        deltaY;
 
+
+    /*
+       منع خروج العنصر
+       خارج التصميم.
+    */
 
     x =
         Math.max(
             0,
             Math.min(
                 x,
-                canvas.clientWidth -
+                canvasRect.width -
                 activeElement.offsetWidth
             )
         );
@@ -1695,39 +1526,81 @@ function moveElement(
             0,
             Math.min(
                 y,
-                canvas.clientHeight -
+                canvasRect.height -
                 activeElement.offsetHeight
             )
         );
 
 
-    activeElement.style.left =
-        x + "px";
+    /*
+       نحفظ الموضع كنسبة
+       وليس بالبكسل.
+    */
+
+    const xRatio =
+        x /
+        canvasRect.width;
 
 
-    activeElement.style.top =
-        y + "px";
+    const yRatio =
+        y /
+        canvasRect.height;
+
+
+    if (
+        activeElement.id ===
+        "nameElement"
+    ) {
+
+        designData.nameX =
+            xRatio;
+
+
+        designData.nameY =
+            yRatio;
+
+    }
+
+
+    if (
+        activeElement.id ===
+        "qrElement"
+    ) {
+
+        designData.qrX =
+            xRatio;
+
+
+        designData.qrY =
+            yRatio;
+
+    }
 
 
     /*
-       بعد السحب تصبح المحاذاة
-       مخصصة حتى لا تعيد الصفحة
-       العنصر إلى مكان المحاذاة.
+       إعادة وضع العنصر
+       بالنسبة المئوية.
     */
 
-    updateDataFromElementPosition();
-
+    positionElements();
 
     updatePreview();
+
+    autoSave();
 
 }
 
 
-/* =========================
-   إنهاء السحب
-========================= */
+function stopPointerDrag() {
 
-function stopDrag() {
+    if (
+        !dragging
+    ) {
+
+        return;
+
+    }
+
 
     if (activeElement) {
 
@@ -1746,44 +1619,197 @@ function stopDrag() {
 
 
 /* =========================
-   جعل المحاذاة مخصصة
+   المحاذاة
 ========================= */
 
-function setCustomAlignment(
-    element
+function alignElement(
+    type,
+    direction
 ) {
 
+    const canvas =
+        document.getElementById(
+            "designCanvas"
+        );
+
+
+    const element =
+        type === "name"
+
+            ? document.getElementById(
+                "nameElement"
+            )
+
+            : document.getElementById(
+                "qrElement"
+            );
+
+
     if (
-        element.id ===
-        "nameElement"
+        !canvas ||
+        !element
     ) {
 
-        designData.nameHorizontalAlign =
-            "custom";
-
-
-        designData.nameVerticalAlign =
-            "custom";
+        return;
 
     }
 
 
-    if (
-        element.id ===
-        "qrElement"
+    /*
+       نحتاج أبعاد العنصر
+       بعد ظهوره فعليًا.
+    */
+
+    const canvasWidth =
+        canvas.clientWidth;
+
+
+    const canvasHeight =
+        canvas.clientHeight;
+
+
+    const elementWidth =
+        element.offsetWidth;
+
+
+    const elementHeight =
+        element.offsetHeight;
+
+
+    let x =
+        type === "name"
+            ? designData.nameX * canvasWidth
+            : designData.qrX * canvasWidth;
+
+
+    let y =
+        type === "name"
+            ? designData.nameY * canvasHeight
+            : designData.qrY * canvasHeight;
+
+
+    /*
+       أفقي
+    */
+
+    if (direction === "left") {
+
+        x = 0;
+
+    }
+
+    else if (
+        direction === "center"
     ) {
 
-        designData.qrHorizontalAlign =
-            "custom";
+        x =
+            (
+                canvasWidth -
+                elementWidth
+            ) / 2;
 
+    }
 
-        designData.qrVerticalAlign =
-            "custom";
+    else if (
+        direction === "right"
+    ) {
+
+        x =
+            canvasWidth -
+            elementWidth;
 
     }
 
 
-    updateAlignmentButtons();
+    /*
+       رأسي
+    */
+
+    if (direction === "top") {
+
+        y = 0;
+
+    }
+
+    else if (
+        direction === "middle"
+    ) {
+
+        y =
+            (
+                canvasHeight -
+                elementHeight
+            ) / 2;
+
+    }
+
+    else if (
+        direction === "bottom"
+    ) {
+
+        y =
+            canvasHeight -
+            elementHeight;
+
+    }
+
+
+    x =
+        Math.max(
+            0,
+            Math.min(
+                x,
+                canvasWidth -
+                elementWidth
+            )
+        );
+
+
+    y =
+        Math.max(
+            0,
+            Math.min(
+                y,
+                canvasHeight -
+                elementHeight
+            )
+        );
+
+
+    if (
+        type === "name"
+    ) {
+
+        designData.nameX =
+            x /
+            canvasWidth;
+
+
+        designData.nameY =
+            y /
+            canvasHeight;
+
+    }
+
+    else {
+
+        designData.qrX =
+            x /
+            canvasWidth;
+
+
+        designData.qrY =
+            y /
+            canvasHeight;
+
+    }
+
+
+    positionElements();
+
+    updatePreview();
+
+    autoSave();
 
 }
 
@@ -1829,33 +1855,13 @@ document
                 size;
 
 
-            const name =
-                document.getElementById(
-                    "nameElement"
-                );
+            applyAllStyles();
 
-
-            name.style.fontSize =
-                size + "px";
-
-
-            /*
-               إذا كان الاسم بمحاذاة
-               معينة، نعيد حساب مكانه.
-            */
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
+            positionElements();
 
             updatePreview();
 
-
-            autoSaveSilently();
+            autoSave();
 
         }
     );
@@ -1902,734 +1908,173 @@ document
                 size;
 
 
-            const qr =
-                document.getElementById(
-                    "qrElement"
+            applyAllStyles();
+
+            positionElements();
+
+            updatePreview();
+
+            autoSave();
+
+        }
+    );
+
+
+/* =========================
+   تغيير الخط
+========================= */
+
+document
+    .getElementById(
+        "nameFont"
+    )
+    .addEventListener(
+        "change",
+        function() {
+
+            designData.nameFont =
+                this.value;
+
+
+            applyAllStyles();
+
+            positionElements();
+
+            updatePreview();
+
+            autoSave();
+
+        }
+    );
+
+
+/* =========================
+   تغيير لون الاسم
+========================= */
+
+document
+    .getElementById(
+        "nameColor"
+    )
+    .addEventListener(
+        "input",
+        function() {
+
+            designData.nameColor =
+                this.value;
+
+
+            applyAllStyles();
+
+            updatePreview();
+
+            autoSave();
+
+        }
+    );
+
+
+/* =========================
+   تغيير لون QR
+========================= */
+
+document
+    .getElementById(
+        "qrColor"
+    )
+    .addEventListener(
+        "input",
+        function() {
+
+            designData.qrColor =
+                this.value;
+
+
+            updateQR();
+
+            autoSave();
+
+        }
+    );
+
+
+/* =========================
+   إنشاء QR
+========================= */
+
+function updateQR() {
+
+    if (!eventId) {
+
+        return;
+
+    }
+
+
+    const qrValue =
+        "https://example.com/check?event_id=" +
+        encodeURIComponent(
+            eventId
+        );
+
+
+    const qrImage =
+        document.getElementById(
+            "qrImage"
+        );
+
+
+    const previewQrImage =
+        document.getElementById(
+            "previewQrImage"
+        );
+
+
+    QRCode.toDataURL(
+
+        qrValue,
+
+        {
+
+            width: 600,
+
+            margin: 0,
+
+            color: {
+
+                dark:
+                    designData.qrColor,
+
+                light:
+                    "#ffffff"
+
+            }
+
+        },
+
+        function(error, url) {
+
+            if (error) {
+
+                console.error(
+                    error
                 );
 
+                return;
 
-            qr.style.width =
-                size + "px";
-
-
-            qr.style.height =
-                size + "px";
+            }
 
 
-            applySavedAlignment(
-                "qr"
-            );
+            qrImage.src =
+                url;
 
 
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            autoSaveSilently();
+            previewQrImage.src =
+                url;
 
         }
+
     );
-
-
-/* =========================
-   محاذاة الاسم أفقيًا
-========================= */
-
-document
-    .getElementById(
-        "nameAlignRight"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameHorizontalAlign =
-                "right";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "nameAlignCenter"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameHorizontalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "nameAlignLeft"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameHorizontalAlign =
-                "left";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   محاذاة الاسم عموديًا
-========================= */
-
-document
-    .getElementById(
-        "nameAlignTop"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameVerticalAlign =
-                "top";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "nameAlignVerticalCenter"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameVerticalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "nameAlignBottom"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameVerticalAlign =
-                "bottom";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   توسيط الاسم بالكامل
-========================= */
-
-document
-    .getElementById(
-        "centerNameButton"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.nameHorizontalAlign =
-                "center";
-
-
-            designData.nameVerticalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "name"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   محاذاة QR أفقيًا
-========================= */
-
-document
-    .getElementById(
-        "qrAlignRight"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrHorizontalAlign =
-                "right";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "qrAlignCenter"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrHorizontalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "qrAlignLeft"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrHorizontalAlign =
-                "left";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   محاذاة QR عموديًا
-========================= */
-
-document
-    .getElementById(
-        "qrAlignTop"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrVerticalAlign =
-                "top";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "qrAlignVerticalCenter"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrVerticalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "qrAlignBottom"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrVerticalAlign =
-                "bottom";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   توسيط QR بالكامل
-========================= */
-
-document
-    .getElementById(
-        "centerQrButton"
-    )
-    .addEventListener(
-        "click",
-        function() {
-
-            designData.qrHorizontalAlign =
-                "center";
-
-
-            designData.qrVerticalAlign =
-                "center";
-
-
-            applySavedAlignment(
-                "qr"
-            );
-
-
-            updateDataFromElementPosition();
-
-
-            updatePreview();
-
-
-            updateAlignmentButtons();
-
-
-            autoSaveSilently();
-
-        }
-    );
-
-
-/* =========================
-   تحديث أزرار المحاذاة
-========================= */
-
-function updateAlignmentButtons() {
-
-    const buttons = [
-
-        "nameAlignRight",
-        "nameAlignCenter",
-        "nameAlignLeft",
-
-        "nameAlignTop",
-        "nameAlignVerticalCenter",
-        "nameAlignBottom",
-
-        "qrAlignRight",
-        "qrAlignCenter",
-        "qrAlignLeft",
-
-        "qrAlignTop",
-        "qrAlignVerticalCenter",
-        "qrAlignBottom"
-
-    ];
-
-
-    buttons.forEach(
-        function(id) {
-
-            document
-                .getElementById(id)
-                .classList
-                .remove("active");
-
-        }
-    );
-
-
-    if (
-        designData.nameHorizontalAlign ===
-        "right"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignRight"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.nameHorizontalAlign ===
-        "center"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignCenter"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.nameHorizontalAlign ===
-        "left"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignLeft"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.nameVerticalAlign ===
-        "top"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignTop"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.nameVerticalAlign ===
-        "center"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignVerticalCenter"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.nameVerticalAlign ===
-        "bottom"
-    ) {
-
-        document
-            .getElementById(
-                "nameAlignBottom"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrHorizontalAlign ===
-        "right"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignRight"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrHorizontalAlign ===
-        "center"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignCenter"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrHorizontalAlign ===
-        "left"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignLeft"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrVerticalAlign ===
-        "top"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignTop"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrVerticalAlign ===
-        "center"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignVerticalCenter"
-            )
-            .classList
-            .add("active");
-
-    }
-
-
-    if (
-        designData.qrVerticalAlign ===
-        "bottom"
-    ) {
-
-        document
-            .getElementById(
-                "qrAlignBottom"
-            )
-            .classList
-            .add("active");
-
-    }
 
 }
 
@@ -2640,9 +2085,19 @@ function updateAlignmentButtons() {
 
 function updatePreview() {
 
-    if (!designData.image) {
+    if (
+        !designData.image
+    ) {
+
         return;
+
     }
+
+
+    const designCanvas =
+        document.getElementById(
+            "designCanvas"
+        );
 
 
     const previewCanvas =
@@ -2663,11 +2118,20 @@ function updatePreview() {
         );
 
 
-    const designCanvas =
-        document.getElementById(
-            "designCanvas"
-        );
+    if (
+        !designCanvas.clientWidth ||
+        !designCanvas.clientHeight
+    ) {
 
+        return;
+
+    }
+
+
+    /*
+       المعاينة تستخدم نفس
+       النسب تمامًا.
+    */
 
     const width =
         designCanvas.clientWidth;
@@ -2675,14 +2139,6 @@ function updatePreview() {
 
     const height =
         designCanvas.clientHeight;
-
-
-    if (
-        !width ||
-        !height
-    ) {
-        return;
-    }
 
 
     previewCanvas.style.width =
@@ -2693,69 +2149,96 @@ function updatePreview() {
         height + "px";
 
 
-    /*
-       الاسم
-    */
-
-    const name =
-        document.getElementById(
-            "nameElement"
-        );
-
-
     previewName.style.left =
         (
-            name.offsetLeft
-        ) + "px";
+            designData.nameX * 100
+        ) + "%";
 
 
     previewName.style.top =
         (
-            name.offsetTop
-        ) + "px";
+            designData.nameY * 100
+        ) + "%";
 
 
     previewName.style.fontSize =
-        designData.nameSize +
-        "px";
+        designData.nameSize + "px";
 
 
-    /*
-       QR
-    */
+    previewName.style.fontFamily =
+        designData.nameFont;
 
-    const qr =
-        document.getElementById(
-            "qrElement"
-        );
+
+    previewName.style.color =
+        designData.nameColor;
 
 
     previewQr.style.left =
         (
-            qr.offsetLeft
-        ) + "px";
+            designData.qrX * 100
+        ) + "%";
 
 
     previewQr.style.top =
         (
-            qr.offsetTop
-        ) + "px";
+            designData.qrY * 100
+        ) + "%";
 
 
     previewQr.style.width =
-        designData.qrSize +
-        "px";
+        designData.qrSize + "px";
 
 
     previewQr.style.height =
-        designData.qrSize +
-        "px";
+        designData.qrSize + "px";
 
 }
 
 
 /* =========================
-   حفظ التصميم
+   حفظ تلقائي
+========================= */
+
+function autoSave() {
+
+    if (
+        !eventId ||
+        !designData.image
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        localStorage.setItem(
+
+            `invitation_design_${eventId}`,
+
+            JSON.stringify(
+                designData
+            )
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Auto save error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   حفظ يدوي
 ========================= */
 
 document
@@ -2770,7 +2253,9 @@ document
 
 function saveDesign() {
 
-    if (!designData.image) {
+    if (
+        !designData.image
+    ) {
 
         showMessage(
             "ارفعي التصميم أولًا.",
@@ -2782,63 +2267,16 @@ function saveDesign() {
     }
 
 
-    /*
-       آخر تحديث للمواقع
-    */
-
-    updateDataFromElementPosition();
-
-
-    /*
-       حفظ نسخة كاملة
-       من التصميم
-    */
-
-    localStorage.setItem(
-
-        `invitation_design_${eventId}`,
-
-        JSON.stringify(
-            designData
-        )
-
-    );
+    autoSave();
 
 
     showMessage(
-        "تم حفظ التصميم ومواقع العناصر والمحاذاة بنجاح 🤍",
+        "تم حفظ التصميم ومواقع العناصر بنجاح 🤍",
         "success"
     );
 
 
     return true;
-
-}
-
-
-/* =========================
-   حفظ تلقائي بدون رسالة
-========================= */
-
-function autoSaveSilently() {
-
-    if (!designData.image) {
-        return;
-    }
-
-
-    updateDataFromElementPosition();
-
-
-    localStorage.setItem(
-
-        `invitation_design_${eventId}`,
-
-        JSON.stringify(
-            designData
-        )
-
-    );
 
 }
 
@@ -2855,7 +2293,9 @@ document
         "click",
         function() {
 
-            if (!designData.image) {
+            if (
+                !designData.image
+            ) {
 
                 showMessage(
                     "ارفعي التصميم أولًا.",
@@ -2868,10 +2308,11 @@ document
 
 
             /*
-               نحفظ قبل الانتقال
+               نحفظ آخر تعديل
+               قبل الانتقال.
             */
 
-            saveDesign();
+            autoSave();
 
 
             window.location.href =
@@ -2885,7 +2326,8 @@ document
 
 
 /* =========================
-   إعادة ضبط عند تغيير الحجم
+   إعادة الحساب عند تغيير
+   حجم الشاشة
 ========================= */
 
 window.addEventListener(
@@ -2896,24 +2338,26 @@ window.addEventListener(
             designData.image
         ) {
 
-            /*
-               ننتظر حتى يعيد المتصفح
-               حساب أبعاد الصورة
-            */
+            positionElements();
 
-            requestAnimationFrame(
-                function() {
-
-                    positionElements();
-
-                    updatePreview();
-
-                    updateAlignmentButtons();
-
-                }
-            );
+            updatePreview();
 
         }
+
+    }
+);
+
+
+/* =========================
+   منع فقدان التصميم
+   عند تحديث الصفحة
+========================= */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        autoSave();
 
     }
 );
@@ -2949,3 +2393,4 @@ function showMessage(
 </body>
 
 </html>
+```
