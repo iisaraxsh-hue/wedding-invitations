@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -130,6 +129,7 @@ button:disabled {
     display: inline-block;
     line-height: 0;
     user-select: none;
+    max-width: 100%;
 }
 
 #designImage {
@@ -200,26 +200,36 @@ button:disabled {
 
 
 /* =========================
-   المحاذاة
+   أزرار المحاذاة
 ========================= */
 
-.alignment-box {
-    margin-top: 12px;
-    background: #faf9f7;
-    padding: 15px;
-    border-radius: 12px;
+.alignment-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 18px;
+    margin-bottom: 8px;
 }
 
 .alignment-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 6px;
 }
 
 .alignment-buttons button {
     margin-top: 0;
-    padding: 11px 8px;
-    font-size: 14px;
+    padding: 10px 5px;
+    font-size: 13px;
+    background: #777;
+}
+
+.alignment-buttons button.active {
+    background: #222;
+}
+
+.center-button {
+    margin-top: 8px !important;
+    background: #555 !important;
 }
 
 
@@ -239,6 +249,7 @@ button:disabled {
     position: relative;
     display: inline-block;
     line-height: 0;
+    max-width: 100%;
 }
 
 #previewImage {
@@ -288,10 +299,6 @@ button:disabled {
 }
 
 
-/* =========================
-   الهاتف
-========================= */
-
 @media (max-width: 600px) {
 
     .container {
@@ -305,10 +312,6 @@ button:disabled {
 
     .controls {
         grid-template-columns: 1fr;
-    }
-
-    .alignment-buttons {
-        grid-template-columns: 1fr 1fr 1fr;
     }
 
 }
@@ -357,6 +360,8 @@ button:disabled {
 <div class="hint">
 
 ارفعي تصميم الدعوة بصيغة PNG أو JPG أو WEBP.
+
+إذا سبق وحفظتِ التصميم، سيتم استرجاعه تلقائيًا.
 
 </div>
 
@@ -420,6 +425,10 @@ button:disabled {
 <div class="controls">
 
 
+<!-- =========================
+     تحكم الاسم
+========================= -->
+
 <div class="control-box">
 
 <label>
@@ -442,8 +451,88 @@ button:disabled {
 
 </button>
 
+
+<div class="alignment-title">
+محاذاة الاسم أفقيًا
 </div>
 
+<div class="alignment-buttons">
+
+<button
+    id="nameAlignRight"
+    type="button">
+
+يمين
+
+</button>
+
+<button
+    id="nameAlignCenter"
+    type="button">
+
+وسط
+
+</button>
+
+<button
+    id="nameAlignLeft"
+    type="button">
+
+يسار
+
+</button>
+
+</div>
+
+
+<div class="alignment-title">
+محاذاة الاسم عموديًا
+</div>
+
+<div class="alignment-buttons">
+
+<button
+    id="nameAlignTop"
+    type="button">
+
+أعلى
+
+</button>
+
+<button
+    id="nameAlignVerticalCenter"
+    type="button">
+
+وسط
+
+</button>
+
+<button
+    id="nameAlignBottom"
+    type="button">
+
+أسفل
+
+</button>
+
+</div>
+
+
+<button
+    id="centerNameButton"
+    class="center-button"
+    type="button">
+
+توسيط الاسم بالكامل
+
+</button>
+
+</div>
+
+
+<!-- =========================
+     تحكم QR
+========================= -->
 
 <div class="control-box">
 
@@ -467,25 +556,15 @@ button:disabled {
 
 </button>
 
+
+<div class="alignment-title">
+محاذاة QR أفقيًا
 </div>
-
-</div>
-
-
-<!-- =========================
-     محاذاة الاسم
-========================= -->
-
-<div class="alignment-box">
-
-<label>
-محاذاة الاسم
-</label>
 
 <div class="alignment-buttons">
 
 <button
-    id="alignRight"
+    id="qrAlignRight"
     type="button">
 
 يمين
@@ -493,15 +572,15 @@ button:disabled {
 </button>
 
 <button
-    id="alignCenter"
+    id="qrAlignCenter"
     type="button">
 
-توسيط
+وسط
 
 </button>
 
 <button
-    id="alignLeft"
+    id="qrAlignLeft"
     type="button">
 
 يسار
@@ -510,9 +589,48 @@ button:disabled {
 
 </div>
 
-<div class="hint">
 
-يمكنك بعد ذلك سحب الاسم وتحريك مكانه بالطريقة التي تريدينها.
+<div class="alignment-title">
+محاذاة QR عموديًا
+</div>
+
+<div class="alignment-buttons">
+
+<button
+    id="qrAlignTop"
+    type="button">
+
+أعلى
+
+</button>
+
+<button
+    id="qrAlignVerticalCenter"
+    type="button">
+
+وسط
+
+</button>
+
+<button
+    id="qrAlignBottom"
+    type="button">
+
+أسفل
+
+</button>
+
+</div>
+
+
+<button
+    id="centerQrButton"
+    class="center-button"
+    type="button">
+
+توسيط QR بالكامل
+
+</button>
 
 </div>
 
@@ -522,6 +640,7 @@ button:disabled {
 <div class="hint">
 
 اسحبي الاسم والـ QR داخل التصميم إلى المكان الذي تريدينه.
+يمكنك أيضًا استخدام أزرار المحاذاة والتوسيط.
 
 </div>
 
@@ -637,13 +756,6 @@ const eventId =
     params.get("event_id");
 
 
-/*
-   بيانات التصميم
-
-   x و y تمثلان
-   مكان العنصر كنسبة من التصميم.
-*/
-
 let designData = {
 
     image: null,
@@ -660,7 +772,13 @@ let designData = {
 
     qrSize: 110,
 
-    nameAlign: "center"
+    nameHorizontalAlign: "custom",
+
+    nameVerticalAlign: "custom",
+
+    qrHorizontalAlign: "custom",
+
+    qrVerticalAlign: "custom"
 
 };
 
@@ -672,17 +790,6 @@ let dragging = false;
 let offsetX = 0;
 
 let offsetY = 0;
-
-
-/* =========================
-   مفتاح الحفظ
-========================= */
-
-function getStorageKey() {
-
-    return `invitation_design_${eventId}`;
-
-}
 
 
 /* =========================
@@ -723,11 +830,7 @@ document.getElementById(
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
-
-        loadSavedDesign();
-
-    }
+    loadSavedDesign
 );
 
 
@@ -744,14 +847,12 @@ function loadSavedDesign() {
 
     const saved =
         localStorage.getItem(
-            getStorageKey()
+            `invitation_design_${eventId}`
         );
 
 
     if (!saved) {
-
         return;
-
     }
 
 
@@ -762,36 +863,43 @@ function loadSavedDesign() {
 
 
         if (
-            !savedData ||
-            !savedData.image
+            savedData &&
+            savedData.image
         ) {
 
-            return;
+            designData = {
+
+                ...designData,
+
+                ...savedData
+
+            };
+
+
+            document.getElementById(
+                "nameSize"
+            ).value =
+                designData.nameSize;
+
+
+            document.getElementById(
+                "qrSize"
+            ).value =
+                designData.qrSize;
+
+
+            loadImageIntoDesign(
+                designData.image,
+                true
+            );
+
+
+            showMessage(
+                "تم استرجاع التصميم السابق 🤍",
+                "success"
+            );
 
         }
-
-
-        /*
-           ندمج البيانات القديمة
-           مع القيم الجديدة.
-        */
-
-        designData = {
-
-            ...designData,
-
-            ...savedData
-
-        };
-
-
-        /*
-           إذا كان التصميم محفوظًا
-           نعرضه مباشرة.
-        */
-
-        showSavedDesign();
-
 
     }
 
@@ -808,10 +916,119 @@ function loadSavedDesign() {
 
 
 /* =========================
-   عرض التصميم المحفوظ
+   رفع التصميم
 ========================= */
 
-function showSavedDesign() {
+document
+    .getElementById("designFile")
+    .addEventListener(
+        "change",
+        loadDesign
+    );
+
+
+function loadDesign(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        showMessage(
+            "صيغة الصورة غير مدعومة.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e) {
+
+            /*
+               عند رفع تصميم جديد
+               نبدأ بإعدادات جديدة.
+            */
+
+            designData.image =
+                e.target.result;
+
+
+            designData.nameX =
+                0.5;
+
+
+            designData.nameY =
+                0.5;
+
+
+            designData.qrX =
+                0.75;
+
+
+            designData.qrY =
+                0.75;
+
+
+            designData.nameHorizontalAlign =
+                "custom";
+
+
+            designData.nameVerticalAlign =
+                "custom";
+
+
+            designData.qrHorizontalAlign =
+                "custom";
+
+
+            designData.qrVerticalAlign =
+                "custom";
+
+
+            loadImageIntoDesign(
+                designData.image,
+                false
+            );
+
+        };
+
+
+    reader.readAsDataURL(file);
+
+}
+
+
+/* =========================
+   تحميل الصورة داخل التصميم
+========================= */
+
+function loadImageIntoDesign(
+    imageData,
+    restoring
+) {
 
     const image =
         document.getElementById(
@@ -823,30 +1040,6 @@ function showSavedDesign() {
         document.getElementById(
             "previewImage"
         );
-
-
-    image.src =
-        designData.image;
-
-
-    previewImage.src =
-        designData.image;
-
-
-    /*
-       تحديث حقول التحكم
-    */
-
-    document.getElementById(
-        "nameSize"
-    ).value =
-        designData.nameSize;
-
-
-    document.getElementById(
-        "qrSize"
-    ).value =
-        designData.qrSize;
 
 
     image.onload =
@@ -880,136 +1073,17 @@ function showSavedDesign() {
 
             updatePreview();
 
-        };
-
-}
-
-
-/* =========================
-   رفع التصميم
-========================= */
-
-document
-    .getElementById("designFile")
-    .addEventListener(
-        "change",
-        loadDesign
-    );
-
-
-function loadDesign(event) {
-
-    const file =
-        event.target.files[0];
-
-
-    if (!file) {
-        return;
-    }
-
-
-    const allowedTypes = [
-
-        "image/png",
-
-        "image/jpeg",
-
-        "image/webp"
-
-    ];
-
-
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
-
-        showMessage(
-            "صيغة الصورة غير مدعومة.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function(e) {
-
-            /*
-               عند رفع تصميم جديد
-               نستخدم الصورة الجديدة
-               لكن لا نحذف إعدادات العناصر
-               المحفوظة بدون سبب.
-            */
-
-            designData.image =
-                e.target.result;
-
-
-            const image =
-                document.getElementById(
-                    "designImage"
-                );
-
-
-            const previewImage =
-                document.getElementById(
-                    "previewImage"
-                );
-
-
-            image.src =
-                designData.image;
-
-
-            previewImage.src =
-                designData.image;
-
-
-            image.onload =
-                function() {
-
-                    document.getElementById(
-                        "canvasWrapper"
-                    ).style.display =
-                        "block";
-
-
-                    document.getElementById(
-                        "controlsSection"
-                    ).style.display =
-                        "block";
-
-
-                    document.getElementById(
-                        "previewSection"
-                    ).style.display =
-                        "block";
-
-
-                    document.getElementById(
-                        "buttonsSection"
-                    ).style.display =
-                        "block";
-
-
-                    positionElements();
-
-                    updatePreview();
-
-                };
+            updateAlignmentButtons();
 
         };
 
 
-    reader.readAsDataURL(file);
+    image.src =
+        imageData;
+
+
+    previewImage.src =
+        imageData;
 
 }
 
@@ -1019,6 +1093,296 @@ function loadDesign(event) {
 ========================= */
 
 function positionElements() {
+
+    const canvas =
+        document.getElementById(
+            "designCanvas"
+        );
+
+
+    if (
+        !canvas.clientWidth ||
+        !canvas.clientHeight
+    ) {
+        return;
+    }
+
+
+    const name =
+        document.getElementById(
+            "nameElement"
+        );
+
+
+    const qr =
+        document.getElementById(
+            "qrElement"
+        );
+
+
+    name.style.fontSize =
+        designData.nameSize +
+        "px";
+
+
+    qr.style.width =
+        designData.qrSize +
+        "px";
+
+
+    qr.style.height =
+        designData.qrSize +
+        "px";
+
+
+    /*
+       إذا كانت هناك محاذاة محفوظة
+       نعيد حساب مكان العنصر بناءً عليها.
+    */
+
+    applySavedAlignment(
+        "name"
+    );
+
+
+    applySavedAlignment(
+        "qr"
+    );
+
+
+    /*
+       إذا لم توجد محاذاة،
+       نستخدم المكان المحفوظ.
+    */
+
+    if (
+        designData.nameHorizontalAlign ===
+        "custom"
+    ) {
+
+        name.style.left =
+            (
+                designData.nameX *
+                canvas.clientWidth
+            ) + "px";
+
+    }
+
+
+    if (
+        designData.nameVerticalAlign ===
+        "custom"
+    ) {
+
+        name.style.top =
+            (
+                designData.nameY *
+                canvas.clientHeight
+            ) + "px";
+
+    }
+
+
+    if (
+        designData.qrHorizontalAlign ===
+        "custom"
+    ) {
+
+        qr.style.left =
+            (
+                designData.qrX *
+                canvas.clientWidth
+            ) + "px";
+
+    }
+
+
+    if (
+        designData.qrVerticalAlign ===
+        "custom"
+    ) {
+
+        qr.style.top =
+            (
+                designData.qrY *
+                canvas.clientHeight
+            ) + "px";
+
+    }
+
+
+    updateDataFromElementPosition();
+
+}
+
+
+/* =========================
+   تطبيق المحاذاة المحفوظة
+========================= */
+
+function applySavedAlignment(
+    elementType
+) {
+
+    const canvas =
+        document.getElementById(
+            "designCanvas"
+        );
+
+
+    let element;
+
+    let horizontal;
+
+    let vertical;
+
+
+    if (
+        elementType ===
+        "name"
+    ) {
+
+        element =
+            document.getElementById(
+                "nameElement"
+            );
+
+
+        horizontal =
+            designData.nameHorizontalAlign;
+
+
+        vertical =
+            designData.nameVerticalAlign;
+
+    }
+
+    else {
+
+        element =
+            document.getElementById(
+                "qrElement"
+            );
+
+
+        horizontal =
+            designData.qrHorizontalAlign;
+
+
+        vertical =
+            designData.qrVerticalAlign;
+
+    }
+
+
+    const width =
+        element.offsetWidth;
+
+
+    const height =
+        element.offsetHeight;
+
+
+    const canvasWidth =
+        canvas.clientWidth;
+
+
+    const canvasHeight =
+        canvas.clientHeight;
+
+
+    /*
+       أفقي
+    */
+
+    if (
+        horizontal ===
+        "right"
+    ) {
+
+        element.style.left =
+            (
+                canvasWidth -
+                width
+            ) + "px";
+
+    }
+
+
+    if (
+        horizontal ===
+        "center"
+    ) {
+
+        element.style.left =
+            (
+                (canvasWidth - width) /
+                2
+            ) + "px";
+
+    }
+
+
+    if (
+        horizontal ===
+        "left"
+    ) {
+
+        element.style.left =
+            "0px";
+
+    }
+
+
+    /*
+       عمودي
+    */
+
+    if (
+        vertical ===
+        "top"
+    ) {
+
+        element.style.top =
+            "0px";
+
+    }
+
+
+    if (
+        vertical ===
+        "center"
+    ) {
+
+        element.style.top =
+            (
+                (canvasHeight - height) /
+                2
+            ) + "px";
+
+    }
+
+
+    if (
+        vertical ===
+        "bottom"
+    ) {
+
+        element.style.top =
+            (
+                canvasHeight - height
+            ) + "px";
+
+    }
+
+}
+
+
+/* =========================
+   تحديث بيانات المواقع
+========================= */
+
+function updateDataFromElementPosition() {
 
     const canvas =
         document.getElementById(
@@ -1038,113 +1402,37 @@ function positionElements() {
         );
 
 
-    /*
-       الاسم
-    */
-
-    name.style.fontSize =
-        designData.nameSize +
-        "px";
-
-
-    name.style.textAlign =
-        designData.nameAlign;
-
-
-    /*
-       نستخدم transform
-       حتى تكون نقطة X
-       هي مركز العنصر عند التوسيط.
-    */
-
     if (
-        designData.nameAlign ===
-        "center"
+        canvas.clientWidth &&
+        canvas.clientHeight
     ) {
 
-        name.style.left =
-            (
-                designData.nameX *
-                100
-            ) + "%";
+        designData.nameX =
+            name.offsetLeft /
+            canvas.clientWidth;
 
 
-        name.style.transform =
-            "translateX(-50%)";
-
-    }
-
-    else if (
-        designData.nameAlign ===
-        "right"
-    ) {
-
-        name.style.left =
-            (
-                designData.nameX *
-                100
-            ) + "%";
+        designData.nameY =
+            name.offsetTop /
+            canvas.clientHeight;
 
 
-        name.style.transform =
-            "translateX(-100%)";
+        designData.qrX =
+            qr.offsetLeft /
+            canvas.clientWidth;
+
+
+        designData.qrY =
+            qr.offsetTop /
+            canvas.clientHeight;
 
     }
-
-    else {
-
-        name.style.left =
-            (
-                designData.nameX *
-                100
-            ) + "%";
-
-
-        name.style.transform =
-            "translateX(0)";
-
-    }
-
-
-    name.style.top =
-        (
-            designData.nameY *
-            100
-        ) + "%";
-
-
-    /*
-       QR
-    */
-
-    qr.style.left =
-        (
-            designData.qrX *
-            100
-        ) + "%";
-
-
-    qr.style.top =
-        (
-            designData.qrY *
-            100
-        ) + "%";
-
-
-    qr.style.width =
-        designData.qrSize +
-        "px";
-
-
-    qr.style.height =
-        designData.qrSize +
-        "px";
 
 }
 
 
 /* =========================
-   بدء السحب بالماوس
+   السحب بالماوس
 ========================= */
 
 document
@@ -1180,7 +1468,7 @@ document.addEventListener(
 
 
 /* =========================
-   اللمس
+   دعم اللمس
 ========================= */
 
 document
@@ -1225,7 +1513,7 @@ document.addEventListener(
 
 
 /* =========================
-   بداية السحب
+   بدء السحب
 ========================= */
 
 function startDrag(event) {
@@ -1256,13 +1544,15 @@ function startDrag(event) {
     );
 
 
-    event.preventDefault();
+    setCustomAlignment(
+        activeElement
+    );
 
 }
 
 
 /* =========================
-   بداية اللمس
+   بدء اللمس
 ========================= */
 
 function startTouch(event) {
@@ -1299,11 +1589,16 @@ function startTouch(event) {
         "selected"
     );
 
+
+    setCustomAlignment(
+        activeElement
+    );
+
 }
 
 
 /* =========================
-   تحريك بالماوس
+   السحب
 ========================= */
 
 function drag(event) {
@@ -1312,9 +1607,7 @@ function drag(event) {
         !dragging ||
         !activeElement
     ) {
-
         return;
-
     }
 
 
@@ -1327,7 +1620,7 @@ function drag(event) {
 
 
 /* =========================
-   تحريك باللمس
+   حركة اللمس
 ========================= */
 
 function moveTouch(event) {
@@ -1336,9 +1629,7 @@ function moveTouch(event) {
         !dragging ||
         !activeElement
     ) {
-
         return;
-
     }
 
 
@@ -1376,11 +1667,6 @@ function moveElement(
         canvas.getBoundingClientRect();
 
 
-    /*
-       نحسب مكان المؤشر
-       داخل التصميم.
-    */
-
     let x =
         clientX -
         canvasRect.left -
@@ -1393,169 +1679,44 @@ function moveElement(
         offsetY;
 
 
-    /*
-       الاسم
-    */
-
-    if (
-        activeElement.id ===
-        "nameElement"
-    ) {
-
-        const width =
-            activeElement.offsetWidth;
+    x =
+        Math.max(
+            0,
+            Math.min(
+                x,
+                canvas.clientWidth -
+                activeElement.offsetWidth
+            )
+        );
 
 
-        /*
-           نحدد المكان بناءً على
-           نوع المحاذاة.
-        */
-
-        if (
-            designData.nameAlign ===
-            "center"
-        ) {
-
-            let centerX =
-                x +
-                width / 2;
+    y =
+        Math.max(
+            0,
+            Math.min(
+                y,
+                canvas.clientHeight -
+                activeElement.offsetHeight
+            )
+        );
 
 
-            centerX =
-                Math.max(
-                    width / 2,
-                    Math.min(
-                        centerX,
-                        canvas.clientWidth -
-                        width / 2
-                    )
-                );
+    activeElement.style.left =
+        x + "px";
 
 
-            designData.nameX =
-                centerX /
-                canvas.clientWidth;
-
-        }
-
-        else if (
-            designData.nameAlign ===
-            "right"
-        ) {
-
-            let rightX =
-                x +
-                width;
-
-
-            rightX =
-                Math.max(
-                    width,
-                    Math.min(
-                        rightX,
-                        canvas.clientWidth
-                    )
-                );
-
-
-            designData.nameX =
-                rightX /
-                canvas.clientWidth;
-
-        }
-
-        else {
-
-            x =
-                Math.max(
-                    0,
-                    Math.min(
-                        x,
-                        canvas.clientWidth -
-                        width
-                    )
-                );
-
-
-            designData.nameX =
-                x /
-                canvas.clientWidth;
-
-        }
-
-
-        /*
-           Y
-        */
-
-        y =
-            Math.max(
-                0,
-                Math.min(
-                    y,
-                    canvas.clientHeight -
-                    activeElement.offsetHeight
-                )
-            );
-
-
-        designData.nameY =
-            y /
-            canvas.clientHeight;
-
-    }
+    activeElement.style.top =
+        y + "px";
 
 
     /*
-       QR
+       بعد السحب تصبح المحاذاة
+       مخصصة حتى لا تعيد الصفحة
+       العنصر إلى مكان المحاذاة.
     */
 
-    if (
-        activeElement.id ===
-        "qrElement"
-    ) {
+    updateDataFromElementPosition();
 
-        x =
-            Math.max(
-                0,
-                Math.min(
-                    x,
-                    canvas.clientWidth -
-                    activeElement.offsetWidth
-                )
-            );
-
-
-        y =
-            Math.max(
-                0,
-                Math.min(
-                    y,
-                    canvas.clientHeight -
-                    activeElement.offsetHeight
-                )
-            );
-
-
-        designData.qrX =
-            (
-                x +
-                activeElement.offsetWidth / 2
-            ) /
-            canvas.clientWidth;
-
-
-        designData.qrY =
-            (
-                y +
-                activeElement.offsetHeight / 2
-            ) /
-            canvas.clientHeight;
-
-    }
-
-
-    positionElements();
 
     updatePreview();
 
@@ -1563,7 +1724,7 @@ function moveElement(
 
 
 /* =========================
-   إيقاف السحب
+   إنهاء السحب
 ========================= */
 
 function stopDrag() {
@@ -1580,6 +1741,49 @@ function stopDrag() {
     dragging = false;
 
     activeElement = null;
+
+}
+
+
+/* =========================
+   جعل المحاذاة مخصصة
+========================= */
+
+function setCustomAlignment(
+    element
+) {
+
+    if (
+        element.id ===
+        "nameElement"
+    ) {
+
+        designData.nameHorizontalAlign =
+            "custom";
+
+
+        designData.nameVerticalAlign =
+            "custom";
+
+    }
+
+
+    if (
+        element.id ===
+        "qrElement"
+    ) {
+
+        designData.qrHorizontalAlign =
+            "custom";
+
+
+        designData.qrVerticalAlign =
+            "custom";
+
+    }
+
+
+    updateAlignmentButtons();
 
 }
 
@@ -1625,9 +1829,33 @@ document
                 size;
 
 
-            positionElements();
+            const name =
+                document.getElementById(
+                    "nameElement"
+                );
+
+
+            name.style.fontSize =
+                size + "px";
+
+
+            /*
+               إذا كان الاسم بمحاذاة
+               معينة، نعيد حساب مكانه.
+            */
+
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
 
             updatePreview();
+
+
+            autoSaveSilently();
 
         }
     );
@@ -1674,84 +1902,736 @@ document
                 size;
 
 
-            positionElements();
+            const qr =
+                document.getElementById(
+                    "qrElement"
+                );
+
+
+            qr.style.width =
+                size + "px";
+
+
+            qr.style.height =
+                size + "px";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
 
             updatePreview();
+
+
+            autoSaveSilently();
 
         }
     );
 
 
 /* =========================
-   محاذاة يمين
+   محاذاة الاسم أفقيًا
 ========================= */
 
 document
     .getElementById(
-        "alignRight"
+        "nameAlignRight"
     )
     .addEventListener(
         "click",
         function() {
 
-            designData.nameAlign =
+            designData.nameHorizontalAlign =
                 "right";
 
 
-            positionElements();
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
 
             updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
 
         }
     );
 
 
-/* =========================
-   محاذاة وسط
-========================= */
-
 document
     .getElementById(
-        "alignCenter"
+        "nameAlignCenter"
     )
     .addEventListener(
         "click",
         function() {
 
-            designData.nameAlign =
+            designData.nameHorizontalAlign =
                 "center";
 
 
-            positionElements();
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
 
             updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "nameAlignLeft"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.nameHorizontalAlign =
+                "left";
+
+
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
 
         }
     );
 
 
 /* =========================
-   محاذاة يسار
+   محاذاة الاسم عموديًا
 ========================= */
 
 document
     .getElementById(
-        "alignLeft"
+        "nameAlignTop"
     )
     .addEventListener(
         "click",
         function() {
 
-            designData.nameAlign =
-                "left";
+            designData.nameVerticalAlign =
+                "top";
 
 
-            positionElements();
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
 
             updatePreview();
 
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
         }
     );
+
+
+document
+    .getElementById(
+        "nameAlignVerticalCenter"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.nameVerticalAlign =
+                "center";
+
+
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "nameAlignBottom"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.nameVerticalAlign =
+                "bottom";
+
+
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+/* =========================
+   توسيط الاسم بالكامل
+========================= */
+
+document
+    .getElementById(
+        "centerNameButton"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.nameHorizontalAlign =
+                "center";
+
+
+            designData.nameVerticalAlign =
+                "center";
+
+
+            applySavedAlignment(
+                "name"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+/* =========================
+   محاذاة QR أفقيًا
+========================= */
+
+document
+    .getElementById(
+        "qrAlignRight"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrHorizontalAlign =
+                "right";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "qrAlignCenter"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrHorizontalAlign =
+                "center";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "qrAlignLeft"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrHorizontalAlign =
+                "left";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+/* =========================
+   محاذاة QR عموديًا
+========================= */
+
+document
+    .getElementById(
+        "qrAlignTop"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrVerticalAlign =
+                "top";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "qrAlignVerticalCenter"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrVerticalAlign =
+                "center";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+document
+    .getElementById(
+        "qrAlignBottom"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrVerticalAlign =
+                "bottom";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+/* =========================
+   توسيط QR بالكامل
+========================= */
+
+document
+    .getElementById(
+        "centerQrButton"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+            designData.qrHorizontalAlign =
+                "center";
+
+
+            designData.qrVerticalAlign =
+                "center";
+
+
+            applySavedAlignment(
+                "qr"
+            );
+
+
+            updateDataFromElementPosition();
+
+
+            updatePreview();
+
+
+            updateAlignmentButtons();
+
+
+            autoSaveSilently();
+
+        }
+    );
+
+
+/* =========================
+   تحديث أزرار المحاذاة
+========================= */
+
+function updateAlignmentButtons() {
+
+    const buttons = [
+
+        "nameAlignRight",
+        "nameAlignCenter",
+        "nameAlignLeft",
+
+        "nameAlignTop",
+        "nameAlignVerticalCenter",
+        "nameAlignBottom",
+
+        "qrAlignRight",
+        "qrAlignCenter",
+        "qrAlignLeft",
+
+        "qrAlignTop",
+        "qrAlignVerticalCenter",
+        "qrAlignBottom"
+
+    ];
+
+
+    buttons.forEach(
+        function(id) {
+
+            document
+                .getElementById(id)
+                .classList
+                .remove("active");
+
+        }
+    );
+
+
+    if (
+        designData.nameHorizontalAlign ===
+        "right"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignRight"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.nameHorizontalAlign ===
+        "center"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignCenter"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.nameHorizontalAlign ===
+        "left"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignLeft"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.nameVerticalAlign ===
+        "top"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignTop"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.nameVerticalAlign ===
+        "center"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignVerticalCenter"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.nameVerticalAlign ===
+        "bottom"
+    ) {
+
+        document
+            .getElementById(
+                "nameAlignBottom"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrHorizontalAlign ===
+        "right"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignRight"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrHorizontalAlign ===
+        "center"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignCenter"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrHorizontalAlign ===
+        "left"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignLeft"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrVerticalAlign ===
+        "top"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignTop"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrVerticalAlign ===
+        "center"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignVerticalCenter"
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    if (
+        designData.qrVerticalAlign ===
+        "bottom"
+    ) {
+
+        document
+            .getElementById(
+                "qrAlignBottom"
+            )
+            .classList
+            .add("active");
+
+    }
+
+}
 
 
 /* =========================
@@ -1761,9 +2641,7 @@ document
 function updatePreview() {
 
     if (!designData.image) {
-
         return;
-
     }
 
 
@@ -1799,9 +2677,13 @@ function updatePreview() {
         designCanvas.clientHeight;
 
 
-    /*
-       نفس أبعاد التصميم
-    */
+    if (
+        !width ||
+        !height
+    ) {
+        return;
+    }
+
 
     previewCanvas.style.width =
         width + "px";
@@ -1815,18 +2697,22 @@ function updatePreview() {
        الاسم
     */
 
+    const name =
+        document.getElementById(
+            "nameElement"
+        );
+
+
     previewName.style.left =
         (
-            designData.nameX *
-            100
-        ) + "%";
+            name.offsetLeft
+        ) + "px";
 
 
     previewName.style.top =
         (
-            designData.nameY *
-            100
-        ) + "%";
+            name.offsetTop
+        ) + "px";
 
 
     previewName.style.fontSize =
@@ -1834,54 +2720,26 @@ function updatePreview() {
         "px";
 
 
-    previewName.style.textAlign =
-        designData.nameAlign;
-
-
-    if (
-        designData.nameAlign ===
-        "center"
-    ) {
-
-        previewName.style.transform =
-            "translateX(-50%)";
-
-    }
-
-    else if (
-        designData.nameAlign ===
-        "right"
-    ) {
-
-        previewName.style.transform =
-            "translateX(-100%)";
-
-    }
-
-    else {
-
-        previewName.style.transform =
-            "translateX(0)";
-
-    }
-
-
     /*
        QR
     */
 
+    const qr =
+        document.getElementById(
+            "qrElement"
+        );
+
+
     previewQr.style.left =
         (
-            designData.qrX *
-            100
-        ) + "%";
+            qr.offsetLeft
+        ) + "px";
 
 
     previewQr.style.top =
         (
-            designData.qrY *
-            100
-        ) + "%";
+            qr.offsetTop
+        ) + "px";
 
 
     previewQr.style.width =
@@ -1924,52 +2782,63 @@ function saveDesign() {
     }
 
 
-    try {
+    /*
+       آخر تحديث للمواقع
+    */
 
-        /*
-           نحفظ كل شيء:
-           الصورة
-           مكان الاسم
-           مكان QR
-           الأحجام
-           المحاذاة
-        */
-
-        localStorage.setItem(
-
-            getStorageKey(),
-
-            JSON.stringify(
-                designData
-            )
-
-        );
+    updateDataFromElementPosition();
 
 
-        showMessage(
-            "تم حفظ التصميم ومواقع العناصر بنجاح 🤍",
-            "success"
-        );
+    /*
+       حفظ نسخة كاملة
+       من التصميم
+    */
+
+    localStorage.setItem(
+
+        `invitation_design_${eventId}`,
+
+        JSON.stringify(
+            designData
+        )
+
+    );
 
 
-        return true;
+    showMessage(
+        "تم حفظ التصميم ومواقع العناصر والمحاذاة بنجاح 🤍",
+        "success"
+    );
 
+
+    return true;
+
+}
+
+
+/* =========================
+   حفظ تلقائي بدون رسالة
+========================= */
+
+function autoSaveSilently() {
+
+    if (!designData.image) {
+        return;
     }
 
-    catch (error) {
 
-        console.error(error);
-
-
-        showMessage(
-            "تعذر حفظ التصميم. قد تكون الصورة كبيرة جدًا.",
-            "error"
-        );
+    updateDataFromElementPosition();
 
 
-        return false;
+    localStorage.setItem(
 
-    }
+        `invitation_design_${eventId}`,
+
+        JSON.stringify(
+            designData
+        )
+
+    );
 
 }
 
@@ -1999,19 +2868,10 @@ document
 
 
             /*
-               نحفظ آخر تعديل
-               قبل الانتقال.
+               نحفظ قبل الانتقال
             */
 
-            const saved =
-                saveDesign();
-
-
-            if (!saved) {
-
-                return;
-
-            }
+            saveDesign();
 
 
             window.location.href =
@@ -2025,18 +2885,33 @@ document
 
 
 /* =========================
-   إعادة ضبط عند تغيير حجم الشاشة
+   إعادة ضبط عند تغيير الحجم
 ========================= */
 
 window.addEventListener(
     "resize",
     function() {
 
-        if (designData.image) {
+        if (
+            designData.image
+        ) {
 
-            positionElements();
+            /*
+               ننتظر حتى يعيد المتصفح
+               حساب أبعاد الصورة
+            */
 
-            updatePreview();
+            requestAnimationFrame(
+                function() {
+
+                    positionElements();
+
+                    updatePreview();
+
+                    updateAlignmentButtons();
+
+                }
+            );
 
         }
 
@@ -2074,4 +2949,3 @@ function showMessage(
 </body>
 
 </html>
-```
