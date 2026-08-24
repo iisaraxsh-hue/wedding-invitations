@@ -1,0 +1,1360 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>التحقق من الدعوة</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background: #f7f3ef;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        .box {
+            width: 100%;
+            max-width: 430px;
+
+            background: white;
+
+            border-radius: 25px;
+
+            padding: 30px 25px;
+
+            text-align: center;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .guest-name {
+            font-size: 28px;
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+        .event-info {
+            color: #777;
+
+            margin-bottom: 20px;
+
+            font-size: 15px;
+        }
+
+        .message-title {
+            font-size: 26px;
+            font-weight: bold;
+
+            margin-top: 15px;
+            margin-bottom: 12px;
+        }
+
+        .message-text {
+            font-size: 17px;
+            line-height: 1.9;
+
+            color: #555;
+
+            margin: 0;
+        }
+
+        .success {
+            color: #287a4b;
+        }
+
+        .warning {
+            color: #b06a00;
+        }
+
+        .danger {
+            color: #c0392b;
+        }
+
+        .countdown-box {
+            margin-top: 25px;
+
+            background: #f7f3ef;
+
+            border-radius: 18px;
+
+            padding: 18px 12px;
+        }
+
+        .countdown-label {
+            font-size: 14px;
+
+            color: #777;
+
+            margin-bottom: 8px;
+        }
+
+        .countdown {
+            font-size: 30px;
+
+            font-weight: bold;
+
+            letter-spacing: 2px;
+        }
+
+        .info {
+            background: #f7f7f7;
+
+            border-radius: 15px;
+
+            padding: 18px;
+
+            margin-top: 25px;
+        }
+
+        .info p {
+            margin: 8px 0;
+
+            font-size: 17px;
+        }
+
+        .remaining {
+            font-size: 22px;
+            font-weight: bold;
+
+            margin: 20px 0;
+        }
+
+        .buttons {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+        button {
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 14px 10px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            background: #222;
+
+            color: white;
+        }
+
+        button:disabled {
+            background: #ccc;
+
+            cursor: not-allowed;
+        }
+
+        .loading {
+            color: #777;
+        }
+
+        .error {
+            color: #c0392b;
+
+            font-weight: bold;
+
+            line-height: 1.8;
+        }
+
+        .time-info {
+            color: #888;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+
+            margin-top: 18px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="box">
+
+    <h1>التحقق من الدعوة 🎟️</h1>
+
+    <div id="content">
+
+        <p class="loading">
+            جاري التحقق من الدعوة...
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+let invitation = null;
+
+let countdownInterval = null;
+
+
+/* =========================
+   تحميل الدعوة
+========================= */
+
+async function loadInvitation() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const code =
+        params.get("code");
+
+
+    if (!code) {
+
+        showInvalidCode();
+
+        return;
+    }
+
+
+    const { data, error } =
+        await supabaseClient
+
+            .from("invitations")
+
+            .select(`
+                *,
+                events (
+                    event_name,
+                    event_date,
+                    start_time,
+                    end_time
+                )
+            `)
+
+            .eq(
+                "qr_code",
+                code
+            )
+
+            .single();
+
+
+    if (error || !data) {
+
+        console.error(error);
+
+        showInvalidCode();
+
+        return;
+    }
+
+
+    invitation = data;
+
+
+    showInvitation();
+
+}
+
+
+/* =========================
+   تحويل وقت السعودية
+========================= */
+
+function saudiDateTime(
+    dateString,
+    timeString
+) {
+
+    if (!dateString || !timeString) {
+
+        return null;
+    }
+
+
+    const time =
+        String(timeString)
+            .substring(0, 8);
+
+
+    const parts =
+        time.split(":");
+
+
+    const hours =
+        Number(parts[0] || 0);
+
+
+    const minutes =
+        Number(parts[1] || 0);
+
+
+    const seconds =
+        Number(parts[2] || 0);
+
+
+    /*
+       السعودية UTC+3
+       ولا يوجد فيها توقيت صيفي.
+
+       نحول وقت السعودية إلى UTC
+       حتى تكون المقارنة ثابتة.
+    */
+
+    const utc =
+        Date.UTC(
+            Number(
+                String(dateString)
+                    .substring(0, 4)
+            ),
+
+            Number(
+                String(dateString)
+                    .substring(5, 7)
+            ) - 1,
+
+            Number(
+                String(dateString)
+                    .substring(8, 10)
+            ),
+
+            hours - 3,
+
+            minutes,
+
+            seconds
+        );
+
+
+    return new Date(utc);
+
+}
+
+
+/* =========================
+   الحصول على حالة الوقت
+========================= */
+
+function getEventStatus() {
+
+    if (!invitation) {
+
+        return "invalid";
+    }
+
+
+    const event =
+        invitation.events;
+
+
+    if (!event) {
+
+        return "invalid";
+    }
+
+
+    if (
+        !event.event_date ||
+        !event.start_time ||
+        !event.end_time
+    ) {
+
+        return "invalid";
+    }
+
+
+    const start =
+        saudiDateTime(
+            event.event_date,
+            event.start_time
+        );
+
+
+    let end =
+        saudiDateTime(
+            event.event_date,
+            event.end_time
+        );
+
+
+    if (!start || !end) {
+
+        return "invalid";
+    }
+
+
+    /*
+       إذا كان وقت النهاية أصغر من وقت البداية
+       نفترض أن الحفل ينتهي بعد منتصف الليل.
+    */
+
+    if (
+        end.getTime() <=
+        start.getTime()
+    ) {
+
+        end =
+            new Date(
+                end.getTime() +
+                (24 * 60 * 60 * 1000)
+            );
+
+    }
+
+
+    const now =
+        new Date();
+
+
+    if (
+        now.getTime() <
+        start.getTime()
+    ) {
+
+        return {
+            status: "before",
+            start: start,
+            end: end
+        };
+
+    }
+
+
+    if (
+        now.getTime() >=
+        start.getTime() &&
+        now.getTime() <=
+        end.getTime()
+    ) {
+
+        return {
+            status: "during",
+            start: start,
+            end: end
+        };
+
+    }
+
+
+    return {
+        status: "after",
+        start: start,
+        end: end
+    };
+
+}
+
+
+/* =========================
+   عرض الدعوة
+========================= */
+
+function showInvitation() {
+
+    clearInterval(
+        countdownInterval
+    );
+
+
+    const eventStatus =
+        getEventStatus();
+
+
+    if (
+        eventStatus === "invalid"
+    ) {
+
+        showError(
+            "تعذر قراءة وقت الحفل."
+        );
+
+        return;
+    }
+
+
+    /*
+       إذا كانت الدعوة مستخدمة بالكامل
+       تظهر رسالة الاستخدام مباشرة.
+    */
+
+    const allowed =
+        Number(
+            invitation.guest_count || 0
+        );
+
+
+    const checkedIn =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    const used =
+        invitation.used === true ||
+        checkedIn >= allowed;
+
+
+    if (used) {
+
+        showUsed();
+
+        return;
+    }
+
+
+    /*
+       قبل وقت الدخول
+    */
+
+    if (
+        eventStatus.status ===
+        "before"
+    ) {
+
+        showBeforeTime(
+            eventStatus.start
+        );
+
+        return;
+    }
+
+
+    /*
+       بعد انتهاء وقت الدخول
+    */
+
+    if (
+        eventStatus.status ===
+        "after"
+    ) {
+
+        showAfterTime();
+
+        return;
+    }
+
+
+    /*
+       أثناء وقت الدخول
+    */
+
+    showDuringTime();
+
+}
+
+
+/* =========================
+   قبل وقت الدخول
+========================= */
+
+function showBeforeTime(
+    startTime
+) {
+
+    const event =
+        invitation.events;
+
+
+    const guestName =
+        invitation.guest_name &&
+        invitation.guest_name !== "مدعو"
+
+            ? invitation.guest_name
+
+            : "مدعو";
+
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <div class="guest-name">
+                ${escapeHtml(guestName)}
+            </div>
+
+
+            ${
+                event
+                ? `
+                    <div class="event-info">
+                        ${escapeHtml(
+                            event.event_name || ""
+                        )}
+                    </div>
+                `
+                : ""
+            }
+
+
+            <div class="message-title warning">
+                أهلًا بك
+            </div>
+
+
+            <p class="message-text">
+                موعدنا لم يحن بعد، ننتظرك في الوقت المحدد
+            </p>
+
+
+            <div class="countdown-box">
+
+                <div class="countdown-label">
+                    متبقي على وقت الدخول
+                </div>
+
+
+                <div
+                    id="countdown"
+                    class="countdown warning"
+                >
+                    --
+                </div>
+
+            </div>
+
+        `;
+
+
+    updateCountdown(
+        startTime
+    );
+
+
+    countdownInterval =
+        setInterval(
+            function() {
+
+                updateCountdown(
+                    startTime
+                );
+
+            },
+            1000
+        );
+
+}
+
+
+/* =========================
+   العداد
+========================= */
+
+function updateCountdown(
+    targetTime
+) {
+
+    const element =
+        document.getElementById(
+            "countdown"
+        );
+
+
+    if (!element) {
+
+        clearInterval(
+            countdownInterval
+        );
+
+        return;
+    }
+
+
+    const now =
+        new Date();
+
+
+    let difference =
+        targetTime.getTime() -
+        now.getTime();
+
+
+    if (
+        difference <= 0
+    ) {
+
+        clearInterval(
+            countdownInterval
+        );
+
+
+        showInvitation();
+
+        return;
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            difference / 1000
+        );
+
+
+    const days =
+        Math.floor(
+            totalSeconds /
+            (24 * 60 * 60)
+        );
+
+
+    const hours =
+        Math.floor(
+            (
+                totalSeconds %
+                (24 * 60 * 60)
+            ) /
+            (60 * 60)
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds %
+                (60 * 60)
+            ) /
+            60
+        );
+
+
+    const seconds =
+        totalSeconds %
+        60;
+
+
+    if (days > 0) {
+
+        element.innerText =
+            `${days} يوم ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+    } else {
+
+        element.innerText =
+            `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+    }
+
+}
+
+
+/* =========================
+   أثناء وقت الدخول
+========================= */
+
+function showDuringTime() {
+
+    const event =
+        invitation.events;
+
+
+    const allowed =
+        Number(
+            invitation.guest_count || 0
+        );
+
+
+    const checkedIn =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    const remaining =
+        Math.max(
+            allowed - checkedIn,
+            0
+        );
+
+
+    const guestName =
+        invitation.guest_name &&
+        invitation.guest_name !== "مدعو"
+
+            ? invitation.guest_name
+
+            : "مدعو";
+
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <div class="guest-name">
+                ${escapeHtml(guestName)}
+            </div>
+
+
+            ${
+                event
+                ? `
+                    <div class="event-info">
+                        ${escapeHtml(
+                            event.event_name || ""
+                        )}
+                    </div>
+                `
+                : ""
+            }
+
+
+            <div class="message-title success">
+                يا هلا ومرحبًا
+            </div>
+
+
+            <p class="message-text">
+                سعداء بحضورك، تم تأكيد دعوتك بنجاح
+            </p>
+
+
+            <div class="info">
+
+                <p>
+                    المسموح:
+                    <strong>
+                        ${allowed}
+                    </strong>
+                    أشخاص
+                </p>
+
+
+                <p>
+                    تم الدخول:
+                    <strong>
+                        ${checkedIn}
+                    </strong>
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    remaining
+                    ${
+                        remaining === 0
+                            ? "danger"
+                            : "success"
+                    }
+                "
+            >
+
+                ${
+                    remaining > 0
+                        ? `المتبقي: ${remaining}`
+                        : "اكتمل عدد الدخول"
+                }
+
+            </div>
+
+
+            ${
+                remaining > 0
+
+                ? `
+
+                    <div class="buttons">
+
+                        ${createButton(
+                            1,
+                            remaining
+                        )}
+
+                        ${createButton(
+                            2,
+                            remaining
+                        )}
+
+                        ${createButton(
+                            3,
+                            remaining
+                        )}
+
+                        ${createButton(
+                            4,
+                            remaining
+                        )}
+
+                    </div>
+
+                `
+
+                : `
+
+                    <p class="danger">
+                        لا يمكن تسجيل دخول إضافي لهذه الدعوة.
+                    </p>
+
+                `
+            }
+
+        `;
+
+}
+
+
+/* =========================
+   بعد انتهاء وقت الدخول
+========================= */
+
+function showAfterTime() {
+
+    clearInterval(
+        countdownInterval
+    );
+
+
+    const event =
+        invitation.events;
+
+
+    const guestName =
+        invitation.guest_name &&
+        invitation.guest_name !== "مدعو"
+
+            ? invitation.guest_name
+
+            : "مدعو";
+
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <div class="guest-name">
+                ${escapeHtml(guestName)}
+            </div>
+
+
+            ${
+                event
+                ? `
+                    <div class="event-info">
+                        ${escapeHtml(
+                            event.event_name || ""
+                        )}
+                    </div>
+                `
+                : ""
+            }
+
+
+            <div class="message-title danger">
+                انتهى وقت الدخول
+            </div>
+
+
+            <p class="message-text">
+                شكرًا لحضورك ومشاركتنا هذه المناسبة الجميلة
+            </p>
+
+        `;
+
+}
+
+
+/* =========================
+   الدعوة مستخدمة
+========================= */
+
+function showUsed() {
+
+    clearInterval(
+        countdownInterval
+    );
+
+
+    const event =
+        invitation.events;
+
+
+    const guestName =
+        invitation.guest_name &&
+        invitation.guest_name !== "مدعو"
+
+            ? invitation.guest_name
+
+            : "مدعو";
+
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <div class="guest-name">
+                ${escapeHtml(guestName)}
+            </div>
+
+
+            ${
+                event
+                ? `
+                    <div class="event-info">
+                        ${escapeHtml(
+                            event.event_name || ""
+                        )}
+                    </div>
+                `
+                : ""
+            }
+
+
+            <div class="message-title danger">
+                تم تسجيل الدخول مسبقًا
+            </div>
+
+
+            <p class="message-text">
+                هذا الكود غير صالح لإعادة الاستخدام.
+            </p>
+
+        `;
+
+}
+
+
+/* =========================
+   الكود غير صحيح
+========================= */
+
+function showInvalidCode() {
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <div class="message-title danger">
+                عذرًا، هذا الكود غير صحيح
+            </div>
+
+
+            <p class="message-text">
+                يرجى التحقق من الكود.
+            </p>
+
+        `;
+
+}
+
+
+/* =========================
+   خطأ عام
+========================= */
+
+function showError(
+    message
+) {
+
+    document
+        .getElementById("content")
+        .innerHTML = `
+
+            <p class="error">
+                ${escapeHtml(message)}
+            </p>
+
+        `;
+
+}
+
+
+/* =========================
+   إنشاء زر الدخول
+========================= */
+
+function createButton(
+    number,
+    remaining
+) {
+
+    const disabled =
+        number > remaining
+            ? "disabled"
+            : "";
+
+
+    return `
+
+        <button
+            ${disabled}
+            onclick="checkIn(${number})">
+
+            دخول ${number}
+
+        </button>
+
+    `;
+
+}
+
+
+/* =========================
+   تسجيل الدخول
+========================= */
+
+async function checkIn(
+    number
+) {
+
+    if (!invitation) {
+
+        return;
+    }
+
+
+    /*
+       نتأكد أن الوقت ما زال داخل
+       فترة الدخول قبل تسجيل الشخص.
+    */
+
+    const eventStatus =
+        getEventStatus();
+
+
+    if (
+        eventStatus === "invalid"
+    ) {
+
+        alert(
+            "تعذر التحقق من وقت الدخول."
+        );
+
+        return;
+    }
+
+
+    if (
+        eventStatus.status ===
+        "before"
+    ) {
+
+        alert(
+            "موعد الدخول لم يبدأ بعد."
+        );
+
+        showBeforeTime(
+            eventStatus.start
+        );
+
+        return;
+    }
+
+
+    if (
+        eventStatus.status ===
+        "after"
+    ) {
+
+        alert(
+            "انتهى وقت الدخول."
+        );
+
+        showAfterTime();
+
+        return;
+    }
+
+
+    const allowed =
+        Number(
+            invitation.guest_count || 0
+        );
+
+
+    const current =
+        Number(
+            invitation.checked_in || 0
+        );
+
+
+    const remaining =
+        allowed - current;
+
+
+    if (
+        number > remaining
+    ) {
+
+        alert(
+            "لا يمكن تجاوز عدد الأشخاص المسموح به."
+        );
+
+        return;
+    }
+
+
+    const newCheckedIn =
+        current + number;
+
+
+    const { data, error } =
+        await supabaseClient
+
+            .from("invitations")
+
+            .update({
+
+                checked_in:
+                    newCheckedIn,
+
+                used:
+                    newCheckedIn >= allowed
+
+            })
+
+            .eq(
+                "id",
+                invitation.id
+            )
+
+            .select()
+
+            .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "حدث خطأ أثناء تسجيل الدخول ❌"
+        );
+
+        return;
+    }
+
+
+    invitation.checked_in =
+        data.checked_in;
+
+
+    invitation.used =
+        data.used;
+
+
+    showInvitation();
+
+
+    if (
+        newCheckedIn >= allowed
+    ) {
+
+        alert(
+            "تم اكتمال دخول جميع الأشخاص المسموح لهم ✅"
+        );
+
+    } else {
+
+        alert(
+            `تم تسجيل دخول ${number} شخص ✅`
+        );
+
+    }
+
+}
+
+
+/* =========================
+   إضافة صفر للأرقام
+========================= */
+
+function pad(number) {
+
+    return String(number)
+        .padStart(2, "0");
+
+}
+
+
+/* =========================
+   حماية النصوص
+========================= */
+
+function escapeHtml(
+    text
+) {
+
+    return String(text)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =========================
+   تشغيل الصفحة
+========================= */
+
+loadInvitation();
+
+</script>
+
+
+</body>
+
+</html>
+```
