@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -266,15 +265,20 @@ async function loadInvitation() {
 
 
     document.getElementById("guestName").innerText =
-        invitation.guest_name;
+        invitation.guest_name || "ضيفنا الكريم";
 
 
     document.getElementById("guestCount").innerText =
         `عدد الأشخاص: ${invitation.guest_count}`;
 
 
+    /*
+       رابط التحقق عند مسح QR
+       تم تغييره من Netlify إلى GitHub Pages
+    */
+
     const verifyURL =
-        `https://monumental-flan-e776ff.netlify.app/verify.html?code=${encodeURIComponent(code)}`;
+        `https://iisaraxsh-hue.github.io/wedding-invitations/verify.html?code=${encodeURIComponent(code)}`;
 
 
     new QRCode(
@@ -303,4 +307,3 @@ loadInvitation();
 </body>
 
 </html>
-```
