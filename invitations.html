@@ -1,5 +1,3 @@
-# invitations.html
-
 ```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -11,7 +9,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>إدارة الدعوات</title>
+<title>الدعوات</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -31,27 +29,30 @@ body {
     background: #f8f6f3;
 
     color: #222;
+
 }
 
 .container {
 
-    max-width: 700px;
+    max-width: 600px;
 
-    margin: 40px auto;
+    margin: 50px auto;
 
     padding: 20px;
+
 }
 
 .box {
 
     background: white;
 
-    padding: 30px;
+    padding: 35px;
 
     border-radius: 20px;
 
     box-shadow:
         0 8px 30px rgba(0,0,0,0.06);
+
 }
 
 h1 {
@@ -61,6 +62,7 @@ h1 {
     margin-top: 0;
 
     margin-bottom: 10px;
+
 }
 
 .subtitle {
@@ -69,27 +71,28 @@ h1 {
 
     color: #888;
 
+    font-size: 14px;
+
     margin-bottom: 30px;
 
-    font-size: 14px;
+    line-height: 1.7;
+
 }
 
 .event-info {
 
     background: #f7f5f2;
 
-    padding: 18px;
+    padding: 15px;
 
-    border-radius: 14px;
+    border-radius: 12px;
 
     margin-bottom: 25px;
 
     line-height: 1.8;
-}
 
-.event-info strong {
+    font-size: 14px;
 
-    font-size: 18px;
 }
 
 label {
@@ -101,13 +104,14 @@ label {
     margin-bottom: 8px;
 
     font-weight: bold;
+
 }
 
 input {
 
     width: 100%;
 
-    padding: 13px;
+    padding: 14px;
 
     border: 1px solid #ddd;
 
@@ -116,6 +120,7 @@ input {
     font-size: 16px;
 
     background: white;
+
 }
 
 input:focus {
@@ -123,6 +128,19 @@ input:focus {
     outline: none;
 
     border-color: #888;
+
+}
+
+.hint {
+
+    margin-top: 7px;
+
+    color: #888;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
 }
 
 button {
@@ -131,7 +149,7 @@ button {
 
     margin-top: 15px;
 
-    padding: 14px;
+    padding: 15px;
 
     border: 0;
 
@@ -144,11 +162,13 @@ button {
     font-size: 16px;
 
     cursor: pointer;
+
 }
 
 button:hover {
 
     opacity: 0.9;
+
 }
 
 button:disabled {
@@ -156,15 +176,51 @@ button:disabled {
     opacity: 0.5;
 
     cursor: not-allowed;
+
 }
 
-.add-box {
-
-    border-top: 1px solid #eee;
+.section {
 
     margin-top: 30px;
 
     padding-top: 25px;
+
+    border-top: 1px solid #eee;
+
+}
+
+.section h3 {
+
+    margin-top: 0;
+
+}
+
+.file-box {
+
+    background: #faf9f7;
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+}
+
+.file-box input {
+
+    margin-top: 10px;
+
+}
+
+.template {
+
+    margin-top: 12px;
+
+    color: #777;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
 }
 
 .invitation {
@@ -173,20 +229,20 @@ button:disabled {
 
     border: 1px solid #eee;
 
-    border-radius: 15px;
+    border-radius: 14px;
 
-    padding: 18px;
+    padding: 17px;
 
-    margin-top: 15px;
+    margin-top: 12px;
+
 }
 
 .invitation-name {
 
-    font-size: 19px;
+    font-size: 18px;
 
     font-weight: bold;
 
-    margin-bottom: 8px;
 }
 
 .invitation-info {
@@ -195,19 +251,23 @@ button:disabled {
 
     font-size: 14px;
 
+    margin-top: 7px;
+
     line-height: 1.8;
+
 }
 
-.invitation-actions {
+.actions {
 
     display: flex;
 
     gap: 8px;
 
     margin-top: 12px;
+
 }
 
-.small-button {
+.small {
 
     flex: 1;
 
@@ -216,36 +276,31 @@ button:disabled {
     padding: 10px;
 
     font-size: 14px;
+
 }
 
-.delete-button {
+.delete {
 
     background: #a94442;
+
 }
 
-.save-button {
+.edit {
 
-    background: #287a4b;
+    background: #666;
+
 }
 
-.empty {
+.success {
 
-    text-align: center;
+    color: #287a4b;
 
-    color: #999;
-
-    padding: 30px 10px;
 }
 
-.next-button {
+.error {
 
-    margin-top: 30px;
+    color: #c0392b;
 
-    background: #222;
-
-    font-size: 17px;
-
-    padding: 16px;
 }
 
 .message {
@@ -257,23 +312,23 @@ button:disabled {
     font-size: 14px;
 
     line-height: 1.7;
+
 }
 
-.success {
-
-    color: #287a4b;
-}
-
-.error {
-
-    color: #c0392b;
-}
-
-.loading {
+.empty {
 
     text-align: center;
 
-    color: #888;
+    color: #999;
+
+    padding: 25px 0;
+
+}
+
+.next {
+
+    margin-top: 30px;
+
 }
 
 </style>
@@ -293,27 +348,35 @@ button:disabled {
 إدارة الدعوات
 </h1>
 
+
 <div class="subtitle">
-أضيفي أسماء المدعوين وعدد المرافقين لكل دعوة
-</div>
 
-
-<div id="eventInfo"
-     class="event-info">
-
-    جاري تحميل بيانات الحفل...
+أضيفي أسماء المدعوين بالطريقة التي تناسبك
 
 </div>
 
 
 <!-- =========================
-     إضافة مدعو
+     معلومات الحفل
 ========================= -->
 
-<div class="add-box">
+<div
+    id="eventInfo"
+    class="event-info">
+
+جاري تحميل بيانات الحفل...
+
+</div>
+
+
+<!-- =========================
+     الإضافة اليدوية
+========================= -->
+
+<div class="section">
 
 <h3>
-إضافة مدعو
+إضافة يدوية
 </h3>
 
 
@@ -324,7 +387,7 @@ button:disabled {
 <input
     id="guestName"
     type="text"
-    placeholder="مثال: نورة محمد"
+    placeholder="مثال: سارة محمد"
 >
 
 
@@ -343,24 +406,101 @@ button:disabled {
 >
 
 
-<div class="message">
-يمكن إضافة من 0 إلى 3 مرافقين.
+<div class="hint">
+
+يمكن ترك العدد 0 إذا لم يوجد مرافقون.
 <br>
-إذا كانت الدعوة للمدعو فقط اتركي العدد 0.
+
+الحد الأقصى للمرافقين: 3.
+
 </div>
 
 
 <button
     id="addButton"
-    type="button"
-    onclick="addInvitation()">
+    type="button">
 
-    إضافة الدعوة
+إضافة المدعو
 
 </button>
 
+</div>
 
-<div id="message"></div>
+
+<!-- =========================
+     رفع جدول
+========================= -->
+
+<div class="section">
+
+<h3>
+إضافة من جدول
+</h3>
+
+
+<div class="file-box">
+
+<div>
+ارفعي ملف CSV يحتوي على أسماء المدعوين والمرافقين.
+</div>
+
+
+<input
+    id="csvFile"
+    type="file"
+    accept=".csv,text/csv"
+>
+
+
+<div class="template">
+
+يجب أن يكون الجدول بهذا الشكل:
+
+<br><br>
+
+<strong>
+الاسم,المرافقين
+</strong>
+
+<br>
+
+سارة محمد,0
+
+<br>
+
+نورة أحمد,2
+
+<br>
+
+ريم خالد,1
+
+<br><br>
+
+المرافقين اختياري، وإذا تركتيه فارغًا سيتم اعتباره 0.
+
+</div>
+
+
+<button
+    id="importButton"
+    type="button">
+
+إضافة الأسماء من الجدول
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     الرسائل
+========================= -->
+
+<div
+    id="message"
+    class="message">
 
 </div>
 
@@ -369,13 +509,21 @@ button:disabled {
      قائمة الدعوات
 ========================= -->
 
-<div
-    id="invitationsList"
-    style="margin-top:30px;">
+<div class="section">
 
-    <div class="loading">
-        جاري تحميل الدعوات...
-    </div>
+<h3>
+الدعوات
+</h3>
+
+
+<div id="invitationsList">
+
+<div class="empty">
+جاري تحميل الدعوات...
+</div>
+
+</div>
+
 
 </div>
 
@@ -385,12 +533,11 @@ button:disabled {
 ========================= -->
 
 <button
-    id="designButton"
-    class="next-button"
-    type="button"
-    onclick="goToDesign()">
+    id="nextButton"
+    class="next"
+    type="button">
 
-    الانتقال إلى تصميم الدعوات
+الانتقال إلى تصميم الدعوات
 
 </button>
 
@@ -404,18 +551,7 @@ button:disabled {
 
 
 /* =========================
-   متغيرات
-========================= */
-
-let eventId = null;
-
-let eventData = null;
-
-let invitations = [];
-
-
-/* =========================
-   قراءة event_id
+   المتغيرات
 ========================= */
 
 const params =
@@ -423,27 +559,21 @@ const params =
         window.location.search
     );
 
-eventId =
+
+const eventId =
     params.get("event_id");
 
 
+let eventData = null;
+
+let invitations = [];
+
+
 /* =========================
-   التحقق
+   تشغيل
 ========================= */
 
-if (!eventId) {
-
-    document.getElementById(
-        "eventInfo"
-    ).innerHTML = `
-
-        <div class="error">
-            لم يتم العثور على الحفل.
-        </div>
-
-    `;
-
-}
+loadEvent();
 
 
 /* =========================
@@ -452,7 +582,15 @@ if (!eventId) {
 
 async function loadEvent() {
 
-    if (!eventId) return;
+    if (!eventId) {
+
+        showMessage(
+            "رابط الحفل غير صحيح.",
+            "error"
+        );
+
+        return;
+    }
 
 
     const {
@@ -474,15 +612,10 @@ async function loadEvent() {
 
         console.error(error);
 
-        document.getElementById(
-            "eventInfo"
-        ).innerHTML = `
-
-            <div class="error">
-                تعذر تحميل بيانات الحفل.
-            </div>
-
-        `;
+        showMessage(
+            "تعذر تحميل بيانات الحفل.",
+            "error"
+        );
 
         return;
     }
@@ -514,7 +647,7 @@ async function loadEvent() {
     `;
 
 
-    loadInvitations();
+    await loadInvitations();
 
 }
 
@@ -549,21 +682,17 @@ async function loadInvitations() {
 
         console.error(error);
 
-        document.getElementById(
-            "invitationsList"
-        ).innerHTML = `
-
-            <div class="error">
-                تعذر تحميل الدعوات.
-            </div>
-
-        `;
+        showMessage(
+            "تعذر تحميل الدعوات.",
+            "error"
+        );
 
         return;
     }
 
 
-    invitations = data || [];
+    invitations =
+        data || [];
 
 
     renderInvitations();
@@ -572,147 +701,18 @@ async function loadInvitations() {
 
 
 /* =========================
-   عرض الدعوات
+   إضافة يدوي
 ========================= */
 
-function renderInvitations() {
-
-    const list =
-        document.getElementById(
-            "invitationsList"
-        );
-
-
-    if (!invitations.length) {
-
-        list.innerHTML = `
-
-            <div class="empty">
-                لم تتم إضافة أسماء بعد.
-            </div>
-
-        `;
-
-        return;
-    }
+document
+    .getElementById("addButton")
+    .addEventListener(
+        "click",
+        addManual
+    );
 
 
-    list.innerHTML = `
-
-        <h3>
-            الدعوات
-            (${invitations.length})
-        </h3>
-
-        ${invitations
-            .map(
-                invitation =>
-                    renderInvitation(invitation)
-            )
-            .join("")
-        }
-
-    `;
-
-}
-
-
-/* =========================
-   بطاقة الدعوة
-========================= */
-
-function renderInvitation(invitation) {
-
-    const guestName =
-        invitation.guest_name ||
-        "بدون اسم";
-
-
-    const companionCount =
-        Math.max(
-            Number(
-                invitation.guest_count || 1
-            ) - 1,
-            0
-        );
-
-
-    const totalAllowed =
-        Number(
-            invitation.guest_count || 1
-        );
-
-
-    const checkedIn =
-        Number(
-            invitation.checked_in || 0
-        );
-
-
-    return `
-
-        <div
-            class="invitation"
-            id="invitation-${invitation.id}">
-
-            <div class="invitation-name">
-
-                ${escapeHtml(guestName)}
-
-            </div>
-
-
-            <div class="invitation-info">
-
-                المرافقون:
-                ${companionCount}
-
-                <br>
-
-                إجمالي الأشخاص المسموح:
-                ${totalAllowed}
-
-                <br>
-
-                تم الدخول:
-                ${checkedIn}
-
-            </div>
-
-
-            <div class="invitation-actions">
-
-                <button
-                    class="small-button save-button"
-                    onclick="editInvitation('${invitation.id}')">
-
-                    تعديل
-
-                </button>
-
-
-                <button
-                    class="small-button delete-button"
-                    onclick="deleteInvitation('${invitation.id}')">
-
-                    حذف
-
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================
-   إضافة دعوة
-========================= */
-
-async function addInvitation() {
+async function addManual() {
 
     const nameInput =
         document.getElementById(
@@ -732,14 +732,14 @@ async function addInvitation() {
 
     const companions =
         Number(
-            companionInput.value
+            companionInput.value || 0
         );
 
 
     if (!name) {
 
         showMessage(
-            "فضلاً اكتبي اسم المدعو.",
+            "اكتبي اسم المدعو أولًا.",
             "error"
         );
 
@@ -762,25 +762,53 @@ async function addInvitation() {
     }
 
 
-    const button =
-        document.getElementById(
-            "addButton"
+    const emptyInvitation =
+        invitations.find(
+            item =>
+                !item.guest_name
         );
 
 
-    button.disabled = true;
-
-    button.innerText =
-        "جاري الإضافة...";
+    const guestCount =
+        companions + 1;
 
 
-    try {
+    let error;
 
 
-        /* =========================
-           رقم داخلي فقط
-           لا يظهر للضيف
-        ========================= */
+    if (emptyInvitation) {
+
+        const result =
+            await supabaseClient
+
+            .from("invitations")
+
+            .update({
+
+                guest_name:
+                    name,
+
+                guest_count:
+                    guestCount,
+
+                checked_in:
+                    0,
+
+                used:
+                    false
+
+            })
+
+            .eq(
+                "id",
+                emptyInvitation.id
+            );
+
+
+        error =
+            result.error;
+
+    } else {
 
         const nextNumber =
             invitations.length
@@ -795,19 +823,7 @@ async function addInvitation() {
                 : 1;
 
 
-        /* =========================
-           إجمالي الأشخاص
-           المدعو + المرافقين
-        ========================= */
-
-        const totalAllowed =
-            1 + companions;
-
-
-        const {
-            data,
-            error
-        } =
+        const result =
             await supabaseClient
 
             .from("invitations")
@@ -824,7 +840,7 @@ async function addInvitation() {
                     nextNumber,
 
                 guest_count:
-                    totalAllowed,
+                    guestCount,
 
                 checked_in:
                     0,
@@ -835,19 +851,170 @@ async function addInvitation() {
                 used:
                     false
 
-            })
-
-            .select()
-
-            .single();
+            });
 
 
-        if (error) {
+        error =
+            result.error;
 
-            console.error(error);
+    }
+
+
+    if (error) {
+
+        console.error(error);
+
+        showMessage(
+            "حدث خطأ أثناء إضافة المدعو.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    nameInput.value = "";
+
+    companionInput.value = "0";
+
+
+    await loadInvitations();
+
+
+    showMessage(
+        "تمت إضافة المدعو بنجاح 🤍",
+        "success"
+    );
+
+}
+
+
+/* =========================
+   استيراد CSV
+========================= */
+
+document
+    .getElementById("importButton")
+    .addEventListener(
+        "click",
+        importCSV
+    );
+
+
+async function importCSV() {
+
+    const fileInput =
+        document.getElementById(
+            "csvFile"
+        );
+
+
+    const file =
+        fileInput.files[0];
+
+
+    if (!file) {
+
+        showMessage(
+            "اختاري ملف CSV أولًا.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const text =
+        await file.text();
+
+
+    const rows =
+        parseCSV(text);
+
+
+    if (!rows.length) {
+
+        showMessage(
+            "الملف فارغ.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    let startIndex = 0;
+
+
+    const firstRow =
+        rows[0]
+            .map(
+                cell =>
+                    cell.trim().toLowerCase()
+            );
+
+
+    if (
+        firstRow.includes("الاسم") ||
+        firstRow.includes("name")
+    ) {
+
+        startIndex = 1;
+
+    }
+
+
+    const validRows = [];
+
+
+    for (
+        let i = startIndex;
+        i < rows.length;
+        i++
+    ) {
+
+        const row =
+            rows[i];
+
+
+        if (!row.length) continue;
+
+
+        const name =
+            String(
+                row[0] || ""
+            ).trim();
+
+
+        if (!name) continue;
+
+
+        let companions =
+            Number(
+                String(
+                    row[1] || "0"
+                ).trim()
+            );
+
+
+        if (
+            !Number.isInteger(
+                companions
+            )
+        ) {
+
+            companions = 0;
+
+        }
+
+
+        if (
+            companions < 0 ||
+            companions > 3
+        ) {
 
             showMessage(
-                "حدث خطأ أثناء إضافة الدعوة.",
+                `عدد المرافقين للمدعو "${name}" يجب أن يكون من 0 إلى 3.`,
                 "error"
             );
 
@@ -855,46 +1022,392 @@ async function addInvitation() {
         }
 
 
-        invitations.push(data);
+        validRows.push({
+
+            name:
+                name,
+
+            companions:
+                companions
+
+        });
+
+    }
 
 
-        nameInput.value = "";
-
-        companionInput.value = "0";
-
-
-        renderInvitations();
-
-
-        showMessage(
-            "تمت إضافة الدعوة بنجاح 🤍",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(error);
+    if (!validRows.length) {
 
         showMessage(
-            "حدث خطأ غير متوقع.",
+            "لم يتم العثور على أسماء صحيحة في الملف.",
             "error"
         );
 
-    } finally {
+        return;
+    }
 
-        button.disabled = false;
 
-        button.innerText =
-            "إضافة الدعوة";
+    const existingEmpty =
+        invitations.filter(
+            item =>
+                !item.guest_name
+        );
+
+
+    const insertRows = [];
+
+
+    for (
+        let i = 0;
+        i < validRows.length;
+        i++
+    ) {
+
+        const row =
+            validRows[i];
+
+
+        const empty =
+            existingEmpty[i];
+
+
+        const guestCount =
+            row.companions + 1;
+
+
+        if (empty) {
+
+            const {
+                error
+            } =
+                await supabaseClient
+
+                .from("invitations")
+
+                .update({
+
+                    guest_name:
+                        row.name,
+
+                    guest_count:
+                        guestCount,
+
+                    checked_in:
+                        0,
+
+                    used:
+                        false
+
+                })
+
+                .eq(
+                    "id",
+                    empty.id
+                );
+
+
+            if (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "حدث خطأ أثناء استيراد الجدول.",
+                    "error"
+                );
+
+                return;
+            }
+
+        } else {
+
+            const nextNumber =
+                invitations.length +
+                insertRows.length +
+                1;
+
+
+            insertRows.push({
+
+                event_id:
+                    eventId,
+
+                guest_name:
+                    row.name,
+
+                invitation_number:
+                    nextNumber,
+
+                guest_count:
+                    guestCount,
+
+                checked_in:
+                    0,
+
+                qr_code:
+                    crypto.randomUUID(),
+
+                used:
+                    false
+
+            });
+
+        }
 
     }
+
+
+    if (insertRows.length) {
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+            .from("invitations")
+
+            .insert(
+                insertRows
+            );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                "حدث خطأ أثناء إضافة باقي الدعوات.",
+                "error"
+            );
+
+            return;
+        }
+
+    }
+
+
+    fileInput.value = "";
+
+
+    await loadInvitations();
+
+
+    showMessage(
+        `تمت إضافة ${validRows.length} دعوة بنجاح 🤍`,
+        "success"
+    );
 
 }
 
 
 /* =========================
-   تعديل الدعوة
+   قراءة CSV
+========================= */
+
+function parseCSV(text) {
+
+    const lines =
+        text
+            .replace(/\r/g, "")
+            .split("\n");
+
+
+    const rows = [];
+
+
+    for (
+        const line of lines
+    ) {
+
+        if (!line.trim()) continue;
+
+
+        const row = [];
+
+        let current = "";
+
+        let insideQuotes = false;
+
+
+        for (
+            let i = 0;
+            i < line.length;
+            i++
+        ) {
+
+            const char =
+                line[i];
+
+
+            if (char === '"') {
+
+                insideQuotes =
+                    !insideQuotes;
+
+                continue;
+
+            }
+
+
+            if (
+                char === "," &&
+                !insideQuotes
+            ) {
+
+                row.push(
+                    current
+                );
+
+                current = "";
+
+            } else {
+
+                current += char;
+
+            }
+
+        }
+
+
+        row.push(
+            current
+        );
+
+
+        rows.push(row);
+
+    }
+
+
+    return rows;
+
+}
+
+
+/* =========================
+   عرض الدعوات
+========================= */
+
+function renderInvitations() {
+
+    const list =
+        document.getElementById(
+            "invitationsList"
+        );
+
+
+    if (!invitations.length) {
+
+        list.innerHTML = `
+
+            <div class="empty">
+                لا توجد دعوات.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        invitations
+            .map(
+                invitation =>
+                    createCard(
+                        invitation
+                    )
+            )
+            .join("");
+
+}
+
+
+/* =========================
+   بطاقة الدعوة
+========================= */
+
+function createCard(
+    invitation
+) {
+
+    const name =
+        invitation.guest_name ||
+        "لم تتم إضافة الاسم بعد";
+
+
+    const total =
+        Number(
+            invitation.guest_count || 1
+        );
+
+
+    const companions =
+        Math.max(
+            total - 1,
+            0
+        );
+
+
+    return `
+
+        <div class="invitation">
+
+            <div class="invitation-name">
+
+                ${escapeHtml(name)}
+
+            </div>
+
+
+            <div class="invitation-info">
+
+                المرافقون:
+                ${companions}
+
+                <br>
+
+                إجمالي المسموح:
+                ${total}
+
+                <br>
+
+                تم الدخول:
+                ${Number(
+                    invitation.checked_in || 0
+                )}
+
+            </div>
+
+
+            <div class="actions">
+
+                <button
+                    class="small edit"
+                    onclick="editInvitation('${invitation.id}')">
+
+                    تعديل
+
+                </button>
+
+
+                <button
+                    class="small delete"
+                    onclick="deleteInvitation('${invitation.id}')">
+
+                    حذف
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   تعديل
 ========================= */
 
 async function editInvitation(id) {
@@ -909,8 +1422,28 @@ async function editInvitation(id) {
     if (!invitation) return;
 
 
-    const currentName =
-        invitation.guest_name || "";
+    const name =
+        prompt(
+            "اسم المدعو:",
+            invitation.guest_name || ""
+        );
+
+
+    if (name === null) return;
+
+
+    const cleanName =
+        name.trim();
+
+
+    if (!cleanName) {
+
+        alert(
+            "يجب كتابة اسم المدعو."
+        );
+
+        return;
+    }
 
 
     const currentCompanions =
@@ -922,48 +1455,26 @@ async function editInvitation(id) {
         );
 
 
-    const newName =
+    const companionInput =
         prompt(
-            "اسم المدعو:",
-            currentName
-        );
-
-
-    if (newName === null) return;
-
-
-    const cleanName =
-        newName.trim();
-
-
-    if (!cleanName) {
-
-        alert(
-            "اسم المدعو لا يمكن أن يكون فارغًا."
-        );
-
-        return;
-    }
-
-
-    const newCompanions =
-        prompt(
-            "عدد المرافقين (من 0 إلى 3):",
+            "عدد المرافقين من 0 إلى 3:",
             currentCompanions
         );
 
 
-    if (newCompanions === null) return;
+    if (companionInput === null) return;
 
 
     const companions =
         Number(
-            newCompanions
+            companionInput
         );
 
 
     if (
-        !Number.isInteger(companions) ||
+        !Number.isInteger(
+            companions
+        ) ||
         companions < 0 ||
         companions > 3
     ) {
@@ -976,12 +1487,7 @@ async function editInvitation(id) {
     }
 
 
-    const totalAllowed =
-        1 + companions;
-
-
     const {
-        data,
         error
     } =
         await supabaseClient
@@ -994,15 +1500,14 @@ async function editInvitation(id) {
                 cleanName,
 
             guest_count:
-                totalAllowed
+                companions + 1
 
         })
 
-        .eq("id", id)
-
-        .select()
-
-        .single();
+        .eq(
+            "id",
+            id
+        );
 
 
     if (error) {
@@ -1010,35 +1515,20 @@ async function editInvitation(id) {
         console.error(error);
 
         alert(
-            "حدث خطأ أثناء تعديل الدعوة."
+            "حدث خطأ أثناء التعديل."
         );
 
         return;
     }
 
 
-    invitations =
-        invitations.map(
-            item =>
-                item.id === id
-                    ? data
-                    : item
-        );
-
-
-    renderInvitations();
-
-
-    showMessage(
-        "تم تعديل الدعوة بنجاح 🤍",
-        "success"
-    );
+    await loadInvitations();
 
 }
 
 
 /* =========================
-   حذف الدعوة
+   حذف
 ========================= */
 
 async function deleteInvitation(id) {
@@ -1053,14 +1543,9 @@ async function deleteInvitation(id) {
     if (!invitation) return;
 
 
-    const name =
-        invitation.guest_name ||
-        "هذه الدعوة";
-
-
     const confirmed =
         confirm(
-            `هل أنتِ متأكدة من حذف دعوة "${name}"؟`
+            `هل تريدين حذف دعوة "${invitation.guest_name || "بدون اسم"}"؟`
         );
 
 
@@ -1076,7 +1561,10 @@ async function deleteInvitation(id) {
 
         .delete()
 
-        .eq("id", id);
+        .eq(
+            "id",
+            id
+        );
 
 
     if (error) {
@@ -1084,27 +1572,14 @@ async function deleteInvitation(id) {
         console.error(error);
 
         alert(
-            "حدث خطأ أثناء حذف الدعوة."
+            "حدث خطأ أثناء الحذف."
         );
 
         return;
     }
 
 
-    invitations =
-        invitations.filter(
-            item =>
-                item.id !== id
-        );
-
-
-    renderInvitations();
-
-
-    showMessage(
-        "تم حذف الدعوة.",
-        "success"
-    );
+    await loadInvitations();
 
 }
 
@@ -1113,32 +1588,17 @@ async function deleteInvitation(id) {
    الانتقال للتصميم
 ========================= */
 
-function goToDesign() {
+document
+    .getElementById("nextButton")
+    .addEventListener(
+        "click",
+        function() {
 
-    if (!eventId) {
+            window.location.href =
+                `design.html?event_id=${encodeURIComponent(eventId)}`;
 
-        alert(
-            "لم يتم العثور على الحفل."
-        );
-
-        return;
-    }
-
-
-    if (!invitations.length) {
-
-        alert(
-            "أضيفي دعوة واحدة على الأقل قبل الانتقال للتصميم."
-        );
-
-        return;
-    }
-
-
-    window.location.href =
-        `design.html?event_id=${encodeURIComponent(eventId)}`;
-
-}
+        }
+    );
 
 
 /* =========================
@@ -1146,7 +1606,7 @@ function goToDesign() {
 ========================= */
 
 function showMessage(
-    message,
+    text,
     type
 ) {
 
@@ -1156,22 +1616,26 @@ function showMessage(
         );
 
 
+    element.innerText =
+        text;
+
+
     element.className =
         `message ${type}`;
 
 
-    element.innerHTML =
-        message;
+    setTimeout(
+        function() {
 
+            element.innerText =
+                "";
 
-    setTimeout(() => {
+            element.className =
+                "message";
 
-        element.innerHTML = "";
-
-        element.className =
-            "message";
-
-    }, 3000);
+        },
+        3500
+    );
 
 }
 
@@ -1210,13 +1674,6 @@ function escapeHtml(text) {
         );
 
 }
-
-
-/* =========================
-   تشغيل الصفحة
-========================= */
-
-loadEvent();
 
 </script>
 
