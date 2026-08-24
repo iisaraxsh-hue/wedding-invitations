@@ -3,186 +3,180 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>دعوتك الخاصة</title>
+    <title>دعوتك الخاصة</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<style>
+    <style>
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-body {
+        body {
+            margin: 0;
+            min-height: 100vh;
 
-    margin: 0;
+            font-family: Arial, sans-serif;
 
-    min-height: 100vh;
+            background:
+                linear-gradient(135deg, #f8f3ed, #eee5dc);
 
-    font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-    background:
-        linear-gradient(135deg, #f8f3ed, #eee5dc);
+            padding: 20px;
+        }
 
-    display: flex;
+        .invitation {
 
-    justify-content: center;
+            width: 100%;
+            max-width: 390px;
 
-    align-items: center;
+            background: #ffffff;
 
-    padding: 20px;
+            border-radius: 30px;
 
-}
+            padding: 35px 25px;
 
-.invitation {
+            text-align: center;
 
-    width: 100%;
+            box-shadow:
+                0 18px 45px rgba(0,0,0,0.10);
+        }
 
-    max-width: 390px;
+        .top-icon {
 
-    background: #ffffff;
+            width: 70px;
+            height: 70px;
 
-    border-radius: 30px;
+            margin: 0 auto 18px;
 
-    padding: 35px 25px;
+            border-radius: 50%;
 
-    text-align: center;
+            background: #f3eee8;
 
-    box-shadow:
-        0 18px 45px rgba(0,0,0,0.10);
+            display: flex;
 
-}
+            justify-content: center;
+            align-items: center;
 
-.top-icon {
+            font-size: 34px;
+        }
 
-    width: 70px;
+        h1 {
 
-    height: 70px;
+            margin: 0;
 
-    margin: 0 auto 18px;
+            color: #292929;
 
-    border-radius: 50%;
+            font-size: 25px;
+        }
 
-    background: #f3eee8;
+        .subtitle {
 
-    display: flex;
+            margin-top: 8px;
 
-    justify-content: center;
+            color: #888;
 
-    align-items: center;
+            font-size: 14px;
+        }
 
-    font-size: 34px;
+        .guest {
 
-}
+            margin: 25px 0 8px;
 
-h1 {
+            font-size: 27px;
 
-    margin: 0;
+            font-weight: bold;
 
-    color: #292929;
+            color: #222;
+        }
 
-    font-size: 25px;
+        .count {
 
-}
+            color: #666;
 
-.subtitle {
+            font-size: 16px;
 
-    margin-top: 8px;
+            margin-bottom: 22px;
+        }
 
-    color: #888;
+        .qr-box {
 
-    font-size: 14px;
+            background: #fafafa;
 
-}
+            border-radius: 22px;
 
-.guest {
+            padding: 18px;
 
-    margin: 25px 0 8px;
+            display: inline-block;
+        }
 
-    font-size: 27px;
+        #qrcode {
 
-    font-weight: bold;
+            display: flex;
 
-    color: #222;
+            justify-content: center;
+        }
 
-}
+        #qrcode img {
 
-.count {
+            display: block;
 
-    color: #666;
+            border-radius: 8px;
+        }
 
-    font-size: 16px;
+        .message {
 
-    margin-bottom: 22px;
+            margin-top: 22px;
 
-}
+            color: #777;
 
-.qr-box {
+            font-size: 14px;
 
-    background: #fafafa;
+            line-height: 1.7;
+        }
 
-    border-radius: 22px;
+        .footer {
 
-    padding: 18px;
+            margin-top: 20px;
 
-    display: inline-block;
+            padding-top: 15px;
 
-}
+            border-top: 1px solid #eee;
 
-#qrcode {
+            color: #aaa;
 
-    display: flex;
+            font-size: 12px;
+        }
 
-    justify-content: center;
+        .error {
 
-}
+            color: #c0392b;
 
-#qrcode img {
+            font-size: 18px;
 
-    display: block;
+            font-weight: bold;
 
-    border-radius: 8px;
+            line-height: 1.8;
+        }
 
-}
-
-.message {
-
-    margin-top: 22px;
-
-    color: #777;
-
-    font-size: 14px;
-
-    line-height: 1.7;
-
-}
-
-.footer {
-
-    margin-top: 20px;
-
-    padding-top: 15px;
-
-    border-top: 1px solid #eee;
-
-    color: #aaa;
-
-    font-size: 12px;
-
-}
-
-</style>
+    </style>
 
 </head>
 
+
 <body>
+
 
 <div class="invitation">
 
@@ -190,17 +184,31 @@ h1 {
         💌
     </div>
 
+
     <h1>
         دعوتك الخاصة
     </h1>
+
 
     <div class="subtitle">
         يسعدنا حضورك ومشاركتنا مناسبتنا ✨
     </div>
 
-    <div id="guestName" class="guest"></div>
 
-    <div id="guestCount" class="count"></div>
+    <div
+        id="guestName"
+        class="guest">
+
+        جاري تحميل الدعوة...
+
+    </div>
+
+
+    <div
+        id="guestCount"
+        class="count">
+    </div>
+
 
     <div class="qr-box">
 
@@ -208,78 +216,134 @@ h1 {
 
     </div>
 
+
     <div class="message">
+
         يرجى إبراز رمز QR عند الدخول
+
         <br>
+
         رمز الدعوة خاص بك ولا يمكن استخدامه أكثر من مرة
+
     </div>
 
+
     <div class="footer">
+
         نتطلع لرؤيتك 🤍
+
     </div>
+
 
 </div>
 
 
 <script>
 
+
 async function loadInvitation() {
 
+
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
+
 
     const code =
         params.get("code");
 
 
+    /* =========================
+       التأكد من وجود الكود
+    ========================= */
+
     if (!code) {
 
-        document.getElementById("guestName").innerText =
-            "الدعوة غير موجودة";
+        document
+            .getElementById("guestName")
+            .innerText =
+            "الدعوة غير موجودة ❌";
 
         return;
     }
 
 
-    const { data: invitation, error } =
-        await supabaseClient
+    /* =========================
+       البحث عن الدعوة
+    ========================= */
 
-            .from("invitations")
+    const {
+        data: invitation,
+        error
+    } = await supabaseClient
 
-            .select("*")
+        .from("invitations")
 
-            .eq("qr_code", code)
+        .select("*")
 
-            .single();
+        .eq("qr_code", code)
 
+        .single();
+
+
+    /* =========================
+       في حالة وجود خطأ
+    ========================= */
 
     if (error || !invitation) {
 
         console.error(error);
 
-        document.getElementById("guestName").innerText =
+        document
+            .getElementById("guestName")
+            .innerText =
             "الدعوة غير صالحة ❌";
+
+        document
+            .getElementById("guestCount")
+            .innerText =
+            "يرجى التحقق من رابط الدعوة.";
 
         return;
     }
 
 
-    document.getElementById("guestName").innerText =
-        invitation.guest_name || "ضيفنا الكريم";
+    /* =========================
+       اسم المدعو
+    ========================= */
+
+    document
+        .getElementById("guestName")
+        .innerText =
+        invitation.guest_name || "مدعو";
 
 
-    document.getElementById("guestCount").innerText =
+    /* =========================
+       عدد الأشخاص
+    ========================= */
+
+    document
+        .getElementById("guestCount")
+        .innerText =
         `عدد الأشخاص: ${invitation.guest_count}`;
 
 
-    /*
-       رابط التحقق عند مسح QR
-       تم تغييره من Netlify إلى GitHub Pages
-    */
+    /* =========================
+       رابط صفحة التحقق
+       
+       مهم:
+       هذا هو رابط GitHub Pages
+       وليس Netlify
+    ========================= */
 
     const verifyURL =
         `https://iisaraxsh-hue.github.io/wedding-invitations/verify.html?code=${encodeURIComponent(code)}`;
 
+
+    /* =========================
+       إنشاء QR
+    ========================= */
 
     new QRCode(
 
@@ -291,7 +355,14 @@ async function loadInvitation() {
 
             width: 220,
 
-            height: 220
+            height: 220,
+
+            colorDark: "#222222",
+
+            colorLight: "#ffffff",
+
+            correctLevel:
+                QRCode.CorrectLevel.H
 
         }
 
@@ -300,9 +371,14 @@ async function loadInvitation() {
 }
 
 
+/* =========================
+   تشغيل الصفحة
+========================= */
+
 loadInvitation();
 
 </script>
+
 
 </body>
 
