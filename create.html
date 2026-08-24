@@ -3,8 +3,11 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>إنشاء الدعوات</title>
 
@@ -12,6 +15,7 @@
     <script src="config.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -24,14 +28,14 @@
         }
 
         .container {
-            max-width: 900px;
-            margin: 40px auto;
+            max-width: 600px;
+            margin: 50px auto;
             padding: 20px;
         }
 
         .box {
             background: white;
-            padding: 30px;
+            padding: 35px;
             border-radius: 20px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.06);
         }
@@ -42,19 +46,16 @@
             margin-bottom: 30px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
         label {
             display: block;
+            margin-top: 18px;
             margin-bottom: 8px;
             font-weight: bold;
         }
 
         input {
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             border: 1px solid #ddd;
             border-radius: 10px;
             font-size: 16px;
@@ -67,66 +68,15 @@
         }
 
         .hint {
-            margin-top: 6px;
+            margin-top: 7px;
             color: #888;
             font-size: 13px;
+            line-height: 1.6;
         }
 
-        .section-title {
-            margin-top: 35px;
-            margin-bottom: 15px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .guest-table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
+        button {
             width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-
-        th,
-        td {
-            border-bottom: 1px solid #eee;
-            padding: 12px;
-            text-align: center;
-        }
-
-        th {
-            background: #f7f5f2;
-        }
-
-        td input {
-            width: 100%;
-            min-width: 100px;
-        }
-
-        .delete-btn {
-            width: auto;
-            margin: 0;
-            padding: 9px 14px;
-            background: #eee;
-            color: #333;
-        }
-
-        .delete-btn:hover {
-            background: #ddd;
-        }
-
-        .add-btn {
-            width: auto;
-            margin-top: 15px;
-            background: #555;
-            padding: 12px 20px;
-        }
-
-        .generate-btn {
             margin-top: 30px;
-            width: 100%;
             padding: 16px;
             border: 0;
             border-radius: 12px;
@@ -136,34 +86,22 @@
             cursor: pointer;
         }
 
+        button:hover {
+            opacity: 0.9;
+        }
+
         button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
 
-        .empty-message {
-            text-align: center;
-            color: #888;
-            padding: 25px;
-        }
-
-        .summary {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f7f7f7;
-            border-radius: 12px;
-            line-height: 1.8;
-        }
-
-        .error {
-            color: #c0392b;
-            font-size: 14px;
-            margin-top: 5px;
-        }
     </style>
+
 </head>
 
+
 <body>
+
 
 <div class="container">
 
@@ -171,139 +109,97 @@
 
         <h1>إنشاء دعوة</h1>
 
-        <!-- اسم الحفل -->
-        <div class="form-group">
-            <label for="eventName">
-                اسم الحفل
-            </label>
 
-            <input
-                id="eventName"
-                type="text"
-                placeholder="مثال: حفل زفاف سارة"
-            >
-        </div>
+        <!-- اسم الحفل -->
+
+        <label>
+            اسم الحفل
+        </label>
+
+        <input
+            id="eventName"
+            type="text"
+            placeholder="مثال: حفل زفاف سارة"
+        >
 
 
         <!-- تاريخ الحفل -->
-        <div class="form-group">
 
-            <label for="eventDate">
-                تاريخ الحفل
-            </label>
+        <label>
+            تاريخ الحفل
+        </label>
 
-            <input
-                id="eventDate"
-                type="date"
-            >
-
-        </div>
+        <input
+            id="eventDate"
+            type="date"
+        >
 
 
         <!-- بداية الدخول -->
-        <div class="form-group">
 
-            <label for="startTime">
-                وقت بداية الدخول
-            </label>
+        <label>
+            وقت بداية الدخول
+        </label>
 
-            <input
-                id="startTime"
-                type="time"
-            >
-
-        </div>
+        <input
+            id="startTime"
+            type="time"
+        >
 
 
         <!-- نهاية الدخول -->
-        <div class="form-group">
 
-            <label for="endTime">
-                وقت انتهاء الدخول
-            </label>
+        <label>
+            وقت انتهاء الدخول
+        </label>
 
-            <input
-                id="endTime"
-                type="time"
-            >
-
-        </div>
+        <input
+            id="endTime"
+            type="time"
+        >
 
 
-        <div class="section-title">
-            قائمة المدعوين
-        </div>
+        <!-- عدد الدعوات -->
+
+        <label>
+            عدد الدعوات المطلوبة
+        </label>
+
+        <input
+            id="invitationCount"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="مثال: 100"
+        >
+
+
+        <!-- عدد المرافقين -->
+
+        <label>
+            عدد المرافقين
+        </label>
+
+        <input
+            id="defaultCompanionCount"
+            type="number"
+            min="0"
+            max="3"
+            step="1"
+            placeholder="اختياري — 0 إلى 3"
+        >
 
         <div class="hint">
-            أضيفي اسم كل مدعو وعدد المرافقين المسموح لهم.
-            ترك عدد المرافقين فارغًا يعني 0 مرافق.
-            الحد الأقصى للمرافقين لكل دعوة هو 3.
+            اتركي الخانة فارغة إذا لم يوجد مرافقون.
+            الحد الأقصى للمرافقين هو 3.
         </div>
 
 
-        <div class="guest-table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>رقم</th>
-                        <th>اسم المدعو</th>
-                        <th>عدد المرافقين</th>
-                        <th>المسموح بالدخول</th>
-                        <th>حذف</th>
-                    </tr>
-
-                </thead>
-
-                <tbody id="guestsTable">
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        <div
-            id="emptyMessage"
-            class="empty-message">
-
-            لم تتم إضافة أي مدعوين بعد
-
-        </div>
-
+        <!-- زر التوليد -->
 
         <button
-            type="button"
-            class="add-btn"
-            id="addGuestButton">
-
-            + إضافة مدعو
-
-        </button>
-
-
-        <div
-            id="summary"
-            class="summary">
-
-            عدد الدعوات:
-            <strong id="totalInvitations">0</strong>
-
-            <br>
-
-            إجمالي الأشخاص المسموح لهم بالدخول:
-            <strong id="totalPeople">0</strong>
-
-        </div>
-
-
-        <button
-            type="button"
-            class="generate-btn"
-            id="generateButton">
+            id="generateButton"
+            type="button">
 
             توليد الدعوات
 
@@ -315,283 +211,6 @@
 
 
 <script>
-
-let guestNumber = 0;
-
-
-/* =========================
-   إضافة مدعو
-========================= */
-
-document
-    .getElementById("addGuestButton")
-    .addEventListener("click", addGuest);
-
-
-function addGuest() {
-
-    guestNumber++;
-
-    const table =
-        document.getElementById("guestsTable");
-
-    const row =
-        document.createElement("tr");
-
-    row.dataset.number =
-        guestNumber;
-
-
-    row.innerHTML = `
-
-        <td>
-            ${guestNumber}
-        </td>
-
-        <td>
-
-            <input
-                type="text"
-                class="guest-name"
-                placeholder="اسم المدعو"
-            >
-
-            <div class="error guest-name-error"></div>
-
-        </td>
-
-        <td>
-
-            <input
-                type="number"
-                class="companion-count"
-                min="0"
-                max="3"
-                step="1"
-                placeholder="0"
-            >
-
-            <div class="error companion-error"></div>
-
-        </td>
-
-        <td>
-
-            <span class="allowed-count">
-                1
-            </span>
-
-            شخص
-
-        </td>
-
-        <td>
-
-            <button
-                type="button"
-                class="delete-btn">
-
-                حذف
-
-            </button>
-
-        </td>
-    `;
-
-
-    table.appendChild(row);
-
-
-    const companionInput =
-        row.querySelector(".companion-count");
-
-
-    companionInput.addEventListener(
-        "input",
-        function () {
-
-            updateAllowedCount(row);
-
-        }
-    );
-
-
-    const deleteButton =
-        row.querySelector(".delete-btn");
-
-
-    deleteButton.addEventListener(
-        "click",
-        function () {
-
-            row.remove();
-
-            renumberGuests();
-
-            updateSummary();
-
-        }
-    );
-
-
-    updateEmptyMessage();
-
-    updateSummary();
-
-}
-
-
-/* =========================
-   حساب العدد المسموح
-========================= */
-
-function updateAllowedCount(row) {
-
-    const input =
-        row.querySelector(".companion-count");
-
-    const allowed =
-        row.querySelector(".allowed-count");
-
-    let companions =
-        input.value.trim() === ""
-            ? 0
-            : Number(input.value);
-
-
-    if (companions < 0) {
-
-        companions = 0;
-
-        input.value = 0;
-
-    }
-
-
-    if (companions > 3) {
-
-        companions = 3;
-
-        input.value = 3;
-
-        alert(
-            "الحد الأقصى للمرافقين هو 3 فقط."
-        );
-
-    }
-
-
-    allowed.innerText =
-        1 + companions;
-
-
-    updateSummary();
-
-}
-
-
-/* =========================
-   إعادة ترقيم المدعوين
-========================= */
-
-function renumberGuests() {
-
-    const rows =
-        document.querySelectorAll(
-            "#guestsTable tr"
-        );
-
-
-    rows.forEach(
-        (row, index) => {
-
-            row.querySelector("td").innerText =
-                index + 1;
-
-        }
-    );
-
-}
-
-
-/* =========================
-   تحديث الملخص
-========================= */
-
-function updateSummary() {
-
-    const rows =
-        document.querySelectorAll(
-            "#guestsTable tr"
-        );
-
-
-    let totalPeople = 0;
-
-
-    rows.forEach(
-        row => {
-
-            const input =
-                row.querySelector(
-                    ".companion-count"
-                );
-
-
-            const companions =
-                input.value.trim() === ""
-                    ? 0
-                    : Number(input.value);
-
-
-            totalPeople +=
-                1 + companions;
-
-        }
-    );
-
-
-    document.getElementById(
-        "totalInvitations"
-    ).innerText =
-        rows.length;
-
-
-    document.getElementById(
-        "totalPeople"
-    ).innerText =
-        totalPeople;
-
-
-    updateEmptyMessage();
-
-}
-
-
-/* =========================
-   رسالة عدم وجود مدعوين
-========================= */
-
-function updateEmptyMessage() {
-
-    const rows =
-        document.querySelectorAll(
-            "#guestsTable tr"
-        );
-
-
-    const message =
-        document.getElementById(
-            "emptyMessage"
-        );
-
-
-    message.style.display =
-        rows.length === 0
-            ? "block"
-            : "none";
-
-}
 
 
 /* =========================
@@ -618,16 +237,17 @@ async function createEvent() {
         );
 
 
+    button.disabled = true;
+
+    button.innerText =
+        "جاري إنشاء الدعوات...";
+
+
     try {
-
-        button.disabled = true;
-
-        button.innerText =
-            "جاري إنشاء الدعوات...";
 
 
         /* =========================
-           قراءة بيانات الحفل
+           قراءة البيانات
         ========================= */
 
         const eventName =
@@ -655,189 +275,137 @@ async function createEvent() {
                 .value;
 
 
+        const invitationCount =
+            Number(
+                document
+                    .getElementById(
+                        "invitationCount"
+                    )
+                    .value
+            );
+
+
+        /*
+           خانة المرافقين اختيارية.
+
+           إذا كانت فارغة:
+           = 0 مرافق
+        */
+
+        const companionInput =
+            document
+                .getElementById(
+                    "defaultCompanionCount"
+                )
+                .value
+                .trim();
+
+
+        const defaultCompanionCount =
+            companionInput === ""
+                ? 0
+                : Number(companionInput);
+
+
         /* =========================
-           التحقق من بيانات الحفل
+           التحقق من البيانات
         ========================= */
 
         if (!eventName) {
 
             alert(
-                "فضلاً اكتبي اسم الحفل."
+                "فضلاً اكتبي اسم الحفل"
             );
 
             return;
-
         }
 
 
         if (!eventDate) {
 
             alert(
-                "فضلاً اختاري تاريخ الحفل."
+                "فضلاً اختاري تاريخ الحفل"
             );
 
             return;
-
         }
 
 
         if (!startTime) {
 
             alert(
-                "فضلاً اختاري وقت بداية الدخول."
+                "فضلاً اختاري وقت بداية الدخول"
             );
 
             return;
-
         }
 
 
         if (!endTime) {
 
             alert(
-                "فضلاً اختاري وقت انتهاء الدخول."
+                "فضلاً اختاري وقت انتهاء الدخول"
             );
 
             return;
-
         }
 
 
-        if (startTime >= endTime) {
+        if (
+            startTime >= endTime
+        ) {
 
             alert(
-                "وقت انتهاء الدخول يجب أن يكون بعد وقت البداية."
+                "وقت انتهاء الدخول يجب أن يكون بعد وقت البداية"
             );
 
             return;
+        }
 
+
+        if (
+            !Number.isInteger(
+                invitationCount
+            ) ||
+            invitationCount < 1
+        ) {
+
+            alert(
+                "فضلاً اكتبي عدد الدعوات"
+            );
+
+            return;
         }
 
 
         /* =========================
-           قراءة جدول المدعوين
+           التحقق من المرافقين
         ========================= */
 
-        const rows =
-            Array.from(
-                document.querySelectorAll(
-                    "#guestsTable tr"
-                )
-            );
-
-
-        if (rows.length === 0) {
+        if (
+            !Number.isInteger(
+                defaultCompanionCount
+            ) ||
+            defaultCompanionCount < 0
+        ) {
 
             alert(
-                "فضلاً أضيفي مدعوًا واحدًا على الأقل."
+                "عدد المرافقين يجب أن يكون 0 أو أكثر"
             );
 
             return;
-
         }
 
 
-        const guests = [];
-
-
-        for (
-            let i = 0;
-            i < rows.length;
-            i++
+        if (
+            defaultCompanionCount > 3
         ) {
 
-            const row = rows[i];
+            alert(
+                "الحد الأقصى للمرافقين هو 3 فقط ❌"
+            );
 
-
-            const nameInput =
-                row.querySelector(
-                    ".guest-name"
-                );
-
-
-            const companionInput =
-                row.querySelector(
-                    ".companion-count"
-                );
-
-
-            const name =
-                nameInput.value.trim();
-
-
-            const companionValue =
-                companionInput.value.trim();
-
-
-            const companions =
-                companionValue === ""
-                    ? 0
-                    : Number(companionValue);
-
-
-            /* =========================
-               التحقق من الاسم
-            ========================= */
-
-            if (!name) {
-
-                alert(
-                    `فضلاً اكتبي اسم المدعو رقم ${i + 1}.`
-                );
-
-                nameInput.focus();
-
-                return;
-
-            }
-
-
-            /* =========================
-               التحقق من المرافقين
-            ========================= */
-
-            if (
-                !Number.isInteger(companions) ||
-                companions < 0
-            ) {
-
-                alert(
-                    `عدد المرافقين للمدعو "${name}" غير صحيح.`
-                );
-
-                companionInput.focus();
-
-                return;
-
-            }
-
-
-            if (companions > 3) {
-
-                alert(
-                    `الحد الأقصى للمرافقين للمدعو "${name}" هو 3 فقط.`
-                );
-
-                companionInput.focus();
-
-                return;
-
-            }
-
-
-            guests.push({
-
-                guest_name:
-                    name,
-
-                companion_count:
-                    companions,
-
-                guest_count:
-                    1 + companions
-
-            });
-
+            return;
         }
 
 
@@ -868,7 +436,7 @@ async function createEvent() {
                         endTime,
 
                     invitation_count:
-                        guests.length
+                        invitationCount
 
                 })
 
@@ -885,49 +453,71 @@ async function createEvent() {
             );
 
             alert(
-                "حدث خطأ أثناء إنشاء الحفل."
+                "حدث خطأ أثناء إنشاء الحفل"
             );
 
             return;
-
         }
 
 
         /* =========================
-           تجهيز الدعوات
+           إنشاء الدعوات
         ========================= */
 
-        const invitations =
-            guests.map(
-                (guest, index) => {
+        const invitations = [];
 
-                    return {
 
-                        event_id:
-                            event.id,
+        /*
+           المدعو الأساسي = 1
 
-                        guest_name:
-                            guest.guest_name,
+           المرافقون = العدد المختار
 
-                        invitation_number:
-                            index + 1,
+           مثال:
+           0 مرافق = 1 شخص
+           1 مرافق = 2 أشخاص
+           2 مرافقين = 3 أشخاص
+           3 مرافقين = 4 أشخاص
+        */
 
-                        guest_count:
-                            guest.guest_count,
 
-                        checked_in:
-                            0,
+        const totalAllowed =
+            1 +
+            defaultCompanionCount;
 
-                        qr_code:
-                            crypto.randomUUID(),
 
-                        used:
-                            false
+        for (
+            let i = 1;
+            i <= invitationCount;
+            i++
+        ) {
 
-                    };
 
-                }
-            );
+            invitations.push({
+
+                event_id:
+                    event.id,
+
+                guest_name:
+                    null,
+
+                invitation_number:
+                    i,
+
+                guest_count:
+                    totalAllowed,
+
+                checked_in:
+                    0,
+
+                qr_code:
+                    crypto.randomUUID(),
+
+                used:
+                    false
+
+            });
+
+        }
 
 
         /* =========================
@@ -953,13 +543,11 @@ async function createEvent() {
                 invitationsError
             );
 
-
             alert(
-                "تم إنشاء الحفل لكن حدث خطأ أثناء إنشاء الدعوات."
+                "تم إنشاء الحفل لكن حدث خطأ في إنشاء الدعوات"
             );
 
             return;
-
         }
 
 
@@ -968,17 +556,15 @@ async function createEvent() {
         ========================= */
 
         alert(
-            `تم إنشاء ${guests.length} دعوة بنجاح 🎉`
+            `تم إنشاء الحفل وتوليد ${invitationCount} دعوة 🎉`
         );
 
 
         window.location.href =
-            `invitations.html?event_id=${encodeURIComponent(event.id)}`;
-
-    }
+            `invitations.html?event_id=${event.id}`;
 
 
-    catch (error) {
+    } catch (error) {
 
         console.error(error);
 
@@ -986,10 +572,7 @@ async function createEvent() {
             "حدث خطأ غير متوقع ❌"
         );
 
-    }
-
-
-    finally {
+    } finally {
 
         button.disabled = false;
 
@@ -999,13 +582,6 @@ async function createEvent() {
     }
 
 }
-
-
-/* =========================
-   إضافة أول صف تلقائيًا
-========================= */
-
-addGuest();
 
 </script>
 
