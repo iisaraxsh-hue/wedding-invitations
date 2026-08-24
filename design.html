@@ -1,0 +1,1693 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>تصميم الدعوات</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background: #f8f6f3;
+
+    color: #222;
+
+}
+
+.container {
+
+    max-width: 900px;
+
+    margin: 40px auto;
+
+    padding: 20px;
+
+}
+
+.box {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.06);
+
+}
+
+h1 {
+
+    text-align: center;
+
+    margin-top: 0;
+
+    margin-bottom: 10px;
+
+}
+
+.subtitle {
+
+    text-align: center;
+
+    color: #888;
+
+    font-size: 14px;
+
+    margin-bottom: 30px;
+
+    line-height: 1.7;
+
+}
+
+.upload-box {
+
+    border: 2px dashed #ddd;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    margin-bottom: 25px;
+
+}
+
+.upload-box input {
+
+    margin-top: 15px;
+
+    width: 100%;
+
+}
+
+input[type="file"] {
+
+    font-size: 14px;
+
+}
+
+.editor-area {
+
+    display: none;
+
+    margin-top: 25px;
+
+}
+
+.canvas-wrapper {
+
+    width: 100%;
+
+    overflow: auto;
+
+    background: #eee;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+}
+
+#designCanvas {
+
+    position: relative;
+
+    display: inline-block;
+
+    line-height: 0;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.15);
+
+    background: white;
+
+}
+
+#designImage {
+
+    display: block;
+
+    max-width: 100%;
+
+    height: auto;
+
+    user-select: none;
+
+}
+
+.element {
+
+    position: absolute;
+
+    cursor: move;
+
+    user-select: none;
+
+}
+
+.name-element {
+
+    color: #222;
+
+    background: rgba(255,255,255,0.85);
+
+    padding: 5px 10px;
+
+    border: 2px dashed #222;
+
+    border-radius: 6px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    line-height: normal;
+
+}
+
+.qr-element {
+
+    width: 100px;
+
+    height: 100px;
+
+    background: white;
+
+    border: 2px dashed #222;
+
+    padding: 5px;
+
+    line-height: normal;
+
+}
+
+.qr-element img {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+}
+
+.selected {
+
+    outline: 2px solid #287a4b;
+
+}
+
+.controls {
+
+    margin-top: 25px;
+
+    background: #faf9f7;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+}
+
+.control-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    flex-wrap: wrap;
+
+}
+
+.control-row label {
+
+    font-weight: bold;
+
+    min-width: 110px;
+
+}
+
+.control-row input[type="range"] {
+
+    flex: 1;
+
+}
+
+.value {
+
+    min-width: 45px;
+
+    text-align: center;
+
+}
+
+button {
+
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    margin-top: 10px;
+
+    background: #222;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+}
+
+button:hover {
+
+    opacity: 0.9;
+
+}
+
+button:disabled {
+
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+}
+
+.secondary {
+
+    background: #777;
+
+}
+
+.success {
+
+    background: #287a4b;
+
+}
+
+.message {
+
+    text-align: center;
+
+    margin-top: 15px;
+
+    line-height: 1.7;
+
+}
+
+.help {
+
+    color: #777;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    margin-top: 15px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+<div class="box">
+
+
+<h1>
+تصميم الدعوات
+</h1>
+
+
+<div class="subtitle">
+
+ارفعي تصميم الدعوة الجاهز،
+ثم حددي مكان اسم المدعو والـ QR مرة واحدة.
+<br>
+
+سيتم استخدام نفس الأماكن لجميع الدعوات.
+
+</div>
+
+
+<!-- =========================
+     رفع التصميم
+========================= -->
+
+<div class="upload-box">
+
+<strong>
+اختاري تصميم الدعوة
+</strong>
+
+<br>
+
+<input
+    id="designFile"
+    type="file"
+    accept="image/png,image/jpeg,image/webp"
+>
+
+<div class="help">
+
+يفضل استخدام صورة بجودة عالية.
+<br>
+
+PNG أو JPG أو WEBP
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     المحرر
+========================= -->
+
+<div
+    id="editorArea"
+    class="editor-area">
+
+
+<div class="canvas-wrapper">
+
+
+<div id="designCanvas">
+
+
+<img
+    id="designImage"
+    draggable="false"
+>
+
+
+<div
+    id="nameElement"
+    class="element name-element">
+
+اسم المدعو
+
+</div>
+
+
+<div
+    id="qrElement"
+    class="element qr-element">
+
+<img
+    id="qrPreview"
+    alt="QR"
+>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     التحكم
+========================= -->
+
+<div class="controls">
+
+
+<div class="control-row">
+
+<label>
+العنصر المحدد
+</label>
+
+<strong id="selectedElement">
+اسم المدعو
+</strong>
+
+</div>
+
+
+<div class="control-row">
+
+<label>
+حجم الاسم
+</label>
+
+<input
+    id="nameSize"
+    type="range"
+    min="10"
+    max="100"
+    value="22"
+>
+
+<span
+    id="nameSizeValue"
+    class="value">
+
+22
+
+</span>
+
+</div>
+
+
+<div class="control-row">
+
+<label>
+حجم QR
+</label>
+
+<input
+    id="qrSize"
+    type="range"
+    min="50"
+    max="500"
+    value="100"
+>
+
+<span
+    id="qrSizeValue"
+    class="value">
+
+100
+
+</span>
+
+</div>
+
+
+<div class="help">
+
+💡 اسحبي «اسم المدعو» إلى المكان الذي تريدينه.
+<br>
+
+💡 اسحبي QR إلى مكانه داخل التصميم.
+<br>
+
+💡 اضغطي على العنصر أولًا ثم غيّري حجمه من شريط التحكم.
+
+</div>
+
+
+<button
+    id="saveButton"
+    class="success"
+    type="button">
+
+حفظ أماكن الاسم والـ QR
+
+</button>
+
+
+<button
+    id="resetButton"
+    class="secondary"
+    type="button">
+
+إعادة ضبط الأماكن
+
+</button>
+
+
+<button
+    id="previewButton"
+    type="button">
+
+معاينة الدعوات
+
+</button>
+
+
+<div
+    id="message"
+    class="message">
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   المتغيرات
+========================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const eventId =
+    params.get("event_id");
+
+
+let imageLoaded = false;
+
+let selectedElement = null;
+
+let dragging = false;
+
+let dragOffsetX = 0;
+
+let dragOffsetY = 0;
+
+
+/* =========================
+   العناصر
+========================= */
+
+const designFile =
+    document.getElementById(
+        "designFile"
+    );
+
+
+const editorArea =
+    document.getElementById(
+        "editorArea"
+    );
+
+
+const designImage =
+    document.getElementById(
+        "designImage"
+    );
+
+
+const designCanvas =
+    document.getElementById(
+        "designCanvas"
+    );
+
+
+const nameElement =
+    document.getElementById(
+        "nameElement"
+    );
+
+
+const qrElement =
+    document.getElementById(
+        "qrElement"
+    );
+
+
+const qrPreview =
+    document.getElementById(
+        "qrPreview"
+    );
+
+
+const nameSize =
+    document.getElementById(
+        "nameSize"
+    );
+
+
+const qrSize =
+    document.getElementById(
+        "qrSize"
+    );
+
+
+const nameSizeValue =
+    document.getElementById(
+        "nameSizeValue"
+    );
+
+
+const qrSizeValue =
+    document.getElementById(
+        "qrSizeValue"
+    );
+
+
+const selectedElementText =
+    document.getElementById(
+        "selectedElement"
+    );
+
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+/* =========================
+   QR تجريبي
+========================= */
+
+function createDemoQR() {
+
+    const svg = `
+
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100">
+
+            <rect
+                width="100"
+                height="100"
+                fill="white"/>
+
+            <rect
+                x="8"
+                y="8"
+                width="25"
+                height="25"
+                fill="none"
+                stroke="black"
+                stroke-width="6"/>
+
+            <rect
+                x="67"
+                y="8"
+                width="25"
+                height="25"
+                fill="none"
+                stroke="black"
+                stroke-width="6"/>
+
+            <rect
+                x="8"
+                y="67"
+                width="25"
+                height="25"
+                fill="none"
+                stroke="black"
+                stroke-width="6"/>
+
+            <rect
+                x="45"
+                y="45"
+                width="10"
+                height="10"
+                fill="black"/>
+
+            <rect
+                x="62"
+                y="45"
+                width="8"
+                height="8"
+                fill="black"/>
+
+            <rect
+                x="78"
+                y="48"
+                width="10"
+                height="10"
+                fill="black"/>
+
+            <rect
+                x="43"
+                y="63"
+                width="12"
+                height="12"
+                fill="black"/>
+
+            <rect
+                x="63"
+                y="68"
+                width="10"
+                height="10"
+                fill="black"/>
+
+            <rect
+                x="80"
+                y="70"
+                width="10"
+                height="18"
+                fill="black"/>
+
+        </svg>
+
+    `;
+
+    qrPreview.src =
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(svg);
+
+}
+
+
+/* =========================
+   رفع الصورة
+========================= */
+
+designFile.addEventListener(
+    "change",
+    function() {
+
+        const file =
+            this.files[0];
+
+
+        if (!file) return;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(event) {
+
+                designImage.src =
+                    event.target.result;
+
+                editorArea.style.display =
+                    "block";
+
+                imageLoaded = true;
+
+
+                designImage.onload =
+                    function() {
+
+                        resetPositions();
+
+                    };
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================
+   اختيار العنصر
+========================= */
+
+nameElement.addEventListener(
+    "mousedown",
+    function(event) {
+
+        selectElement(
+            nameElement
+        );
+
+        startDrag(
+            event,
+            nameElement
+        );
+
+    }
+);
+
+
+qrElement.addEventListener(
+    "mousedown",
+    function(event) {
+
+        selectElement(
+            qrElement
+        );
+
+        startDrag(
+            event,
+            qrElement
+        );
+
+    }
+);
+
+
+/* =========================
+   لمس الجوال
+========================= */
+
+nameElement.addEventListener(
+    "touchstart",
+    function(event) {
+
+        selectElement(
+            nameElement
+        );
+
+        startTouchDrag(
+            event,
+            nameElement
+        );
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+qrElement.addEventListener(
+    "touchstart",
+    function(event) {
+
+        selectElement(
+            qrElement
+        );
+
+        startTouchDrag(
+            event,
+            qrElement
+        );
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================
+   اختيار عنصر
+========================= */
+
+function selectElement(element) {
+
+    nameElement.classList.remove(
+        "selected"
+    );
+
+    qrElement.classList.remove(
+        "selected"
+    );
+
+
+    element.classList.add(
+        "selected"
+    );
+
+
+    selectedElement =
+        element;
+
+
+    if (element === nameElement) {
+
+        selectedElementText.innerText =
+            "اسم المدعو";
+
+    } else {
+
+        selectedElementText.innerText =
+            "QR";
+
+    }
+
+}
+
+
+/* =========================
+   بدء السحب بالماوس
+========================= */
+
+function startDrag(
+    event,
+    element
+) {
+
+    event.preventDefault();
+
+
+    dragging = true;
+
+
+    const rect =
+        element.getBoundingClientRect();
+
+
+    dragOffsetX =
+        event.clientX -
+        rect.left;
+
+
+    dragOffsetY =
+        event.clientY -
+        rect.top;
+
+
+    document.addEventListener(
+        "mousemove",
+        dragMove
+    );
+
+
+    document.addEventListener(
+        "mouseup",
+        stopDrag
+    );
+
+}
+
+
+/* =========================
+   تحريك العنصر
+========================= */
+
+function dragMove(event) {
+
+    if (
+        !dragging ||
+        !selectedElement
+    ) return;
+
+
+    const canvasRect =
+        designCanvas.getBoundingClientRect();
+
+
+    let x =
+        event.clientX -
+        canvasRect.left -
+        dragOffsetX;
+
+
+    let y =
+        event.clientY -
+        canvasRect.top -
+        dragOffsetY;
+
+
+    x =
+        Math.max(
+            0,
+            Math.min(
+                x,
+                designCanvas.offsetWidth -
+                selectedElement.offsetWidth
+            )
+        );
+
+
+    y =
+        Math.max(
+            0,
+            Math.min(
+                y,
+                designCanvas.offsetHeight -
+                selectedElement.offsetHeight
+            )
+        );
+
+
+    selectedElement.style.left =
+        `${x}px`;
+
+
+    selectedElement.style.top =
+        `${y}px`;
+
+}
+
+
+/* =========================
+   إيقاف السحب
+========================= */
+
+function stopDrag() {
+
+    dragging = false;
+
+
+    document.removeEventListener(
+        "mousemove",
+        dragMove
+    );
+
+
+    document.removeEventListener(
+        "mouseup",
+        stopDrag
+    );
+
+}
+
+
+/* =========================
+   لمس الجوال
+========================= */
+
+function startTouchDrag(
+    event,
+    element
+) {
+
+    event.preventDefault();
+
+
+    selectedElement =
+        element;
+
+
+    const touch =
+        event.touches[0];
+
+
+    const rect =
+        element.getBoundingClientRect();
+
+
+    dragOffsetX =
+        touch.clientX -
+        rect.left;
+
+
+    dragOffsetY =
+        touch.clientY -
+        rect.top;
+
+
+    document.addEventListener(
+        "touchmove",
+        touchMove,
+        {
+            passive: false
+        }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        stopTouchDrag
+    );
+
+}
+
+
+function touchMove(event) {
+
+    if (!selectedElement) return;
+
+
+    event.preventDefault();
+
+
+    const touch =
+        event.touches[0];
+
+
+    const canvasRect =
+        designCanvas.getBoundingClientRect();
+
+
+    let x =
+        touch.clientX -
+        canvasRect.left -
+        dragOffsetX;
+
+
+    let y =
+        touch.clientY -
+        canvasRect.top -
+        dragOffsetY;
+
+
+    x =
+        Math.max(
+            0,
+            Math.min(
+                x,
+                designCanvas.offsetWidth -
+                selectedElement.offsetWidth
+            )
+        );
+
+
+    y =
+        Math.max(
+            0,
+            Math.min(
+                y,
+                designCanvas.offsetHeight -
+                selectedElement.offsetHeight
+            )
+        );
+
+
+    selectedElement.style.left =
+        `${x}px`;
+
+
+    selectedElement.style.top =
+        `${y}px`;
+
+}
+
+
+function stopTouchDrag() {
+
+    document.removeEventListener(
+        "touchmove",
+        touchMove
+    );
+
+
+    document.removeEventListener(
+        "touchend",
+        stopTouchDrag
+    );
+
+}
+
+
+/* =========================
+   حجم الاسم
+========================= */
+
+nameSize.addEventListener(
+    "input",
+    function() {
+
+        const size =
+            Number(this.value);
+
+
+        nameElement.style.fontSize =
+            `${size}px`;
+
+
+        nameSizeValue.innerText =
+            size;
+
+    }
+);
+
+
+/* =========================
+   حجم QR
+========================= */
+
+qrSize.addEventListener(
+    "input",
+    function() {
+
+        const size =
+            Number(this.value);
+
+
+        qrElement.style.width =
+            `${size}px`;
+
+
+        qrElement.style.height =
+            `${size}px`;
+
+
+        qrSizeValue.innerText =
+            size;
+
+    }
+);
+
+
+/* =========================
+   إعادة ضبط
+========================= */
+
+function resetPositions() {
+
+    if (!imageLoaded) return;
+
+
+    const width =
+        designImage.offsetWidth;
+
+
+    const height =
+        designImage.offsetHeight;
+
+
+    designCanvas.style.width =
+        `${width}px`;
+
+
+    designCanvas.style.height =
+        `${height}px`;
+
+
+    nameElement.style.left =
+        `${Math.max(
+            20,
+            width / 2 -
+            nameElement.offsetWidth / 2
+        )}px`;
+
+
+    nameElement.style.top =
+        `${height * 0.65}px`;
+
+
+    qrElement.style.left =
+        `${width - 120}px`;
+
+
+    qrElement.style.top =
+        `${height - 120}px`;
+
+
+    nameSize.value =
+        22;
+
+
+    nameSizeValue.innerText =
+        "22";
+
+
+    qrSize.value =
+        100;
+
+
+    qrSizeValue.innerText =
+        "100";
+
+
+    nameElement.style.fontSize =
+        "22px";
+
+
+    qrElement.style.width =
+        "100px";
+
+
+    qrElement.style.height =
+        "100px";
+
+
+    selectElement(
+        nameElement
+    );
+
+}
+
+
+/* =========================
+   حفظ التصميم
+========================= */
+
+document
+.getElementById("saveButton")
+.addEventListener(
+    "click",
+    saveDesign
+);
+
+
+function saveDesign() {
+
+    if (!imageLoaded) {
+
+        showMessage(
+            "ارفعي تصميم الدعوة أولًا.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const canvasWidth =
+        designCanvas.offsetWidth;
+
+
+    const canvasHeight =
+        designCanvas.offsetHeight;
+
+
+    const nameData = {
+
+        left:
+            parseFloat(
+                nameElement.style.left
+            ),
+
+        top:
+            parseFloat(
+                nameElement.style.top
+            ),
+
+        fontSize:
+            parseFloat(
+                nameElement.style.fontSize
+            )
+
+    };
+
+
+    const qrData = {
+
+        left:
+            parseFloat(
+                qrElement.style.left
+            ),
+
+        top:
+            parseFloat(
+                qrElement.style.top
+            ),
+
+        size:
+            parseFloat(
+                qrElement.style.width
+            )
+
+    };
+
+
+    const designData = {
+
+        eventId:
+            eventId,
+
+        image:
+            designImage.src,
+
+        width:
+            canvasWidth,
+
+        height:
+            canvasHeight,
+
+        name:
+            nameData,
+
+        qr:
+            qrData,
+
+        savedAt:
+            new Date().toISOString()
+
+    };
+
+
+    /*
+       حفظ التصميم محليًا
+
+       نستخدم eventId حتى يكون
+       لكل حفل تصميم مستقل
+    */
+
+    localStorage.setItem(
+
+        `wedding_design_${eventId}`,
+
+        JSON.stringify(
+            designData
+        )
+
+    );
+
+
+    showMessage(
+        "تم حفظ التصميم بنجاح 🤍",
+        "success"
+    );
+
+}
+
+
+/* =========================
+   تحميل التصميم المحفوظ
+========================= */
+
+function loadSavedDesign() {
+
+    if (!eventId) return;
+
+
+    const saved =
+        localStorage.getItem(
+            `wedding_design_${eventId}`
+        );
+
+
+    if (!saved) return;
+
+
+    try {
+
+        const data =
+            JSON.parse(saved);
+
+
+        if (!data.image) return;
+
+
+        designImage.src =
+            data.image;
+
+
+        editorArea.style.display =
+            "block";
+
+
+        designImage.onload =
+            function() {
+
+                designCanvas.style.width =
+                    `${designImage.offsetWidth}px`;
+
+
+                designCanvas.style.height =
+                    `${designImage.offsetHeight}px`;
+
+
+                nameElement.style.left =
+                    `${data.name.left}px`;
+
+
+                nameElement.style.top =
+                    `${data.name.top}px`;
+
+
+                nameElement.style.fontSize =
+                    `${data.name.fontSize}px`;
+
+
+                qrElement.style.left =
+                    `${data.qr.left}px`;
+
+
+                qrElement.style.top =
+                    `${data.qr.top}px`;
+
+
+                qrElement.style.width =
+                    `${data.qr.size}px`;
+
+
+                qrElement.style.height =
+                    `${data.qr.size}px`;
+
+
+                nameSize.value =
+                    data.name.fontSize;
+
+
+                nameSizeValue.innerText =
+                    data.name.fontSize;
+
+
+                qrSize.value =
+                    data.qr.size;
+
+
+                qrSizeValue.innerText =
+                    data.qr.size;
+
+
+                imageLoaded = true;
+
+
+                selectElement(
+                    nameElement
+                );
+
+            };
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* =========================
+   إعادة الضبط
+========================= */
+
+document
+.getElementById("resetButton")
+.addEventListener(
+    "click",
+    function() {
+
+        if (!imageLoaded) return;
+
+
+        const confirmed =
+            confirm(
+                "هل تريدين إعادة ضبط أماكن الاسم والـQR؟"
+            );
+
+
+        if (!confirmed) return;
+
+
+        resetPositions();
+
+        localStorage.removeItem(
+            `wedding_design_${eventId}`
+        );
+
+
+        showMessage(
+            "تمت إعادة ضبط التصميم.",
+            "success"
+        );
+
+    }
+);
+
+
+/* =========================
+   المعاينة
+========================= */
+
+document
+.getElementById("previewButton")
+.addEventListener(
+    "click",
+    function() {
+
+        if (!imageLoaded) {
+
+            showMessage(
+                "ارفعي التصميم أولًا.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        saveDesign();
+
+
+        setTimeout(
+            function() {
+
+                window.location.href =
+                    `preview.html?event_id=${encodeURIComponent(eventId)}`;
+
+            },
+            300
+        );
+
+    }
+);
+
+
+/* =========================
+   الرسائل
+========================= */
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.innerText =
+        text;
+
+
+    message.className =
+        `message ${type}`;
+
+
+    setTimeout(
+        function() {
+
+            message.innerText =
+                "";
+
+            message.className =
+                "message";
+
+        },
+        3000
+    );
+
+}
+
+
+/* =========================
+   تشغيل
+========================= */
+
+createDemoQR();
+
+loadSavedDesign();
+
+
+</script>
+
+</body>
+
+</html>
+```
