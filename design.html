@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -16,7 +15,6 @@
 
 <!-- QR -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-
 
 <style>
 
@@ -151,6 +149,8 @@ button:disabled {
     display: block;
     max-width: 100%;
     height: auto;
+    user-select: none;
+    pointer-events: none;
 }
 
 
@@ -174,7 +174,7 @@ button:disabled {
     font-size: 22px;
     font-weight: bold;
     white-space: nowrap;
-    transform-origin: top left;
+    transform-origin: center center;
 }
 
 #qrElement {
@@ -248,7 +248,7 @@ button:disabled {
 
 
 /* =========================
-   اللون والخط
+   الخط والألوان
 ========================= */
 
 .style-grid {
@@ -478,7 +478,7 @@ button:disabled {
     id="nameSize"
     type="number"
     min="8"
-    max="100"
+    max="200"
     value="22"
 >
 
@@ -858,7 +858,6 @@ const params =
         window.location.search
     );
 
-
 const eventId =
     params.get("event_id");
 
@@ -871,29 +870,52 @@ let designData = {
 
     image: null,
 
-    nameX: 0.50,
+    /*
+       المواضع الآن محفوظة
+       كنسبة من التصميم نفسه.
+    */
 
+    nameX: 0.50,
     nameY: 0.50,
 
     qrX: 0.75,
-
     qrY: 0.75,
 
-    nameSize: 22,
+    /*
+       الحجم الأصلي
+    */
 
+    nameSize: 22,
     qrSize: 110,
 
+    /*
+       نسبة الحجم من عرض التصميم
+       حتى لا يتغير عند التوليد.
+    */
+
+    nameSizeRatio: null,
+    qrSizeRatio: null,
+
+    /*
+       أبعاد التصميم الأصلي
+    */
+
+    designWidth: null,
+    designHeight: null,
+
+    /*
+       التنسيق
+    */
+
     nameFont: "Arial",
-
     nameColor: "#222222",
-
     qrColor: "#000000"
 
 };
 
 
 /* =========================
-   السحب
+   المتغيرات
 ========================= */
 
 let activeElement = null;
@@ -901,12 +923,12 @@ let activeElement = null;
 let dragging = false;
 
 let dragStartX = 0;
-
 let dragStartY = 0;
 
 let startLeft = 0;
-
 let startTop = 0;
+
+let saveTimer = null;
 
 
 /* =========================
@@ -932,19 +954,13 @@ async function initPage() {
 
     }
 
-
-    /*
-       أول شيء نحاول استرجاع
-       التصميم السابق.
-    */
-
     loadSavedDesign();
 
 }
 
 
 /* =========================
-   استرجاع التصميم السابق
+   استرجاع التصميم
 ========================= */
 
 function loadSavedDesign() {
@@ -978,14 +994,69 @@ function loadSavedDesign() {
         }
 
 
+        /*
+           ندمج البيانات القديمة
+           مع النظام الجديد.
+        */
+
         designData = {
 
             ...designData,
-
             ...parsed
 
         };
 
+
+        /*
+           ترقية التصميم القديم
+           إذا لم تكن فيه نسب الحجم.
+        */
+
+        if (
+            !designData.designWidth
+        ) {
+
+            designData.designWidth = null;
+
+        }
+
+
+        if (
+            !designData.designHeight
+        ) {
+
+            designData.designHeight = null;
+
+        }
+
+
+        if (
+            !designData.nameSizeRatio &&
+            designData.designWidth
+        ) {
+
+            designData.nameSizeRatio =
+                designData.nameSize /
+                designData.designWidth;
+
+        }
+
+
+        if (
+            !designData.qrSizeRatio &&
+            designData.designWidth
+        ) {
+
+            designData.qrSizeRatio =
+                designData.qrSize /
+                designData.designWidth;
+
+        }
+
+
+        /*
+           تعبئة الحقول.
+        */
 
         document.getElementById(
             "nameSize"
@@ -1028,6 +1099,11 @@ function loadSavedDesign() {
             error
         );
 
+        showMessage(
+            "تعذر استرجاع التصميم المحفوظ.",
+            "error"
+        );
+
     }
 
 }
@@ -1051,16 +1127,10 @@ function showSavedDesign() {
         );
 
 
-    image.src =
-        designData.image;
-
-
-    previewImage.src =
-        designData.image;
-
-
     image.onload =
         function() {
+
+            setupDesignDimensions();
 
             showDesignSections();
 
@@ -1073,6 +1143,14 @@ function showSavedDesign() {
             updateQR();
 
         };
+
+
+    image.src =
+        designData.image;
+
+
+    previewImage.src =
+        designData.image;
 
 }
 
@@ -1142,8 +1220,7 @@ function loadDesign(event) {
 
             /*
                عند رفع تصميم جديد
-               لا نعيد العناصر للصفر
-               إذا كان هناك تصميم سابق.
+               نحتفظ بالإعدادات الحالية.
             */
 
             const image =
@@ -1158,16 +1235,48 @@ function loadDesign(event) {
                 );
 
 
-            image.src =
-                designData.image;
-
-
-            previewImage.src =
-                designData.image;
-
-
             image.onload =
                 function() {
+
+                    /*
+                       التصميم الجديد يبدأ
+                       بأبعاد جديدة.
+                    */
+
+                    designData.designWidth =
+                        image.naturalWidth;
+
+
+                    designData.designHeight =
+                        image.naturalHeight;
+
+
+                    /*
+                       إذا كان أول تصميم،
+                       نستخدم الإعدادات الحالية.
+                    */
+
+                    if (
+                        !designData.nameSizeRatio
+                    ) {
+
+                        designData.nameSizeRatio =
+                            designData.nameSize /
+                            image.naturalWidth;
+
+                    }
+
+
+                    if (
+                        !designData.qrSizeRatio
+                    ) {
+
+                        designData.qrSizeRatio =
+                            designData.qrSize /
+                            image.naturalWidth;
+
+                    }
+
 
                     showDesignSections();
 
@@ -1188,10 +1297,93 @@ function loadDesign(event) {
 
                 };
 
+
+            image.src =
+                designData.image;
+
+
+            previewImage.src =
+                designData.image;
+
         };
 
 
     reader.readAsDataURL(file);
+
+}
+
+
+/* =========================
+   إعداد أبعاد التصميم
+========================= */
+
+function setupDesignDimensions() {
+
+    const image =
+        document.getElementById(
+            "designImage"
+        );
+
+
+    if (
+        !image.naturalWidth
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       نخزن أبعاد الصورة الأصلية
+       مرة واحدة.
+    */
+
+    if (
+        !designData.designWidth
+    ) {
+
+        designData.designWidth =
+            image.naturalWidth;
+
+    }
+
+
+    if (
+        !designData.designHeight
+    ) {
+
+        designData.designHeight =
+            image.naturalHeight;
+
+    }
+
+
+    /*
+       إذا لم توجد نسب حجم،
+       نحسبها من الحجم الحالي.
+    */
+
+    if (
+        !designData.nameSizeRatio
+    ) {
+
+        designData.nameSizeRatio =
+            designData.nameSize /
+            designData.designWidth;
+
+    }
+
+
+    if (
+        !designData.qrSizeRatio
+    ) {
+
+        designData.qrSizeRatio =
+            designData.qrSize /
+            designData.designWidth;
+
+    }
 
 }
 
@@ -1229,10 +1421,49 @@ function showDesignSections() {
 
 
 /* =========================
-   تطبيق كل الإعدادات
+   تطبيق الإعدادات
 ========================= */
 
 function applyAllStyles() {
+
+    const image =
+        document.getElementById(
+            "designImage"
+        );
+
+
+    if (
+        image.naturalWidth
+    ) {
+
+        /*
+           الحجم الحقيقي للعرض الحالي
+           يتناسب مع حجم التصميم.
+        */
+
+        if (
+            designData.nameSizeRatio
+        ) {
+
+            designData.nameSize =
+                designData.nameSizeRatio *
+                image.naturalWidth;
+
+        }
+
+
+        if (
+            designData.qrSizeRatio
+        ) {
+
+            designData.qrSize =
+                designData.qrSizeRatio *
+                image.naturalWidth;
+
+        }
+
+    }
+
 
     const name =
         document.getElementById(
@@ -1297,6 +1528,26 @@ function applyAllStyles() {
     previewQr.style.height =
         designData.qrSize + "px";
 
+
+    /*
+       تحديث حقول التحكم
+    */
+
+    document.getElementById(
+        "nameSize"
+    ).value =
+        Math.round(
+            designData.nameSize
+        );
+
+
+    document.getElementById(
+        "qrSize"
+    ).value =
+        Math.round(
+            designData.qrSize
+        );
+
 }
 
 
@@ -1313,7 +1564,6 @@ function positionElements() {
 
 
     if (
-        !canvas ||
         !canvas.clientWidth ||
         !canvas.clientHeight
     ) {
@@ -1336,8 +1586,8 @@ function positionElements() {
 
 
     /*
-       الموضع هنا دائمًا
-       نسبة من التصميم نفسه.
+       الموضع دائمًا نسبة من
+       التصميم الظاهر.
     */
 
     name.style.left =
@@ -1367,7 +1617,7 @@ function positionElements() {
 
 
 /* =========================
-   نظام السحب الجديد
+   السحب
 ========================= */
 
 document
@@ -1393,6 +1643,8 @@ document
 function startPointerDrag(event) {
 
     event.preventDefault();
+
+    event.stopPropagation();
 
 
     activeElement =
@@ -1439,9 +1691,19 @@ function startPointerDrag(event) {
     );
 
 
-    activeElement.setPointerCapture(
-        event.pointerId
-    );
+    try {
+
+        activeElement.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+    }
 
 }
 
@@ -1480,11 +1742,6 @@ function movePointerDrag(event) {
         canvas.getBoundingClientRect();
 
 
-    /*
-       مقدار الحركة الفعلية
-       بالنسبة لحجم الشاشة.
-    */
-
     const deltaX =
         event.clientX -
         dragStartX;
@@ -1506,17 +1763,32 @@ function movePointerDrag(event) {
 
 
     /*
-       منع خروج العنصر
-       خارج التصميم.
+       نمنع خروج العنصر
+       من التصميم.
     */
+
+    const maxX =
+        Math.max(
+            0,
+            canvasRect.width -
+            activeElement.offsetWidth
+        );
+
+
+    const maxY =
+        Math.max(
+            0,
+            canvasRect.height -
+            activeElement.offsetHeight
+        );
+
 
     x =
         Math.max(
             0,
             Math.min(
                 x,
-                canvasRect.width -
-                activeElement.offsetWidth
+                maxX
             )
         );
 
@@ -1526,15 +1798,13 @@ function movePointerDrag(event) {
             0,
             Math.min(
                 y,
-                canvasRect.height -
-                activeElement.offsetHeight
+                maxY
             )
         );
 
 
     /*
-       نحفظ الموضع كنسبة
-       وليس بالبكسل.
+       حفظ الموضع كنسبة.
     */
 
     const xRatio =
@@ -1562,7 +1832,7 @@ function movePointerDrag(event) {
     }
 
 
-    if (
+    else if (
         activeElement.id ===
         "qrElement"
     ) {
@@ -1578,24 +1848,21 @@ function movePointerDrag(event) {
 
 
     /*
-       إعادة وضع العنصر
-       بالنسبة المئوية.
+       تحديث مباشر.
     */
 
     positionElements();
 
     updatePreview();
 
-    autoSave();
+    scheduleAutoSave();
 
 }
 
 
 function stopPointerDrag() {
 
-    if (
-        !dragging
-    ) {
+    if (!dragging) {
 
         return;
 
@@ -1614,6 +1881,9 @@ function stopPointerDrag() {
     dragging = false;
 
     activeElement = null;
+
+
+    autoSave();
 
 }
 
@@ -1647,18 +1917,14 @@ function alignElement(
 
     if (
         !canvas ||
-        !element
+        !element ||
+        !canvas.clientWidth
     ) {
 
         return;
 
     }
 
-
-    /*
-       نحتاج أبعاد العنصر
-       بعد ظهوره فعليًا.
-    */
 
     const canvasWidth =
         canvas.clientWidth;
@@ -1677,22 +1943,30 @@ function alignElement(
 
 
     let x =
-        type === "name"
-            ? designData.nameX * canvasWidth
-            : designData.qrX * canvasWidth;
+        designData[
+            type === "name"
+                ? "nameX"
+                : "qrX"
+        ] *
+        canvasWidth;
 
 
     let y =
-        type === "name"
-            ? designData.nameY * canvasHeight
-            : designData.qrY * canvasHeight;
+        designData[
+            type === "name"
+                ? "nameY"
+                : "qrY"
+        ] *
+        canvasHeight;
 
 
     /*
        أفقي
     */
 
-    if (direction === "left") {
+    if (
+        direction === "left"
+    ) {
 
         x = 0;
 
@@ -1725,7 +1999,9 @@ function alignElement(
        رأسي
     */
 
-    if (direction === "top") {
+    if (
+        direction === "top"
+    ) {
 
         y = 0;
 
@@ -1811,6 +2087,12 @@ function alignElement(
 
     autoSave();
 
+
+    showMessage(
+        "تمت المحاذاة وحفظ الموضع 🤍",
+        "success"
+    );
+
 }
 
 
@@ -1837,12 +2119,13 @@ document
 
 
             if (
+                !Number.isFinite(size) ||
                 size < 8 ||
-                size > 100
+                size > 200
             ) {
 
                 showMessage(
-                    "حجم الاسم يجب أن يكون بين 8 و100.",
+                    "حجم الاسم يجب أن يكون بين 8 و200.",
                     "error"
                 );
 
@@ -1853,6 +2136,23 @@ document
 
             designData.nameSize =
                 size;
+
+
+            const image =
+                document.getElementById(
+                    "designImage"
+                );
+
+
+            if (
+                image.naturalWidth
+            ) {
+
+                designData.nameSizeRatio =
+                    size /
+                    image.naturalWidth;
+
+            }
 
 
             applyAllStyles();
@@ -1890,6 +2190,7 @@ document
 
 
             if (
+                !Number.isFinite(size) ||
                 size < 50 ||
                 size > 500
             ) {
@@ -1906,6 +2207,23 @@ document
 
             designData.qrSize =
                 size;
+
+
+            const image =
+                document.getElementById(
+                    "designImage"
+                );
+
+
+            if (
+                image.naturalWidth
+            ) {
+
+                designData.qrSizeRatio =
+                    size /
+                    image.naturalWidth;
+
+            }
 
 
             applyAllStyles();
@@ -1949,7 +2267,7 @@ document
 
 
 /* =========================
-   تغيير لون الاسم
+   لون الاسم
 ========================= */
 
 document
@@ -1968,14 +2286,14 @@ document
 
             updatePreview();
 
-            autoSave();
+            scheduleAutoSave();
 
         }
     );
 
 
 /* =========================
-   تغيير لون QR
+   لون QR
 ========================= */
 
 document
@@ -1992,7 +2310,7 @@ document
 
             updateQR();
 
-            autoSave();
+            scheduleAutoSave();
 
         }
     );
@@ -2004,7 +2322,10 @@ document
 
 function updateQR() {
 
-    if (!eventId) {
+    if (
+        !eventId ||
+        typeof QRCode === "undefined"
+    ) {
 
         return;
 
@@ -2018,18 +2339,6 @@ function updateQR() {
         );
 
 
-    const qrImage =
-        document.getElementById(
-            "qrImage"
-        );
-
-
-    const previewQrImage =
-        document.getElementById(
-            "previewQrImage"
-        );
-
-
     QRCode.toDataURL(
 
         qrValue,
@@ -2039,6 +2348,8 @@ function updateQR() {
             width: 600,
 
             margin: 0,
+
+            errorCorrectionLevel: "H",
 
             color: {
 
@@ -2057,6 +2368,7 @@ function updateQR() {
             if (error) {
 
                 console.error(
+                    "QR error:",
                     error
                 );
 
@@ -2065,11 +2377,15 @@ function updateQR() {
             }
 
 
-            qrImage.src =
+            document.getElementById(
+                "qrImage"
+            ).src =
                 url;
 
 
-            previewQrImage.src =
+            document.getElementById(
+                "previewQrImage"
+            ).src =
                 url;
 
         }
@@ -2129,8 +2445,8 @@ function updatePreview() {
 
 
     /*
-       المعاينة تستخدم نفس
-       النسب تمامًا.
+       نفس أبعاد التصميم
+       المستخدمة في المعاينة.
     */
 
     const width =
@@ -2148,6 +2464,10 @@ function updatePreview() {
     previewCanvas.style.height =
         height + "px";
 
+
+    /*
+       الاسم
+    */
 
     previewName.style.left =
         (
@@ -2173,6 +2493,10 @@ function updatePreview() {
         designData.nameColor;
 
 
+    /*
+       QR
+    */
+
     previewQr.style.left =
         (
             designData.qrX * 100
@@ -2196,7 +2520,7 @@ function updatePreview() {
 
 
 /* =========================
-   حفظ تلقائي
+   الحفظ التلقائي
 ========================= */
 
 function autoSave() {
@@ -2232,7 +2556,37 @@ function autoSave() {
             error
         );
 
+
+        showMessage(
+            "تعذر حفظ التصميم تلقائيًا. قد تكون صورة التصميم كبيرة جدًا.",
+            "error"
+        );
+
     }
+
+}
+
+
+/* =========================
+   تأخير الحفظ
+========================= */
+
+function scheduleAutoSave() {
+
+    clearTimeout(
+        saveTimer
+    );
+
+
+    saveTimer =
+        setTimeout(
+            function() {
+
+                autoSave();
+
+            },
+            300
+        );
 
 }
 
@@ -2263,6 +2617,40 @@ function saveDesign() {
         );
 
         return false;
+
+    }
+
+
+    /*
+       تأكيد آخر القيم
+    */
+
+    const image =
+        document.getElementById(
+            "designImage"
+        );
+
+
+    if (
+        image.naturalWidth
+    ) {
+
+        designData.designWidth =
+            image.naturalWidth;
+
+
+        designData.designHeight =
+            image.naturalHeight;
+
+
+        designData.nameSizeRatio =
+            designData.nameSize /
+            image.naturalWidth;
+
+
+        designData.qrSizeRatio =
+            designData.qrSize /
+            image.naturalWidth;
 
     }
 
@@ -2308,12 +2696,23 @@ document
 
 
             /*
-               نحفظ آخر تعديل
+               حفظ آخر تعديل
                قبل الانتقال.
             */
 
-            autoSave();
+            if (
+                !saveDesign()
+            ) {
 
+                return;
+
+            }
+
+
+            /*
+               الانتقال فقط عند الضغط
+               على زر توليد الدعوات.
+            */
 
             window.location.href =
                 "generate.html?event_id=" +
@@ -2326,8 +2725,7 @@ document
 
 
 /* =========================
-   إعادة الحساب عند تغيير
-   حجم الشاشة
+   تغيير حجم الشاشة
 ========================= */
 
 window.addEventListener(
@@ -2337,6 +2735,13 @@ window.addEventListener(
         if (
             designData.image
         ) {
+
+            /*
+               نعيد حساب الحجم
+               بدون تغيير النسب.
+            */
+
+            applyAllStyles();
 
             positionElements();
 
@@ -2350,7 +2755,6 @@ window.addEventListener(
 
 /* =========================
    منع فقدان التصميم
-   عند تحديث الصفحة
 ========================= */
 
 window.addEventListener(
@@ -2393,4 +2797,3 @@ function showMessage(
 </body>
 
 </html>
-```
