@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -122,6 +121,72 @@ h1 {
 
 .section h3 {
     margin-top: 0;
+}
+
+
+/* =========================
+   اختيار نوع الدعوة
+========================= */
+
+.mode-box {
+    background: #faf9f7;
+    padding: 18px;
+    border-radius: 14px;
+}
+
+.mode-title {
+    font-weight: bold;
+    margin-bottom: 14px;
+}
+
+.mode-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.mode-option {
+    position: relative;
+}
+
+.mode-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mode-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55px;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-weight: normal;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.mode-option input:checked + label {
+    border-color: #222;
+    background: #222;
+    color: white;
+}
+
+.mode-option input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mode-help {
+    color: #888;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-top: 12px;
 }
 
 
@@ -330,6 +395,10 @@ td input {
         grid-template-columns: 1fr;
     }
 
+    .mode-options {
+        grid-template-columns: 1fr;
+    }
+
     table {
         min-width: 520px;
     }
@@ -380,6 +449,19 @@ td input {
 </span>
 
 <strong id="eventName">
+-
+</strong>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+عدد الدعوات المطلوب
+</span>
+
+<strong id="allowedCount">
 -
 </strong>
 
@@ -442,13 +524,101 @@ td input {
 
 
 <!-- =========================
-     إضافة يدوية
+     اختيار نوع الدعوة
 ========================= -->
 
 <div class="section">
 
 <h3>
-إضافة مدعو يدويًا
+اختيار طريقة إدراج الدعوات
+</h3>
+
+
+<div class="mode-box">
+
+<div class="mode-title">
+اختاري خيارًا واحدًا فقط:
+</div>
+
+
+<div class="mode-options">
+
+
+<div class="mode-option">
+
+<input
+    id="modeName"
+    type="radio"
+    name="invitationMode"
+    value="name"
+>
+
+<label for="modeName">
+اسم
+</label>
+
+</div>
+
+
+<div class="mode-option">
+
+<input
+    id="modeNumber"
+    type="radio"
+    name="invitationMode"
+    value="number"
+>
+
+<label for="modeNumber">
+رقم
+</label>
+
+</div>
+
+
+<div class="mode-option">
+
+<input
+    id="modeBlank"
+    type="radio"
+    name="invitationMode"
+    value="blank"
+>
+
+<label for="modeBlank">
+فراغ يتعبى لاحقًا
+</label>
+
+</div>
+
+
+</div>
+
+
+<div
+    id="modeHelp"
+    class="mode-help">
+
+لا يمكن إضافة الدعوات قبل اختيار أحد الخيارات.
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     إضافة يدوية
+========================= -->
+
+<div
+    id="manualSection"
+    class="section"
+    style="display:none;">
+
+<h3>
+إضافة دعوة يدويًا
 </h3>
 
 
@@ -457,7 +627,7 @@ td input {
 
 <div>
 
-<label>
+<label id="manualValueLabel">
 اسم المدعو
 </label>
 
@@ -466,6 +636,7 @@ td input {
     type="text"
     placeholder="مثال: سارة محمد"
 >
+
 
 </div>
 
@@ -491,7 +662,7 @@ td input {
     id="addGuestButton"
     type="button">
 
-إضافة المدعو
+إضافة الدعوة
 
 </button>
 
@@ -511,10 +682,13 @@ td input {
      رفع Excel / CSV
 ========================= -->
 
-<div class="section">
+<div
+    id="importSection"
+    class="section"
+    style="display:none;">
 
 <h3>
-إضافة مجموعة من المدعوين
+إضافة مجموعة من الدعوات
 </h3>
 
 
@@ -529,7 +703,7 @@ td input {
 <input
     id="fileInput"
     type="file"
-    accept=".csv,.xlsx,.xls,.xlsm,.xltx,.xlt,.ods,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet"
+    accept=".csv,.xlsx,.xls,.xlsm,.xlsb,.ods,.tsv,text/csv,text/tab-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.oasis.opendocument.spreadsheet"
 >
 
 
@@ -537,15 +711,45 @@ td input {
 
 يمكنك رفع:
 
-CSV أو XLS أو XLSX أو XLSM أو XLTX أو XLT أو ODS.
+<strong>
+CSV
+</strong>
+أو
+<strong>
+XLSX
+</strong>
+أو
+<strong>
+XLS
+</strong>
+أو
+<strong>
+XLSM
+</strong>
+أو
+<strong>
+XLSB
+</strong>
+أو
+<strong>
+ODS
+</strong>
+أو
+<strong>
+TSV
+</strong>.
 
-يفضل أن يحتوي الجدول على عمود:
+<br>
 
-<strong>الاسم</strong>
+في وضع الاسم، يمكن أن يحتوي الجدول على عمود الاسم وعمود اختياري للمرافقين.
 
-وعمود اختياري:
+<br>
 
-<strong>المرافقين</strong>
+في وضع الرقم، يمكن أن يحتوي الجدول على عمود الرقم وعمود اختياري للمرافقين.
+
+<br>
+
+في وضع الفراغ، يكفي وجود الصفوف في الملف، وسيتم إنشاء دعوات فارغة.
 
 </div>
 
@@ -593,7 +797,7 @@ CSV أو XLS أو XLSX أو XLSM أو XLTX أو XLT أو ODS.
 
 <tr>
 
-<th>
+<th id="valueTableHeader">
 الاسم
 </th>
 
@@ -629,7 +833,7 @@ CSV أو XLS أو XLSX أو XLSM أو XLTX أو XLT أو ODS.
     class="hint"
     style="text-align:center;">
 
-لا توجد أسماء مضافة حتى الآن.
+لا توجد دعوات مضافة حتى الآن.
 
 </div>
 
@@ -749,6 +953,8 @@ let eventData = null;
 
 let invitations = [];
 
+let invitationMode = null;
+
 
 /*
    عدد الدعوات الظاهرة
@@ -794,6 +1000,10 @@ async function loadPage() {
 
         await loadInvitations();
 
+        loadSavedMode();
+
+        updateModeInterface();
+
         renderTable();
 
         updateStats();
@@ -805,7 +1015,11 @@ async function loadPage() {
         console.error(error);
 
         showMessage(
-            "حدث خطأ أثناء تحميل البيانات.",
+            "حدث خطأ أثناء تحميل البيانات: " +
+            (
+                error.message ||
+                ""
+            ),
             "error"
         );
 
@@ -854,6 +1068,121 @@ async function loadEvent() {
     ).innerText =
         data.event_name || "-";
 
+
+    const allowed =
+        getInvitationLimit();
+
+
+    document.getElementById(
+        "allowedCount"
+    ).innerText =
+        allowed > 0
+            ? allowed
+            : "غير محدد";
+
+}
+
+
+/* =========================
+   معرفة عدد الدعوات المسموح
+========================= */
+
+function getInvitationLimit() {
+
+    if (!eventData) {
+        return 0;
+    }
+
+
+    /*
+       نجرب أكثر من اسم محتمل
+       حتى تعمل الصفحة مع اختلاف
+       اسم الحقل في قاعدة البيانات.
+    */
+
+    const possibleFields = [
+
+        "invitation_count",
+
+        "invitations_count",
+
+        "total_invitations",
+
+        "number_of_invitations",
+
+        "allowed_invitations",
+
+        "max_invitations",
+
+        "guest_limit",
+
+        "invitation_limit"
+
+    ];
+
+
+    for (
+        const field
+        of possibleFields
+    ) {
+
+        const value =
+            Number(
+                eventData[field]
+            );
+
+
+        if (
+            Number.isFinite(value) &&
+            value > 0
+        ) {
+
+            return Math.floor(
+                value
+            );
+
+        }
+
+    }
+
+
+    /*
+       إذا كان الحفل يستخدم اسم
+       مختلف للحقل يمكن إضافة الاسم هنا.
+    */
+
+    return 0;
+
+}
+
+
+/* =========================
+   الدعوات المتبقية
+========================= */
+
+function getRemainingInvitations() {
+
+    const limit =
+        getInvitationLimit();
+
+
+    /*
+       0 يعني أن الحقل غير موجود
+       وبالتالي لا نفرض حدًا.
+    */
+
+    if (limit <= 0) {
+
+        return Infinity;
+
+    }
+
+
+    return Math.max(
+        0,
+        limit - invitations.length
+    );
+
 }
 
 
@@ -895,6 +1224,287 @@ async function loadInvitations() {
 
     invitations =
         data || [];
+
+}
+
+
+/* =========================
+   اختيار نوع الدعوة
+========================= */
+
+document
+    .querySelectorAll(
+        'input[name="invitationMode"]'
+    )
+    .forEach(
+        function(input) {
+
+            input.addEventListener(
+                "change",
+                function() {
+
+                    invitationMode =
+                        input.value;
+
+
+                    localStorage.setItem(
+                        `invitation_mode_${eventId}`,
+                        invitationMode
+                    );
+
+
+                    updateModeInterface();
+
+                    renderTable();
+
+                    updateStats();
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================
+   تحميل الاختيار المحفوظ
+========================= */
+
+function loadSavedMode() {
+
+    const saved =
+        localStorage.getItem(
+            `invitation_mode_${eventId}`
+        );
+
+
+    /*
+       إذا كانت هناك دعوات موجودة
+       نحاول تحديد النوع تلقائيًا
+       إذا لم يوجد اختيار محفوظ.
+    */
+
+    if (
+        saved === "name" ||
+        saved === "number" ||
+        saved === "blank"
+    ) {
+
+        invitationMode =
+            saved;
+
+    }
+
+    else if (
+        invitations.length > 0
+    ) {
+
+        const first =
+            invitations[0];
+
+
+        const value =
+            String(
+                first.guest_name || ""
+            ).trim();
+
+
+        if (!value) {
+
+            invitationMode =
+                "blank";
+
+        }
+
+        else if (
+            /^\d+$/.test(
+                value
+            )
+        ) {
+
+            invitationMode =
+                "number";
+
+        }
+
+        else {
+
+            invitationMode =
+                "name";
+
+        }
+
+    }
+
+
+    if (invitationMode) {
+
+        const radio =
+            document.querySelector(
+                `input[name="invitationMode"][value="${invitationMode}"]`
+            );
+
+
+        if (radio) {
+
+            radio.checked =
+                true;
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   تحديث واجهة الاختيار
+========================= */
+
+function updateModeInterface() {
+
+    const manualSection =
+        document.getElementById(
+            "manualSection"
+        );
+
+
+    const importSection =
+        document.getElementById(
+            "importSection"
+        );
+
+
+    const modeHelp =
+        document.getElementById(
+            "modeHelp"
+        );
+
+
+    const valueLabel =
+        document.getElementById(
+            "manualValueLabel"
+        );
+
+
+    const valueInput =
+        document.getElementById(
+            "guestName"
+        );
+
+
+    const tableHeader =
+        document.getElementById(
+            "valueTableHeader"
+        );
+
+
+    if (!invitationMode) {
+
+        manualSection.style.display =
+            "none";
+
+
+        importSection.style.display =
+            "none";
+
+
+        modeHelp.innerText =
+            "لا يمكن إضافة الدعوات قبل اختيار أحد الخيارات.";
+
+
+        return;
+
+    }
+
+
+    manualSection.style.display =
+        "block";
+
+
+    importSection.style.display =
+        "block";
+
+
+    if (
+        invitationMode ===
+        "name"
+    ) {
+
+        valueLabel.innerText =
+            "اسم المدعو";
+
+
+        valueInput.placeholder =
+            "مثال: سارة محمد";
+
+
+        valueInput.type =
+            "text";
+
+
+        tableHeader.innerText =
+            "الاسم";
+
+
+        modeHelp.innerText =
+            "سيتم إدراج أسماء المدعوين مع عدد المرافقين لكل دعوة.";
+
+    }
+
+
+    else if (
+        invitationMode ===
+        "number"
+    ) {
+
+        valueLabel.innerText =
+            "رقم المدعو";
+
+
+        valueInput.placeholder =
+            "مثال: 1001";
+
+
+        valueInput.type =
+            "text";
+
+
+        tableHeader.innerText =
+            "الرقم";
+
+
+        modeHelp.innerText =
+            "سيتم إدراج أرقام المدعوين مع عدد المرافقين لكل دعوة.";
+
+    }
+
+
+    else if (
+        invitationMode ===
+        "blank"
+    ) {
+
+        valueLabel.innerText =
+            "البيان";
+
+
+        valueInput.placeholder =
+            "سيتم إنشاء الدعوة فارغة";
+
+
+        valueInput.type =
+            "text";
+
+
+        tableHeader.innerText =
+            "البيان";
+
+
+        modeHelp.innerText =
+            "سيتم إنشاء الدعوات بدون اسم أو رقم، ويمكن تعبئتها لاحقًا.";
+
+    }
 
 }
 
@@ -944,20 +1554,12 @@ function renderTable() {
         "none";
 
 
-    /*
-       حساب عدد الصفحات
-    */
-
     const totalPages =
         Math.ceil(
             invitations.length /
             ITEMS_PER_PAGE
         );
 
-
-    /*
-       إذا حذفنا عناصر من آخر صفحة
-    */
 
     if (
         currentPage >
@@ -969,10 +1571,6 @@ function renderTable() {
 
     }
 
-
-    /*
-       بداية ونهاية الدعوات
-    */
 
     const startIndex =
         (
@@ -993,10 +1591,6 @@ function renderTable() {
         );
 
 
-    /*
-       عرض الدعوات الحالية فقط
-    */
-
     pageInvitations.forEach(
         function(invitation) {
 
@@ -1006,46 +1600,74 @@ function renderTable() {
                 );
 
 
-            /* الاسم */
+            /* =====================
+               القيمة
+            ===================== */
 
-            const nameCell =
+            const valueCell =
                 document.createElement(
                     "td"
                 );
 
 
-            const nameInput =
+            const valueInput =
                 document.createElement(
                     "input"
                 );
 
 
-            nameInput.type =
+            valueInput.type =
                 "text";
 
 
-            nameInput.value =
+            valueInput.value =
                 invitation.guest_name || "";
 
 
-            nameInput.placeholder =
-                "اسم المدعو";
+            if (
+                invitationMode ===
+                "name"
+            ) {
+
+                valueInput.placeholder =
+                    "اسم المدعو";
+
+            }
+
+            else if (
+                invitationMode ===
+                "number"
+            ) {
+
+                valueInput.placeholder =
+                    "رقم المدعو";
+
+            }
+
+            else {
+
+                valueInput.placeholder =
+                    "فارغ";
+
+            }
 
 
-            nameInput.dataset.id =
+            valueInput.dataset.id =
                 invitation.id;
 
 
-            nameInput.className =
+            valueInput.className =
                 "guest-name-input";
 
 
-            nameCell.appendChild(
-                nameInput
+            valueCell.appendChild(
+                valueInput
             );
 
 
-            /* المرافقون */
+            /* =====================
+               المرافقون
+            ===================== */
 
             const companionCell =
                 document.createElement(
@@ -1090,7 +1712,9 @@ function renderTable() {
             );
 
 
-            /* حالة الدخول */
+            /* =====================
+               حالة الدخول
+            ===================== */
 
             const statusCell =
                 document.createElement(
@@ -1104,7 +1728,9 @@ function renderTable() {
                     : "لم يدخل";
 
 
-            /* الإجراء */
+            /* =====================
+               الإجراء
+            ===================== */
 
             const actionCell =
                 document.createElement(
@@ -1148,7 +1774,7 @@ function renderTable() {
 
 
             row.appendChild(
-                nameCell
+                valueCell
             );
 
 
@@ -1174,10 +1800,6 @@ function renderTable() {
         }
     );
 
-
-    /*
-       تحديث أزرار الصفحات
-    */
 
     updatePagination(
         totalPages
@@ -1217,11 +1839,6 @@ function updatePagination(
             "pageNumber"
         );
 
-
-    /*
-       إذا كانت الدعوات 10 أو أقل
-       لا نحتاج للتنقل
-    */
 
     if (
         totalPages <= 1
@@ -1334,22 +1951,27 @@ function updateStats() {
 
 
     /*
-       الدعوة تعتبر معبأة
-       إذا كان فيها اسم
+       الدعوة تعتبر معبأة إذا
+       كان فيها اسم أو رقم.
     */
 
     const filled =
         invitations.filter(
-            invitation =>
-                String(
+            function(invitation) {
+
+                return String(
                     invitation.guest_name || ""
-                ).trim() !== ""
+                ).trim() !== "";
+
+            }
         ).length;
 
 
     const empty =
-        total -
-        filled;
+        Math.max(
+            0,
+            total - filled
+        );
 
 
     document.getElementById(
@@ -1368,6 +1990,18 @@ function updateStats() {
         "emptyCount"
     ).innerText =
         empty;
+
+
+    const allowed =
+        getInvitationLimit();
+
+
+    document.getElementById(
+        "allowedCount"
+    ).innerText =
+        allowed > 0
+            ? allowed
+            : "غير محدد";
 
 }
 
@@ -1410,6 +2044,36 @@ document
 
 async function addGuest() {
 
+    if (!invitationMode) {
+
+        showMessage(
+            "اختاري أولًا: اسم أو رقم أو فراغ.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const remaining =
+        getRemainingInvitations();
+
+
+    if (
+        remaining <= 0
+    ) {
+
+        showMessage(
+            "وصلتِ إلى العدد المحدد للدعوات، لا يمكن إضافة دعوات أكثر.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     const nameInput =
         document.getElementById(
             "guestName"
@@ -1422,7 +2086,7 @@ async function addGuest() {
         );
 
 
-    const name =
+    let value =
         nameInput.value.trim();
 
 
@@ -1432,14 +2096,47 @@ async function addGuest() {
         );
 
 
-    if (!name) {
+    /*
+       الفراغ لا يحتاج قيمة.
+    */
+
+    if (
+        invitationMode !==
+        "blank" &&
+        !value
+    ) {
 
         showMessage(
-            "اكتبي اسم المدعو أولًا.",
+            invitationMode === "number"
+                ? "اكتبي رقم المدعو أولًا."
+                : "اكتبي اسم المدعو أولًا.",
             "error"
         );
 
         return;
+
+    }
+
+
+    if (
+        invitationMode ===
+        "number"
+    ) {
+
+        if (
+            !/^\d+$/.test(
+                value
+            )
+        ) {
+
+            showMessage(
+                "في خيار الرقم يجب إدخال أرقام فقط.",
+                "error"
+            );
+
+            return;
+
+        }
 
     }
 
@@ -1457,6 +2154,17 @@ async function addGuest() {
         );
 
         return;
+
+    }
+
+
+    if (
+        invitationMode ===
+        "blank"
+    ) {
+
+        value =
+            "";
 
     }
 
@@ -1481,7 +2189,8 @@ async function addGuest() {
                         eventId,
 
                     guest_name:
-                        name,
+                        value ||
+                        null,
 
                     invitation_number:
                         nextNumber,
@@ -1517,24 +2226,7 @@ async function addGuest() {
         );
 
 
-        /*
-           إعادة ترتيب الدعوات
-        */
-
-        invitations.sort(
-            function(a, b) {
-
-                return (
-                    Number(
-                        a.invitation_number
-                    ) -
-                    Number(
-                        b.invitation_number
-                    )
-                );
-
-            }
-        );
+        sortInvitations();
 
 
         nameInput.value =
@@ -1544,11 +2236,6 @@ async function addGuest() {
         companionInput.value =
             "0";
 
-
-        /*
-           نذهب لآخر صفحة
-           لرؤية الدعوة الجديدة
-        */
 
         currentPage =
             Math.ceil(
@@ -1563,7 +2250,7 @@ async function addGuest() {
 
 
         showMessage(
-            "تمت إضافة المدعو بنجاح 🤍",
+            "تمت إضافة الدعوة بنجاح 🤍",
             "success"
         );
 
@@ -1574,7 +2261,11 @@ async function addGuest() {
         console.error(error);
 
         showMessage(
-            "تعذر إضافة المدعو.",
+            "تعذر إضافة الدعوة: " +
+            (
+                error.message ||
+                ""
+            ),
             "error"
         );
 
@@ -1601,16 +2292,43 @@ function getNextInvitationNumber() {
     const numbers =
         invitations
             .map(
-                invitation =>
-                    Number(
+                function(invitation) {
+
+                    return Number(
                         invitation.invitation_number
-                    ) || 0
+                    ) || 0;
+
+                }
             );
 
 
     return Math.max(
         ...numbers
     ) + 1;
+
+}
+
+
+/* =========================
+   ترتيب الدعوات
+========================= */
+
+function sortInvitations() {
+
+    invitations.sort(
+        function(a, b) {
+
+            return (
+                Number(
+                    a.invitation_number
+                ) -
+                Number(
+                    b.invitation_number
+                )
+            );
+
+        }
+    );
 
 }
 
@@ -1660,10 +2378,36 @@ async function deleteInvitation(
 
         invitations =
             invitations.filter(
-                invitation =>
-                    invitation.id !==
-                    invitationId
+                function(invitation) {
+
+                    return (
+                        invitation.id !==
+                        invitationId
+                    );
+
+                }
             );
+
+
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    invitations.length /
+                    ITEMS_PER_PAGE
+                )
+            );
+
+
+        if (
+            currentPage >
+            totalPages
+        ) {
+
+            currentPage =
+                totalPages;
+
+        }
 
 
         renderTable();
@@ -1707,6 +2451,18 @@ document
 
 
 async function importFile() {
+
+    if (!invitationMode) {
+
+        showMessage(
+            "اختاري أولًا: اسم أو رقم أو فراغ.",
+            "error"
+        );
+
+        return;
+
+    }
+
 
     const input =
         document.getElementById(
@@ -1754,9 +2510,23 @@ async function importFile() {
             XLSX.read(
                 buffer,
                 {
-                    type: "array"
+                    type: "array",
+                    cellDates: true,
+                    raw: false
                 }
             );
+
+
+        if (
+            !workbook.SheetNames ||
+            workbook.SheetNames.length === 0
+        ) {
+
+            throw new Error(
+                "لم يتم العثور على ورقة داخل الملف."
+            );
+
+        }
 
 
         const firstSheet =
@@ -1786,34 +2556,171 @@ async function importFile() {
         }
 
 
-        let added = 0;
+        /*
+           إزالة الصفوف الفارغة تمامًا.
+        */
+
+        const validRows =
+            rows.filter(
+                function(row) {
+
+                    return Object.values(
+                        row
+                    ).some(
+                        function(value) {
+
+                            return String(
+                                value || ""
+                            ).trim() !== "";
+
+                        }
+                    );
+
+                }
+            );
+
+
+        if (
+            validRows.length === 0
+        ) {
+
+            throw new Error(
+                "لم يتم العثور على بيانات داخل الملف."
+            );
+
+        }
+
+
+        /*
+           التحقق من العدد قبل
+           إدراج أي صف.
+        */
+
+        const remaining =
+            getRemainingInvitations();
+
+
+        if (
+            Number.isFinite(
+                remaining
+            ) &&
+            validRows.length >
+            remaining
+        ) {
+
+            throw new Error(
+                `عدد الصفوف في الملف (${validRows.length}) أكبر من عدد الدعوات المتبقية (${remaining}). لم تتم إضافة أي دعوة.`
+            );
+
+        }
+
+
+        /*
+           في وضع الاسم أو الرقم:
+           نتأكد من وجود القيم.
+        */
+
+        const preparedRows = [];
 
 
         for (
-            const row of rows
+            let i = 0;
+            i < validRows.length;
+            i++
         ) {
 
-            const name =
-                findValue(
-                    row,
-                    [
-                        "الاسم",
-                        "اسم",
-                        "اسم المدعو",
-                        "المدعو",
-                        "name",
-                        "guest",
-                        "guest_name"
-                    ]
-                );
+            const row =
+                validRows[i];
+
+
+            let value =
+                "";
 
 
             if (
-                !String(name || "")
-                    .trim()
+                invitationMode ===
+                "name"
             ) {
 
-                continue;
+                value =
+                    findValue(
+                        row,
+                        NAME_COLUMN_NAMES
+                    );
+
+
+                value =
+                    String(
+                        value || ""
+                    ).trim();
+
+
+                if (!value) {
+
+                    throw new Error(
+                        `لم يتم العثور على اسم في الصف ${i + 2}.`
+                    );
+
+                }
+
+            }
+
+
+            else if (
+                invitationMode ===
+                "number"
+            ) {
+
+                value =
+                    findValue(
+                        row,
+                        NUMBER_COLUMN_NAMES
+                    );
+
+
+                value =
+                    String(
+                        value || ""
+                    ).trim();
+
+
+                if (!value) {
+
+                    throw new Error(
+                        `لم يتم العثور على رقم في الصف ${i + 2}.`
+                    );
+
+                }
+
+
+                /*
+                   الرقم يقبل أرقام فقط.
+                */
+
+                if (
+                    !/^\d+$/.test(
+                        value
+                    )
+                ) {
+
+                    throw new Error(
+                        `الرقم في الصف ${i + 2} غير صحيح.`
+                    );
+
+                }
+
+            }
+
+
+            /*
+               وضع الفراغ:
+               لا نحتاج قيمة.
+            */
+
+            else {
+
+                value =
+                    "";
 
             }
 
@@ -1821,22 +2728,36 @@ async function importFile() {
             const companionValue =
                 findValue(
                     row,
-                    [
-                        "المرافقين",
-                        "مرافقين",
-                        "عدد المرافقين",
-                        "المرافقون",
-                        "companions",
-                        "companion",
-                        "companion_count"
-                    ]
+                    COMPANION_COLUMN_NAMES
                 );
 
 
             let companions =
                 Number(
-                    companionValue || 0
+                    String(
+                        companionValue || ""
+                    ).trim() ||
+                    0
                 );
+
+
+            /*
+               دعم الأرقام التي تكون
+               مخزنة بصيغة 2.0
+            */
+
+            if (
+                Number.isFinite(
+                    companions
+                )
+            ) {
+
+                companions =
+                    Math.floor(
+                        companions
+                    );
+
+            }
 
 
             if (
@@ -1846,10 +2767,43 @@ async function importFile() {
                 companions < 0
             ) {
 
-                companions = 0;
+                companions =
+                    0;
 
             }
 
+
+            preparedRows.push({
+
+                value:
+                    value,
+
+                companions:
+                    companions
+
+            });
+
+        }
+
+
+        button.innerText =
+            "جاري استيراد الدعوات...";
+
+
+        let added =
+            0;
+
+
+        /*
+           إدراج الصفوف واحدًا واحدًا
+           حتى نحافظ على نفس طريقة
+           قاعدة البيانات الحالية.
+        */
+
+        for (
+            const item
+            of preparedRows
+        ) {
 
             const invitation = {
 
@@ -1857,15 +2811,15 @@ async function importFile() {
                     eventId,
 
                 guest_name:
-                    String(
-                        name
-                    ).trim(),
+                    item.value ||
+                    null,
 
                 invitation_number:
                     getNextInvitationNumber(),
 
                 guest_count:
-                    1 + companions,
+                    1 +
+                    item.companions,
 
                 checked_in:
                     0,
@@ -1892,18 +2846,12 @@ async function importFile() {
                     )
 
                     .select()
-
                     .single();
 
 
             if (error) {
 
-                console.error(
-                    "Import row error:",
-                    error
-                );
-
-                continue;
+                throw error;
 
             }
 
@@ -1918,24 +2866,14 @@ async function importFile() {
         }
 
 
-        /*
-           إعادة ترتيب الدعوات
-        */
+        sortInvitations();
 
-        invitations.sort(
-            function(a, b) {
 
-                return (
-                    Number(
-                        a.invitation_number
-                    ) -
-                    Number(
-                        b.invitation_number
-                    )
-                );
-
-            }
-        );
+        currentPage =
+            Math.ceil(
+                invitations.length /
+                ITEMS_PER_PAGE
+            );
 
 
         renderTable();
@@ -1944,7 +2882,7 @@ async function importFile() {
 
 
         showMessage(
-            `تم استيراد ${added} مدعو بنجاح 🤍`,
+            `تم استيراد ${added} دعوة بنجاح 🤍`,
             "success"
         );
 
@@ -1957,10 +2895,15 @@ async function importFile() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "IMPORT ERROR:",
+            error
+        );
+
 
         showMessage(
-            "تعذر قراءة الملف. تأكدي أن الملف يحتوي على عمود الاسم.",
+            error.message ||
+            "تعذر قراءة الملف.",
             "error"
         );
 
@@ -1980,6 +2923,191 @@ async function importFile() {
 
 
 /* =========================
+   أسماء أعمدة الاسم
+========================= */
+
+const NAME_COLUMN_NAMES = [
+
+    "الاسم",
+
+    "اسم",
+
+    "اسم المدعو",
+
+    "اسم المدعوة",
+
+    "اسم المدعو إليه",
+
+    "المدعو",
+
+    "المدعوة",
+
+    "الضيف",
+
+    "اسم الضيف",
+
+    "اسم الشخص",
+
+    "اسم الحضور",
+
+    "الاسم الكامل",
+
+    "الاسم الثلاثي",
+
+    "الاسم الرباعي",
+
+    "الاسماء",
+
+    "أسماء",
+
+    "اسماء",
+
+    "guest name",
+
+    "guest_name",
+
+    "guestname",
+
+    "guest",
+
+    "name",
+
+    "full name",
+
+    "full_name",
+
+    "fullname",
+
+    "guest full name",
+
+    "guest_full_name"
+
+];
+
+
+/* =========================
+   أسماء أعمدة الرقم
+========================= */
+
+const NUMBER_COLUMN_NAMES = [
+
+    "الرقم",
+
+    "رقم",
+
+    "رقم المدعو",
+
+    "رقم المدعوة",
+
+    "رقم الضيف",
+
+    "رقم الدعوة",
+
+    "رقم الدعوه",
+
+    "الرقم التسلسلي",
+
+    "الرقم التعريفي",
+
+    "الرقم التعريفي للمدعو",
+
+    "رقم الشخص",
+
+    "رقم الحضور",
+
+    "العدد",
+
+    "التسلسل",
+
+    "تسلسل",
+
+    "رقم تسلسلي",
+
+    "no",
+
+    "number",
+
+    "number id",
+
+    "number_id",
+
+    "guest number",
+
+    "guest_number",
+
+    "guest no",
+
+    "guest_no",
+
+    "guest id",
+
+    "guest_id",
+
+    "id",
+
+    "code"
+
+];
+
+
+/* =========================
+   أسماء أعمدة المرافقين
+========================= */
+
+const COMPANION_COLUMN_NAMES = [
+
+    "المرافقين",
+
+    "المرافقون",
+
+    "المرافق",
+
+    "عدد المرافقين",
+
+    "عدد المرافقون",
+
+    "عدد المرافق",
+
+    "مرافقين",
+
+    "مرافقون",
+
+    "عدد مرافقين",
+
+    "عدد مرافقون",
+
+    "عدد الاشخاص",
+
+    "عدد الأشخاص",
+
+    "عدد الضيوف",
+
+    "المرافقين مع المدعو",
+
+    "companions",
+
+    "companion",
+
+    "companion count",
+
+    "companion_count",
+
+    "companions count",
+
+    "companions_count",
+
+    "guest count",
+
+    "guest_count",
+
+    "guests count",
+
+    "guests_count"
+
+];
+
+
+/* =========================
    البحث عن قيمة داخل الصف
 ========================= */
 
@@ -1994,6 +3122,10 @@ function findValue(
         );
 
 
+    /*
+       المطابقة المباشرة
+    */
+
     for (
         const possibleName
         of possibleNames
@@ -2001,13 +3133,78 @@ function findValue(
 
         const found =
             keys.find(
-                key =>
-                    normalize(
-                        key
-                    ) ===
-                    normalize(
-                        possibleName
-                    )
+                function(key) {
+
+                    return (
+                        normalize(
+                            key
+                        ) ===
+                        normalize(
+                            possibleName
+                        )
+                    );
+
+                }
+            );
+
+
+        if (
+            found !== undefined
+        ) {
+
+            return row[found];
+
+        }
+
+    }
+
+
+    /*
+       مطابقة أكثر مرونة:
+       إذا كان اسم العمود يحتوي
+       على الكلمات الأساسية.
+    */
+
+    for (
+        const possibleName
+        of possibleNames
+    ) {
+
+        const normalizedPossible =
+            normalize(
+                possibleName
+            );
+
+
+        if (
+            !normalizedPossible
+        ) {
+
+            continue;
+
+        }
+
+
+        const found =
+            keys.find(
+                function(key) {
+
+                    const normalizedKey =
+                        normalize(
+                            key
+                        );
+
+
+                    return (
+                        normalizedKey.includes(
+                            normalizedPossible
+                        ) ||
+                        normalizedPossible.includes(
+                            normalizedKey
+                        )
+                    );
+
+                }
             );
 
 
@@ -2038,11 +3235,29 @@ function normalize(
     return String(
         value || ""
     )
+
         .trim()
+
         .toLowerCase()
+
         .replace(
-            /\s+/g,
+            /[\s_\-]+/g,
             ""
+        )
+
+        .replace(
+            /[أإآ]/g,
+            "ا"
+        )
+
+        .replace(
+            /ة/g,
+            "ه"
+        )
+
+        .replace(
+            /ى/g,
+            "ي"
         );
 
 }
@@ -2064,6 +3279,18 @@ document
 
 async function saveChanges() {
 
+    if (!invitationMode) {
+
+        showMessage(
+            "اختاري أولًا: اسم أو رقم أو فراغ.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
     const button =
         document.getElementById(
             "saveButton"
@@ -2079,11 +3306,6 @@ async function saveChanges() {
 
 
     try {
-
-        /*
-           نحصل على الصفوف الموجودة
-           في الصفحة الحالية فقط
-        */
 
         const names =
             document.querySelectorAll(
@@ -2121,7 +3343,7 @@ async function saveChanges() {
             }
 
 
-            const name =
+            let value =
                 names[i]
                     .value
                     .trim();
@@ -2148,6 +3370,50 @@ async function saveChanges() {
             }
 
 
+            /*
+               إذا كان الخيار رقم،
+               نتحقق من الرقم.
+            */
+
+            if (
+                invitationMode ===
+                "number" &&
+                value &&
+                !/^\d+$/.test(
+                    value
+                )
+            ) {
+
+                throw new Error(
+                    "في خيار الرقم يجب إدخال أرقام فقط."
+                );
+
+            }
+
+
+            /*
+               في الفراغ يسمح أن تكون
+               القيمة فارغة.
+            */
+
+            if (
+                invitationMode ===
+                "blank"
+            ) {
+
+                /*
+                   إذا كتب العميل شيئًا
+                   في الفراغ، نسمح به حتى
+                   يستطيع تعبئة الفراغات
+                   من نفس الجدول.
+                */
+
+                value =
+                    value || "";
+
+            }
+
+
             const {
                 data,
                 error
@@ -2159,7 +3425,7 @@ async function saveChanges() {
                     .update({
 
                         guest_name:
-                            name ||
+                            value ||
                             null,
 
                         guest_count:
@@ -2202,6 +3468,9 @@ async function saveChanges() {
             "success"
         );
 
+
+        return true;
+
     }
 
     catch (error) {
@@ -2209,9 +3478,16 @@ async function saveChanges() {
         console.error(error);
 
         showMessage(
-            "حدث خطأ أثناء حفظ التعديلات.",
+            "حدث خطأ أثناء حفظ التعديلات: " +
+            (
+                error.message ||
+                ""
+            ),
             "error"
         );
+
+
+        return false;
 
     }
 
@@ -2240,7 +3516,17 @@ document
         "click",
         async function() {
 
-            await saveChanges();
+            const saved =
+                await saveChanges();
+
+
+            if (
+                saved === false
+            ) {
+
+                return;
+
+            }
 
 
             window.location.href =
@@ -2302,4 +3588,3 @@ function showMessage(
 </body>
 
 </html>
-```
