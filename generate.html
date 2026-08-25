@@ -22,6 +22,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
+
 <style>
 
 * {
@@ -85,7 +86,7 @@ h1 {
 
 
 /* =========================
-   زر عام
+   الأزرار
 ========================= */
 
 button {
@@ -105,7 +106,7 @@ button:hover {
 }
 
 button:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
@@ -115,31 +116,60 @@ button:disabled {
 
 
 /* =========================
-   منطقة المراجعة
+   أزرار التنقل
 ========================= */
 
-.review-area {
+.review-controls {
     display: none;
-    margin-top: 25px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.review-title {
+.review-buttons {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.review-buttons button {
+    margin-top: 0;
+}
+
+.review-counter {
+    min-width: 90px;
     text-align: center;
-    font-size: 17px;
     font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.review-card {
-    background: #eee;
-    border-radius: 16px;
-    padding: 15px;
-    text-align: center;
+    color: #333;
 }
 
 
 /* =========================
-   التصميم
+   بطاقة الدعوة
+========================= */
+
+.invitation-grid {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.invitation-card {
+    width: 100%;
+    background: #eee;
+    border-radius: 15px;
+    padding: 12px;
+    text-align: center;
+}
+
+.invitation-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+/* =========================
+   التصميم النهائي
 ========================= */
 
 .invitation-canvas {
@@ -148,7 +178,6 @@ button:disabled {
     max-width: 100%;
     line-height: 0;
     overflow: hidden;
-    border-radius: 10px;
 }
 
 .invitation-canvas > img.background {
@@ -177,53 +206,7 @@ button:disabled {
 
 
 /* =========================
-   أزرار السابق والتالي
-========================= */
-
-.review-navigation {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.review-navigation button {
-    flex: 1;
-    margin-top: 0;
-}
-
-.review-counter {
-    min-width: 95px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 15px;
-    color: #555;
-}
-
-
-/* =========================
-   اسم الدعوة
-========================= */
-
-.current-guest {
-    margin-top: 12px;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-
-/* =========================
-   الأزرار النهائية
-========================= */
-
-.actions {
-    display: none;
-    margin-top: 25px;
-}
-
-
-/* =========================
-   تحميل
+   التحميل
 ========================= */
 
 .loading {
@@ -262,13 +245,12 @@ button:disabled {
         padding: 20px;
     }
 
-    .review-navigation {
-        gap: 8px;
+    .review-buttons {
+        grid-template-columns: 1fr;
     }
 
     .review-counter {
-        min-width: 75px;
-        font-size: 14px;
+        order: -1;
     }
 
 }
@@ -292,7 +274,7 @@ button:disabled {
 
 
 <div class="subtitle">
-راجعي كل دعوة قبل التوليد والتأكد من الاسم والـ QR
+راجعي الدعوات واحدة واحدة قبل تنزيلها
 </div>
 
 
@@ -334,7 +316,7 @@ button:disabled {
 
 
 <!-- =========================
-     التحميل
+     الحالة
 ========================= -->
 
 <div
@@ -347,63 +329,40 @@ button:disabled {
 
 
 <!-- =========================
-     منطقة المراجعة
+     أزرار السابق والتالي
 ========================= -->
 
 <div
-    id="reviewArea"
-    class="review-area">
+    id="reviewControls"
+    class="review-controls">
 
-    <div class="review-title">
-        مراجعة الدعوة
-    </div>
+    <div class="review-buttons">
 
+        <button
+            id="previousButton"
+            type="button">
 
-    <div class="review-card">
+            ← السابق
+
+        </button>
+
 
         <div
-            id="invitationCanvasWrapper">
+            id="reviewCounter"
+            class="review-counter">
+
+            0 من 0
+
         </div>
 
 
-        <div
-            id="currentGuest"
-            class="current-guest">
-        </div>
+        <button
+            id="nextButton"
+            type="button">
 
+            التالي →
 
-        <!-- أزرار السابق والتالي -->
-
-        <div
-            class="review-navigation">
-
-            <button
-                id="previousButton"
-                type="button">
-
-                ← السابق
-
-            </button>
-
-
-            <div
-                id="reviewCounter"
-                class="review-counter">
-
-                0 من 0
-
-            </div>
-
-
-            <button
-                id="nextButton"
-                type="button">
-
-                التالي →
-
-            </button>
-
-        </div>
+        </button>
 
     </div>
 
@@ -411,13 +370,23 @@ button:disabled {
 
 
 <!-- =========================
-     أزرار التوليد
+     الدعوة الحالية
+========================= -->
+
+<div
+    id="invitationGrid"
+    class="invitation-grid">
+
+</div>
+
+
+<!-- =========================
+     الأزرار
 ========================= -->
 
 <div
     id="actions"
-    class="actions">
-
+    style="display:none;">
 
     <button
         id="downloadImagesButton"
@@ -470,6 +439,7 @@ button:disabled {
 <div
     id="message"
     class="message">
+
 </div>
 
 
@@ -489,6 +459,7 @@ const params =
         window.location.search
     );
 
+
 const eventId =
     params.get("event_id");
 
@@ -503,7 +474,7 @@ let invitations = [];
 
 let designData = null;
 
-let currentIndex = 0;
+let currentInvitationIndex = 0;
 
 
 /* =========================
@@ -520,12 +491,12 @@ async function loadPage() {
 
     if (!eventId) {
 
-        hideLoading();
-
         showMessage(
             "رابط الحفل غير صحيح.",
             "error"
         );
+
+        hideLoading();
 
         return;
     }
@@ -539,36 +510,7 @@ async function loadPage() {
 
         await loadInvitations();
 
-
-        if (!invitations.length) {
-
-            hideLoading();
-
-            showMessage(
-                "لا توجد دعوات لهذا الحفل.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        currentIndex = 0;
-
-        showCurrentInvitation();
-
-
-        hideLoading();
-
-
-        document.getElementById(
-            "reviewArea"
-        ).style.display = "block";
-
-
-        document.getElementById(
-            "actions"
-        ).style.display = "block";
+        renderInvitations();
 
     }
 
@@ -580,14 +522,29 @@ async function loadPage() {
         );
 
 
-        hideLoading();
+        let message =
+            "حدث خطأ أثناء تحميل الدعوات.";
+
+
+        if (
+            error &&
+            error.message
+        ) {
+
+            message +=
+                " السبب: " +
+                error.message;
+
+        }
 
 
         showMessage(
-            error.message ||
-            "حدث خطأ أثناء تحميل الدعوات.",
+            message,
             "error"
         );
+
+
+        hideLoading();
 
     }
 
@@ -637,13 +594,11 @@ async function loadDesign() {
     ) {
 
         throw new Error(
-            "صورة التصميم غير موجودة."
+            "صورة التصميم غير موجودة في التصميم المحفوظ."
         );
 
     }
 
-
-    /* القيم الافتراضية */
 
     designData.nameX =
         Number(
@@ -688,7 +643,7 @@ async function loadDesign() {
 
     designData.nameAlign =
         designData.nameAlign ||
-        "center";
+        "right";
 
 
     designData.qrAlign =
@@ -732,16 +687,16 @@ async function loadEvent() {
     } =
         await supabaseClient
 
-        .from("events")
+            .from("events")
 
-        .select("*")
+            .select("*")
 
-        .eq(
-            "id",
-            eventId
-        )
+            .eq(
+                "id",
+                eventId
+            )
 
-        .single();
+            .single();
 
 
     if (error) {
@@ -793,21 +748,21 @@ async function loadInvitations() {
     } =
         await supabaseClient
 
-        .from("invitations")
+            .from("invitations")
 
-        .select("*")
+            .select("*")
 
-        .eq(
-            "event_id",
-            eventId
-        )
+            .eq(
+                "event_id",
+                eventId
+            )
 
-        .order(
-            "invitation_number",
-            {
-                ascending: true
-            }
-        );
+            .order(
+                "invitation_number",
+                {
+                    ascending: true
+                }
+            );
 
 
     if (error) {
@@ -833,85 +788,140 @@ async function loadInvitations() {
 
 
 /* =========================
-   عرض الدعوة الحالية
+   عرض الدعوات
 ========================= */
 
-function showCurrentInvitation() {
+function renderInvitations() {
 
     if (
-        !invitations.length
+        invitations.length === 0
     ) {
+
+        hideLoading();
+
+        document.getElementById(
+            "reviewControls"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "actions"
+        ).style.display =
+            "none";
+
+
+        showMessage(
+            "لا توجد دعوات لهذا الحفل.",
+            "error"
+        );
+
 
         return;
 
     }
 
 
-    if (
-        currentIndex < 0
-    ) {
-
-        currentIndex = 0;
-
-    }
-
-
-    if (
-        currentIndex >=
-        invitations.length
-    ) {
-
-        currentIndex =
-            invitations.length - 1;
-
-    }
-
-
-    const invitation =
-        invitations[currentIndex];
-
-
-    const wrapper =
-        document.getElementById(
-            "invitationCanvasWrapper"
-        );
-
-
-    wrapper.innerHTML =
-        "";
-
-
-    const canvas =
-        createInvitationCanvas(
-            invitation
-        );
-
-
-    wrapper.appendChild(
-        canvas
-    );
+    hideLoading();
 
 
     document.getElementById(
-        "currentGuest"
-    ).innerText =
-        invitation.guest_name ||
-        "اسم المدعو";
+        "actions"
+    ).style.display =
+        "block";
 
 
     document.getElementById(
-        "reviewCounter"
-    ).innerText =
-        `${currentIndex + 1} من ${invitations.length}`;
+        "reviewControls"
+    ).style.display =
+        "block";
 
 
-    updateNavigationButtons();
+    currentInvitationIndex =
+        0;
+
+
+    renderCurrentInvitation();
 
 }
 
 
 /* =========================
-   أزرار السابق والتالي
+   عرض الدعوة الحالية فقط
+========================= */
+
+function renderCurrentInvitation() {
+
+    const grid =
+        document.getElementById(
+            "invitationGrid"
+        );
+
+
+    grid.innerHTML =
+        "";
+
+
+    const invitation =
+        invitations[
+            currentInvitationIndex
+        ];
+
+
+    if (!invitation) {
+
+        return;
+
+    }
+
+
+    const card =
+        createInvitationCard(
+            invitation,
+            currentInvitationIndex
+        );
+
+
+    grid.appendChild(
+        card
+    );
+
+
+    /*
+       تحديث العداد
+    */
+
+    document.getElementById(
+        "reviewCounter"
+    ).innerText =
+        `${currentInvitationIndex + 1} من ${invitations.length}`;
+
+
+    /*
+       تعطيل السابق في البداية
+    */
+
+    document.getElementById(
+        "previousButton"
+    ).disabled =
+        currentInvitationIndex === 0;
+
+
+    /*
+       تعطيل التالي في النهاية
+    */
+
+    document.getElementById(
+        "nextButton"
+    ).disabled =
+        currentInvitationIndex ===
+        invitations.length - 1;
+
+}
+
+
+/* =========================
+   السابق
 ========================= */
 
 document
@@ -923,18 +933,22 @@ document
         function() {
 
             if (
-                currentIndex > 0
+                currentInvitationIndex > 0
             ) {
 
-                currentIndex--;
+                currentInvitationIndex--;
 
-                showCurrentInvitation();
+                renderCurrentInvitation();
 
             }
 
         }
     );
 
+
+/* =========================
+   التالي
+========================= */
 
 document
     .getElementById(
@@ -945,13 +959,13 @@ document
         function() {
 
             if (
-                currentIndex <
+                currentInvitationIndex <
                 invitations.length - 1
             ) {
 
-                currentIndex++;
+                currentInvitationIndex++;
 
-                showCurrentInvitation();
+                renderCurrentInvitation();
 
             }
 
@@ -959,38 +973,44 @@ document
     );
 
 
-function updateNavigationButtons() {
-
-    const previous =
-        document.getElementById(
-            "previousButton"
-        );
-
-
-    const next =
-        document.getElementById(
-            "nextButton"
-        );
-
-
-    previous.disabled =
-        currentIndex === 0;
-
-
-    next.disabled =
-        currentIndex ===
-        invitations.length - 1;
-
-}
-
-
 /* =========================
-   إنشاء الدعوة
+   إنشاء بطاقة الدعوة
 ========================= */
 
-function createInvitationCanvas(
-    invitation
+function createInvitationCard(
+    invitation,
+    index
 ) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "invitation-card";
+
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+
+    title.className =
+        "invitation-title";
+
+
+    title.innerText =
+        invitation.guest_name ||
+        `دعوة ${index + 1}`;
+
+
+    card.appendChild(
+        title
+    );
+
 
     const canvas =
         document.createElement(
@@ -1002,15 +1022,13 @@ function createInvitationCanvas(
         "invitation-canvas";
 
 
-    canvas.dataset.invitationIndex =
-        invitations.indexOf(
-            invitation
-        );
+    canvas.dataset.index =
+        index;
 
 
-    /* =====================
-       الخلفية
-    ===================== */
+    /*
+       صورة الخلفية
+    */
 
     const background =
         document.createElement(
@@ -1035,9 +1053,9 @@ function createInvitationCanvas(
     );
 
 
-    /* =====================
+    /*
        الاسم
-    ===================== */
+    */
 
     const name =
         document.createElement(
@@ -1056,13 +1074,15 @@ function createInvitationCanvas(
 
     name.style.left =
         (
-            designData.nameX * 100
+            designData.nameX *
+            100
         ) + "%";
 
 
     name.style.top =
         (
-            designData.nameY * 100
+            designData.nameY *
+            100
         ) + "%";
 
 
@@ -1099,18 +1119,21 @@ function createInvitationCanvas(
 
     else if (
         designData.nameAlign ===
+        "right"
+    ) {
+
+        name.style.transform =
+            "translateX(0)";
+
+    }
+
+    else if (
+        designData.nameAlign ===
         "left"
     ) {
 
         name.style.transform =
             "translateX(-100%)";
-
-    }
-
-    else {
-
-        name.style.transform =
-            "translateX(0)";
 
     }
 
@@ -1120,9 +1143,9 @@ function createInvitationCanvas(
     );
 
 
-    /* =====================
+    /*
        QR
-    ===================== */
+    */
 
     const qr =
         document.createElement(
@@ -1136,13 +1159,15 @@ function createInvitationCanvas(
 
     qr.style.left =
         (
-            designData.qrX * 100
+            designData.qrX *
+            100
         ) + "%";
 
 
     qr.style.top =
         (
-            designData.qrY * 100
+            designData.qrY *
+            100
         ) + "%";
 
 
@@ -1157,36 +1182,8 @@ function createInvitationCanvas(
 
 
     /*
-       محاذاة QR
+       صورة QR
     */
-
-    if (
-        designData.qrAlign ===
-        "center"
-    ) {
-
-        qr.style.transform =
-            "translateX(-50%)";
-
-    }
-
-    else if (
-        designData.qrAlign ===
-        "left"
-    ) {
-
-        qr.style.transform =
-            "translateX(-100%)";
-
-    }
-
-    else {
-
-        qr.style.transform =
-            "translateX(0)";
-
-    }
-
 
     const qrImage =
         document.createElement(
@@ -1214,7 +1211,44 @@ function createInvitationCanvas(
     );
 
 
-    return canvas;
+    card.appendChild(
+        canvas
+    );
+
+
+    /*
+       زر تنزيل الدعوة الحالية
+    */
+
+    const downloadButton =
+        document.createElement(
+            "button"
+        );
+
+
+    downloadButton.innerText =
+        "تنزيل هذه الدعوة";
+
+
+    downloadButton.addEventListener(
+        "click",
+        function() {
+
+            downloadSingleInvitation(
+                canvas,
+                invitation
+            );
+
+        }
+    );
+
+
+    card.appendChild(
+        downloadButton
+    );
+
+
+    return card;
 
 }
 
@@ -1228,6 +1262,20 @@ function createQRImage(
     imageElement
 ) {
 
+    if (!imageElement) {
+
+        return;
+
+    }
+
+
+    const qrValue =
+        String(
+            value ||
+            "DEMO"
+        );
+
+
     if (
         typeof QRCode ===
         "undefined"
@@ -1240,12 +1288,6 @@ function createQRImage(
         return;
 
     }
-
-
-    const qrValue =
-        String(
-            value || "DEMO"
-        );
 
 
     QRCode.toDataURL(
@@ -1282,7 +1324,7 @@ function createQRImage(
             if (error) {
 
                 console.error(
-                    "QR ERROR:",
+                    "QR CREATE ERROR:",
                     error
                 );
 
@@ -1400,44 +1442,59 @@ async function downloadSingleInvitation(
     invitation
 ) {
 
-    const canvas =
-        await canvasToImage(
-            element
+    try {
+
+        const canvas =
+            await canvasToImage(
+                element
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        const name =
+            safeFileName(
+                invitation.guest_name ||
+                `دعوة-${invitation.invitation_number || ""}`
+            );
+
+
+        link.download =
+            `${name}.png`;
+
+
+        link.href =
+            canvas.toDataURL(
+                "image/png"
+            );
+
+
+        document.body.appendChild(
+            link
         );
 
 
-    const link =
-        document.createElement(
-            "a"
+        link.click();
+
+
+        link.remove();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "تعذر تنزيل الدعوة كصورة.",
+            "error"
         );
 
-
-    const name =
-        safeFileName(
-            invitation.guest_name ||
-            "دعوة"
-        );
-
-
-    link.download =
-        `${name}.png`;
-
-
-    link.href =
-        canvas.toDataURL(
-            "image/png"
-        );
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
+    }
 
 }
 
@@ -1474,37 +1531,41 @@ async function downloadAllImages() {
 
     try {
 
+        /*
+           مؤقتًا نعرض كل الدعوات واحدة واحدة
+           أثناء التوليد بدون تغيير المعاينة.
+        */
+
         for (
             let i = 0;
             i < invitations.length;
             i++
         ) {
 
-            const temp =
-                createInvitationCanvas(
-                    invitations[i]
+            currentInvitationIndex =
+                i;
+
+
+            renderCurrentInvitation();
+
+
+            await wait(100);
+
+
+            const element =
+                document.querySelector(
+                    ".invitation-canvas"
                 );
-
-
-            temp.style.position =
-                "fixed";
-
-            temp.style.left =
-                "-10000px";
-
-            temp.style.top =
-                "0";
-
-
-            document.body.appendChild(
-                temp
-            );
 
 
             const canvas =
                 await canvasToImage(
-                    temp
+                    element
                 );
+
+
+            const invitation =
+                invitations[i];
 
 
             const link =
@@ -1515,7 +1576,7 @@ async function downloadAllImages() {
 
             const name =
                 safeFileName(
-                    invitations[i].guest_name ||
+                    invitation.guest_name ||
                     `دعوة-${i + 1}`
                 );
 
@@ -1540,20 +1601,25 @@ async function downloadAllImages() {
 
             link.remove();
 
-            temp.remove();
 
-
-            button.innerText =
-                `جاري تجهيز ${i + 1} من ${invitations.length}...`;
-
-
-            await wait(300);
+            await wait(400);
 
         }
 
 
+        /*
+           الرجوع لأول دعوة
+        */
+
+        currentInvitationIndex =
+            0;
+
+
+        renderCurrentInvitation();
+
+
         showMessage(
-            "تم تجهيز الدعوات كصور 🤍",
+            "تم تجهيز الدعوات كصور.",
             "success"
         );
 
@@ -1616,71 +1682,53 @@ async function downloadPDF() {
 
     try {
 
+        if (
+            !invitations.length
+        ) {
+
+            throw new Error(
+                "لا توجد دعوات لإنشاء PDF."
+            );
+
+        }
+
+
         const {
             jsPDF
         } =
             window.jspdf;
 
 
-        let firstCanvas =
-            null;
+        /*
+           أول دعوة
+        */
+
+        currentInvitationIndex =
+            0;
+
+        renderCurrentInvitation();
+
+        await wait(100);
 
 
-        let firstWidth = 0;
-
-        let firstHeight = 0;
-
-
-        for (
-            let i = 0;
-            i < invitations.length;
-            i++
-        ) {
-
-            const temp =
-                createInvitationCanvas(
-                    invitations[i]
-                );
-
-
-            temp.style.position =
-                "fixed";
-
-            temp.style.left =
-                "-10000px";
-
-            temp.style.top =
-                "0";
-
-
-            document.body.appendChild(
-                temp
+        const firstElement =
+            document.querySelector(
+                ".invitation-canvas"
             );
 
 
-            const imageCanvas =
-                await canvasToImage(
-                    temp
-                );
+        const firstCanvas =
+            await canvasToImage(
+                firstElement
+            );
 
 
-            temp.remove();
+        const firstWidth =
+            firstCanvas.width;
 
 
-            if (i === 0) {
-
-                firstCanvas =
-                    imageCanvas;
-
-                firstWidth =
-                    imageCanvas.width;
-
-                firstHeight =
-                    imageCanvas.height;
-
-            }
-
-        }
+        const firstHeight =
+            firstCanvas.height;
 
 
         const orientation =
@@ -1712,7 +1760,7 @@ async function downloadPDF() {
 
 
         /*
-           نعيد إنشاء كل دعوة
+           إضافة الدعوات
         */
 
         for (
@@ -1721,61 +1769,62 @@ async function downloadPDF() {
             i++
         ) {
 
-            const temp =
-                createInvitationCanvas(
-                    invitations[i]
+            currentInvitationIndex =
+                i;
+
+
+            renderCurrentInvitation();
+
+
+            await wait(100);
+
+
+            const element =
+                document.querySelector(
+                    ".invitation-canvas"
                 );
-
-
-            temp.style.position =
-                "fixed";
-
-            temp.style.left =
-                "-10000px";
-
-            temp.style.top =
-                "0";
-
-
-            document.body.appendChild(
-                temp
-            );
 
 
             const imageCanvas =
                 await canvasToImage(
-                    temp
+                    element
                 );
 
 
-            temp.remove();
+            const imageWidth =
+                imageCanvas.width;
+
+
+            const imageHeight =
+                imageCanvas.height;
 
 
             if (i > 0) {
 
                 pdf.addPage(
-
                     [
-                        imageCanvas.width,
-                        imageCanvas.height
+                        imageWidth,
+                        imageHeight
                     ],
-
-                    imageCanvas.height >
-                    imageCanvas.width
+                    imageHeight >
+                    imageWidth
                         ? "portrait"
                         : "landscape"
-
                 );
 
             }
 
 
-            pdf.addImage(
-
+            const imageData =
                 imageCanvas.toDataURL(
                     "image/jpeg",
                     0.95
-                ),
+                );
+
+
+            pdf.addImage(
+
+                imageData,
 
                 "JPEG",
 
@@ -1783,9 +1832,9 @@ async function downloadPDF() {
 
                 0,
 
-                imageCanvas.width,
+                imageWidth,
 
-                imageCanvas.height,
+                imageHeight,
 
                 undefined,
 
@@ -1793,14 +1842,36 @@ async function downloadPDF() {
 
             );
 
+
+            button.innerText =
+                `جاري تجهيز ${i + 1} من ${invitations.length}...`;
+
+
+            await wait(100);
+
         }
 
 
-        pdf.save(
+        /*
+           الرجوع لأول دعوة
+        */
+
+        currentInvitationIndex =
+            0;
+
+
+        renderCurrentInvitation();
+
+
+        const fileName =
             safeFileName(
                 eventData.event_name ||
                 "الدعوات"
-            ) +
+            );
+
+
+        pdf.save(
+            fileName +
             ".pdf"
         );
 
@@ -1867,7 +1938,22 @@ async function downloadZIP() {
         true;
 
 
+    button.innerText =
+        "جاري إنشاء ZIP...";
+
+
     try {
+
+        if (
+            !invitations.length
+        ) {
+
+            throw new Error(
+                "لا توجد دعوات لإنشاء ZIP."
+            );
+
+        }
+
 
         const zip =
             new JSZip();
@@ -1885,34 +1971,37 @@ async function downloadZIP() {
             i++
         ) {
 
-            const temp =
-                createInvitationCanvas(
-                    invitations[i]
+            currentInvitationIndex =
+                i;
+
+
+            renderCurrentInvitation();
+
+
+            await wait(100);
+
+
+            const element =
+                document.querySelector(
+                    ".invitation-canvas"
                 );
-
-
-            temp.style.position =
-                "fixed";
-
-            temp.style.left =
-                "-10000px";
-
-            temp.style.top =
-                "0";
-
-
-            document.body.appendChild(
-                temp
-            );
 
 
             const canvas =
                 await canvasToImage(
-                    temp
+                    element
                 );
 
 
-            temp.remove();
+            const invitation =
+                invitations[i];
+
+
+            const name =
+                safeFileName(
+                    invitation.guest_name ||
+                    `دعوة-${i + 1}`
+                );
 
 
             const blob =
@@ -1928,18 +2017,28 @@ async function downloadZIP() {
                 );
 
 
+            if (!blob) {
+
+                throw new Error(
+                    "تعذر تحويل الدعوة رقم " +
+                    (i + 1) +
+                    " إلى صورة."
+                );
+
+            }
+
+
             folder.file(
-                safeFileName(
-                    invitations[i].guest_name ||
-                    `دعوة-${i + 1}`
-                ) +
-                ".png",
+                `${name}.png`,
                 blob
             );
 
 
             button.innerText =
                 `جاري تجهيز ${i + 1} من ${invitations.length}...`;
+
+
+            await wait(100);
 
         }
 
@@ -1951,7 +2050,15 @@ async function downloadZIP() {
         const content =
             await zip.generateAsync(
                 {
-                    type: "blob"
+                    type: "blob",
+
+                    compression:
+                        "DEFLATE",
+
+                    compressionOptions:
+                        {
+                            level: 6
+                        }
                 }
             );
 
@@ -1991,9 +2098,23 @@ async function downloadZIP() {
         link.remove();
 
 
-        URL.revokeObjectURL(
-            url
+        setTimeout(
+            function() {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1000
         );
+
+
+        currentInvitationIndex =
+            0;
+
+
+        renderCurrentInvitation();
 
 
         showMessage(
@@ -2058,7 +2179,26 @@ async function downloadCodesOnly() {
         true;
 
 
+    button.innerText =
+        "جاري تجهيز الأكواد...";
+
+
     try {
+
+        if (
+            !invitations.length
+        ) {
+
+            throw new Error(
+                "لا توجد أكواد لحفظها."
+            );
+
+        }
+
+
+        let savedCount =
+            0;
+
 
         for (
             let i = 0;
@@ -2091,12 +2231,15 @@ async function downloadCodesOnly() {
                 );
 
 
-            link.download =
+            const name =
                 safeFileName(
                     invitation.guest_name ||
-                    `كود-${i + 1}`
-                ) +
-                "-QR.png";
+                    `كود-${invitation.invitation_number || i + 1}`
+                );
+
+
+            link.download =
+                `${name}-QR.png`;
 
 
             link.href =
@@ -2114,8 +2257,11 @@ async function downloadCodesOnly() {
             link.remove();
 
 
+            savedCount++;
+
+
             button.innerText =
-                `جاري حفظ ${i + 1} من ${invitations.length}...`;
+                `جاري حفظ ${savedCount} من ${invitations.length}...`;
 
 
             await wait(300);
@@ -2123,8 +2269,19 @@ async function downloadCodesOnly() {
         }
 
 
+        if (
+            savedCount === 0
+        ) {
+
+            throw new Error(
+                "لا توجد أكواد لحفظها."
+            );
+
+        }
+
+
         showMessage(
-            "تم حفظ الأكواد كصور PNG 🤍",
+            `تم حفظ ${savedCount} كود كصور PNG بدون تصميم 🤍`,
             "success"
         );
 
@@ -2132,7 +2289,11 @@ async function downloadCodesOnly() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "CODES ERROR:",
+            error
+        );
+
 
         showMessage(
             "تعذر حفظ الأكواد: " +
@@ -2156,7 +2317,7 @@ async function downloadCodesOnly() {
 
 
 /* =========================
-   QR Data URL
+   إنشاء QR للحفظ
 ========================= */
 
 function generateQRDataURL(
@@ -2165,6 +2326,22 @@ function generateQRDataURL(
 
     return new Promise(
         function(resolve, reject) {
+
+            if (
+                typeof QRCode ===
+                "undefined"
+            ) {
+
+                reject(
+                    new Error(
+                        "لم يتم تحميل مكتبة QR."
+                    )
+                );
+
+                return;
+
+            }
+
 
             QRCode.toDataURL(
 
@@ -2199,14 +2376,18 @@ function generateQRDataURL(
 
                     if (error) {
 
-                        reject(error);
+                        reject(
+                            error
+                        );
 
                         return;
 
                     }
 
 
-                    resolve(url);
+                    resolve(
+                        url
+                    );
 
                 }
 
@@ -2267,8 +2448,7 @@ function safeFileName(
             100
         )
 
-        ||
-        "دعوة";
+        || "دعوة";
 
 }
 
@@ -2338,7 +2518,7 @@ function showMessage(
 
     message.className =
         "message " +
-        (type || "");
+        type;
 
 }
 
