@@ -18,6 +18,10 @@
 
 <style>
 
+/* =====================================================
+   الأساسيات
+===================================================== */
+
 * {
     box-sizing: border-box;
 }
@@ -335,12 +339,9 @@ button:disabled {
 }
 
 .invitation-navigation button {
-    width: 100%;
     margin-top: 0;
+    display: block;
     min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: #222;
     color: white;
     border: none;
@@ -381,11 +382,6 @@ button:disabled {
     font-weight: bold;
     color: #555;
 }
-
-
-/* =====================================================
-   حالة التحميل
-===================================================== */
 
 .invitations-loading {
     margin-top: 15px;
@@ -473,7 +469,6 @@ button:disabled {
 </style>
 
 </head>
-
 
 <body>
 
@@ -569,6 +564,8 @@ button:disabled {
 <div class="controls">
 
 
+<!-- الاسم -->
+
 <div class="control-box">
 
 <label>
@@ -603,25 +600,19 @@ button:disabled {
 <button
     type="button"
     onclick="alignElement('name','left')">
-
 يمين
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('name','center')">
-
 وسط
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('name','right')">
-
 يسار
-
 </button>
 
 </div>
@@ -640,25 +631,19 @@ button:disabled {
 <button
     type="button"
     onclick="alignElement('name','top')">
-
 أعلى
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('name','middle')">
-
 وسط
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('name','bottom')">
-
 أسفل
-
 </button>
 
 </div>
@@ -667,6 +652,8 @@ button:disabled {
 
 </div>
 
+
+<!-- QR -->
 
 <div class="control-box">
 
@@ -702,25 +689,19 @@ button:disabled {
 <button
     type="button"
     onclick="alignElement('qr','left')">
-
 يمين
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('qr','center')">
-
 وسط
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('qr','right')">
-
 يسار
-
 </button>
 
 </div>
@@ -739,25 +720,19 @@ button:disabled {
 <button
     type="button"
     onclick="alignElement('qr','top')">
-
 أعلى
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('qr','middle')">
-
 وسط
-
 </button>
 
 <button
     type="button"
     onclick="alignElement('qr','bottom')">
-
 أسفل
-
 </button>
 
 </div>
@@ -864,7 +839,6 @@ Courier New
 معاينة الدعوة
 </h3>
 
-
 <div class="preview-area">
 
 <div id="previewCanvas">
@@ -898,12 +872,13 @@ Courier New
 
 
 <!-- =====================================================
-     أزرار السابق والتالي
+     السابق والتالي
 ===================================================== -->
 
 <div
     id="invitationNavigation"
-    class="invitation-navigation">
+    class="invitation-navigation"
+    style="display:none;">
 
 <button
     id="previousInvitation"
@@ -938,7 +913,8 @@ Courier New
 
 <div
     id="currentInvitationName"
-    class="current-invitation-name">
+    class="current-invitation-name"
+    style="display:none;">
 
 </div>
 
@@ -959,6 +935,7 @@ Courier New
     style="display:none;">
 
 </div>
+
 
 </div>
 
@@ -997,14 +974,12 @@ Courier New
 
 </div>
 
-
 </div>
 
 </div>
 
 
 <script>
-
 
 /* =====================================================
    الحدث
@@ -1035,59 +1010,56 @@ const STORE_NAME =
 
 function openDesignDB() {
 
-    return new Promise(
-        function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
 
-            const request =
-                indexedDB.open(
-                    DB_NAME,
-                    DB_VERSION
+        const request =
+            indexedDB.open(
+                DB_NAME,
+                DB_VERSION
+            );
+
+
+        request.onupgradeneeded =
+            function(event) {
+
+                const db =
+                    event.target.result;
+
+                if (
+                    !db.objectStoreNames.contains(
+                        STORE_NAME
+                    )
+                ) {
+
+                    db.createObjectStore(
+                        STORE_NAME
+                    );
+
+                }
+
+            };
+
+
+        request.onsuccess =
+            function() {
+
+                resolve(
+                    request.result
                 );
 
-
-            request.onupgradeneeded =
-                function(event) {
-
-                    const db =
-                        event.target.result;
+            };
 
 
-                    if (
-                        !db.objectStoreNames.contains(
-                            STORE_NAME
-                        )
-                    ) {
+        request.onerror =
+            function() {
 
-                        db.createObjectStore(
-                            STORE_NAME
-                        );
+                reject(
+                    request.error
+                );
 
-                    }
+            };
 
-                };
-
-
-            request.onsuccess =
-                function() {
-
-                    resolve(
-                        request.result
-                    );
-
-                };
-
-
-            request.onerror =
-                function() {
-
-                    reject(
-                        request.error
-                    );
-
-                };
-
-        }
-    );
+    });
 
 }
 
@@ -1097,38 +1069,42 @@ async function saveImageToDB(imageBlob) {
     const db =
         await openDesignDB();
 
-    return new Promise(
-        function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
 
-            const transaction =
-                db.transaction(
-                    STORE_NAME,
-                    "readwrite"
+        const transaction =
+            db.transaction(
+                STORE_NAME,
+                "readwrite"
+            );
+
+        const store =
+            transaction.objectStore(
+                STORE_NAME
+            );
+
+        const request =
+            store.put(
+                imageBlob,
+                "image_" + eventId
+            );
+
+        request.onsuccess =
+            function() {
+
+                resolve(true);
+
+            };
+
+        request.onerror =
+            function() {
+
+                reject(
+                    request.error
                 );
 
-            const store =
-                transaction.objectStore(
-                    STORE_NAME
-                );
+            };
 
-            const request =
-                store.put(
-                    imageBlob,
-                    "image_" + eventId
-                );
-
-            request.onsuccess =
-                function() {
-                    resolve(true);
-                };
-
-            request.onerror =
-                function() {
-                    reject(request.error);
-                };
-
-        }
-    );
+    });
 
 }
 
@@ -1138,45 +1114,43 @@ async function getImageFromDB() {
     const db =
         await openDesignDB();
 
-    return new Promise(
-        function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
 
-            const transaction =
-                db.transaction(
-                    STORE_NAME,
-                    "readonly"
+        const transaction =
+            db.transaction(
+                STORE_NAME,
+                "readonly"
+            );
+
+        const store =
+            transaction.objectStore(
+                STORE_NAME
+            );
+
+        const request =
+            store.get(
+                "image_" + eventId
+            );
+
+        request.onsuccess =
+            function() {
+
+                resolve(
+                    request.result || null
                 );
 
-            const store =
-                transaction.objectStore(
-                    STORE_NAME
+            };
+
+        request.onerror =
+            function() {
+
+                reject(
+                    request.error
                 );
 
-            const request =
-                store.get(
-                    "image_" + eventId
-                );
+            };
 
-            request.onsuccess =
-                function() {
-
-                    resolve(
-                        request.result || null
-                    );
-
-                };
-
-            request.onerror =
-                function() {
-
-                    reject(
-                        request.error
-                    );
-
-                };
-
-        }
-    );
+    });
 
 }
 
@@ -1288,6 +1262,7 @@ async function loadSavedDesign() {
                 settingsKey
             );
 
+
         if (savedSettings) {
 
             const parsed =
@@ -1302,8 +1277,10 @@ async function loadSavedDesign() {
 
         }
 
+
         const savedImage =
             await getImageFromDB();
+
 
         if (!savedImage) {
 
@@ -1311,8 +1288,10 @@ async function loadSavedDesign() {
 
         }
 
+
         designBlob =
             savedImage;
+
 
         showSavedImage();
 
@@ -1342,8 +1321,11 @@ async function loadSavedDesign() {
 async function showSavedImage() {
 
     if (!designBlob) {
+
         return;
+
     }
+
 
     if (designObjectURL) {
 
@@ -1353,26 +1335,31 @@ async function showSavedImage() {
 
     }
 
+
     designObjectURL =
         URL.createObjectURL(
             designBlob
         );
+
 
     const image =
         document.getElementById(
             "designImage"
         );
 
+
     const previewImage =
         document.getElementById(
             "previewImage"
         );
+
 
     image.src =
         designObjectURL;
 
     previewImage.src =
         designObjectURL;
+
 
     image.onload =
         async function() {
@@ -1382,6 +1369,7 @@ async function showSavedImage() {
 
             designData.imageHeight =
                 image.naturalHeight;
+
 
             showDesignSections();
 
@@ -1419,15 +1407,22 @@ async function loadDesign(event) {
     const file =
         event.target.files[0];
 
+
     if (!file) {
+
         return;
+
     }
 
+
     const allowedTypes = [
+
         "image/png",
         "image/jpeg",
         "image/webp"
+
     ];
+
 
     if (
         !allowedTypes.includes(
@@ -1444,6 +1439,7 @@ async function loadDesign(event) {
 
     }
 
+
     try {
 
         showMessage(
@@ -1451,22 +1447,27 @@ async function loadDesign(event) {
             "success"
         );
 
+
         designBlob =
             file;
+
 
         await saveImageToDB(
             designBlob
         );
+
 
         const image =
             document.getElementById(
                 "designImage"
             );
 
+
         const previewImage =
             document.getElementById(
                 "previewImage"
             );
+
 
         if (designObjectURL) {
 
@@ -1476,16 +1477,19 @@ async function loadDesign(event) {
 
         }
 
+
         designObjectURL =
             URL.createObjectURL(
                 designBlob
             );
+
 
         image.src =
             designObjectURL;
 
         previewImage.src =
             designObjectURL;
+
 
         image.onload =
             async function() {
@@ -1495,6 +1499,7 @@ async function loadDesign(event) {
 
                 designData.imageHeight =
                     image.naturalHeight;
+
 
                 showDesignSections();
 
@@ -1511,6 +1516,7 @@ async function loadDesign(event) {
                 saveSettings();
 
                 await loadInvitations();
+
 
                 showMessage(
                     "تم حفظ التصميم بنجاح 🤍",
@@ -1549,15 +1555,18 @@ function showDesignSections() {
     ).style.display =
         "block";
 
+
     document.getElementById(
         "controlsSection"
     ).style.display =
         "block";
 
+
     document.getElementById(
         "previewSection"
     ).style.display =
         "block";
+
 
     document.getElementById(
         "buttonsSection"
@@ -1578,20 +1587,24 @@ function applyInputs() {
     ).value =
         designData.nameSize;
 
+
     document.getElementById(
         "qrSize"
     ).value =
         designData.qrSize;
+
 
     document.getElementById(
         "nameFont"
     ).value =
         designData.nameFont;
 
+
     document.getElementById(
         "nameColor"
     ).value =
         designData.nameColor;
+
 
     document.getElementById(
         "qrColor"
@@ -1602,23 +1615,49 @@ function applyInputs() {
 
 
 /* =====================================================
-   تحميل الدعوات
+   تحميل الدعوات من Supabase
 ===================================================== */
 
 async function loadInvitations() {
 
-    const debug =
+    const navigation =
         document.getElementById(
-            "invitationsDebug"
+            "invitationNavigation"
         );
+
+
+    const currentName =
+        document.getElementById(
+            "currentInvitationName"
+        );
+
 
     const loading =
         document.getElementById(
             "invitationsLoading"
         );
 
+
+    const debug =
+        document.getElementById(
+            "invitationsDebug"
+        );
+
+
     loading.style.display =
         "block";
+
+    navigation.style.display =
+        "none";
+
+    currentName.style.display =
+        "none";
+
+    debug.style.display =
+        "none";
+
+
+    /* التأكد من Supabase */
 
     if (
         typeof supabaseClient ===
@@ -1628,17 +1667,47 @@ async function loadInvitations() {
         loading.style.display =
             "none";
 
-        debug.style.display =
-            "block";
-
-        debug.innerText =
-            "لم يتم تحميل Supabase. تأكدي من ملف config.js.";
+        showMessage(
+            "لم يتم تحميل Supabase. تأكدي من ملف config.js.",
+            "error"
+        );
 
         return;
 
     }
 
+
+    /* التأكد من event_id */
+
+    if (!eventId) {
+
+        loading.style.display =
+            "none";
+
+        showMessage(
+            "لم يتم العثور على event_id في الرابط.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     try {
+
+        console.log(
+            "EVENT ID:",
+            eventId
+        );
+
+
+        /*
+         * مهم:
+         * نستخدم select("*")
+         * حتى لا تتعطل الصفحة بسبب اسم عمود
+         * غير موجود في جدول invitations.
+         */
 
         const {
             data,
@@ -1646,9 +1715,7 @@ async function loadInvitations() {
         } =
         await supabaseClient
             .from("invitations")
-            .select(
-                "id, created_at, event_id, guest_name, invitation_number, guest_count, qr_code, companion_count"
-            )
+            .select("*")
             .eq(
                 "event_id",
                 eventId
@@ -1660,20 +1727,76 @@ async function loadInvitations() {
                 }
             );
 
+
+        console.log(
+            "INVITATIONS DATA:",
+            data
+        );
+
+
+        console.log(
+            "INVITATIONS ERROR:",
+            error
+        );
+
+
         if (error) {
+
             throw error;
+
         }
+
 
         invitations =
             Array.isArray(data)
                 ? data
                 : [];
 
+
         currentInvitationIndex =
             0;
 
+
         loading.style.display =
             "none";
+
+
+        /*
+         * لا توجد دعوات
+         */
+
+        if (
+            invitations.length === 0
+        ) {
+
+            navigation.style.display =
+                "none";
+
+            currentName.style.display =
+                "none";
+
+            debug.style.display =
+                "block";
+
+            debug.innerText =
+                "لم يتم العثور على أي دعوة لهذا الحفل.";
+
+            updatePreview();
+
+            return;
+
+        }
+
+
+        /*
+         * توجد دعوات
+         */
+
+        navigation.style.display =
+            "grid";
+
+        currentName.style.display =
+            "block";
 
         debug.style.display =
             "block";
@@ -1681,23 +1804,14 @@ async function loadInvitations() {
         debug.innerText =
             "تم تحميل " +
             invitations.length +
-            " دعوة للحفل الحالي.";
+            " دعوة بنجاح.";
 
-        if (
-            invitations.length > 0
-        ) {
 
-            updateInvitationPreview();
+        /*
+         * عرض أول دعوة
+         */
 
-        }
-        else {
-
-            document.getElementById(
-                "invitationCounter"
-            ).innerText =
-                "0 من 0";
-
-        }
+        updateInvitationPreview();
 
     }
 
@@ -1708,14 +1822,29 @@ async function loadInvitations() {
             error
         );
 
+
+        invitations = [];
+
+
         loading.style.display =
+            "none";
+
+        navigation.style.display =
+            "none";
+
+        currentName.style.display =
             "none";
 
         debug.style.display =
             "block";
 
         debug.innerText =
-            "تعذر تحميل الدعوات من Supabase.";
+            "حدث خطأ أثناء تحميل الدعوات: " +
+            (
+                error.message ||
+                "خطأ غير معروف"
+            );
+
 
         showMessage(
             "تعذر تحميل الدعوات: " +
@@ -1732,7 +1861,7 @@ async function loadInvitations() {
 
 
 /* =====================================================
-   تحديث الدعوة الحالية
+   الدعوة الحالية
 ===================================================== */
 
 function updateInvitationPreview() {
@@ -1745,29 +1874,65 @@ function updateInvitationPreview() {
 
     }
 
+
+    if (
+        currentInvitationIndex < 0
+    ) {
+
+        currentInvitationIndex =
+            0;
+
+    }
+
+
+    if (
+        currentInvitationIndex >=
+        invitations.length
+    ) {
+
+        currentInvitationIndex =
+            invitations.length - 1;
+
+    }
+
+
     const invitation =
         invitations[
             currentInvitationIndex
         ];
+
 
     const previewName =
         document.getElementById(
             "previewName"
         );
 
+
     const counter =
         document.getElementById(
             "invitationCounter"
         );
+
 
     const currentName =
         document.getElementById(
             "currentInvitationName"
         );
 
+
+    /*
+     * اسم المدعو
+     */
+
     previewName.innerText =
         invitation.guest_name ||
+        invitation.name ||
         "اسم المدعو";
+
+
+    /*
+     * العداد
+     */
 
     counter.innerText =
         (
@@ -1776,15 +1941,38 @@ function updateInvitationPreview() {
         " من " +
         invitations.length;
 
+
+    /*
+     * اسم الدعوة أسفل الأزرار
+     */
+
     currentName.innerText =
-        invitation.guest_name
-            ? "المدعو: " +
-              invitation.guest_name
-            : "";
+        (
+            invitation.guest_name ||
+            invitation.name
+        )
+        ? "المدعو: " +
+          (
+              invitation.guest_name ||
+              invitation.name
+          )
+        : "الدعوة رقم " +
+          (
+              currentInvitationIndex + 1
+          );
+
+
+    /*
+     * QR الخاص بالدعوة الحالية
+     */
 
     updatePreviewQR(
-        invitation.qr_code
+        invitation.qr_code ||
+        invitation.qr ||
+        invitation.code ||
+        invitation.id
     );
+
 
     updatePreview();
 
@@ -1800,16 +1988,31 @@ function updateInvitationPreview() {
 function goPrevious() {
 
     if (
-        !invitations.length
+        !Array.isArray(invitations)
     ) {
+
         return;
+
     }
+
+
+    if (
+        invitations.length === 0
+    ) {
+
+        return;
+
+    }
+
 
     if (
         currentInvitationIndex <= 0
     ) {
+
         return;
+
     }
+
 
     currentInvitationIndex--;
 
@@ -1825,17 +2028,32 @@ function goPrevious() {
 function goNext() {
 
     if (
-        !invitations.length
+        !Array.isArray(invitations)
     ) {
+
         return;
+
     }
+
+
+    if (
+        invitations.length === 0
+    ) {
+
+        return;
+
+    }
+
 
     if (
         currentInvitationIndex >=
         invitations.length - 1
     ) {
+
         return;
+
     }
+
 
     currentInvitationIndex++;
 
@@ -1845,7 +2063,7 @@ function goNext() {
 
 
 /* =====================================================
-   تعطيل الأزرار عند البداية والنهاية
+   أزرار التنقل
 ===================================================== */
 
 function updateNavigationButtons() {
@@ -1855,23 +2073,36 @@ function updateNavigationButtons() {
             "previousInvitation"
         );
 
+
     const nextButton =
         document.getElementById(
             "nextInvitation"
         );
 
+
+    if (
+        !previousButton ||
+        !nextButton
+    ) {
+
+        return;
+
+    }
+
+
     previousButton.disabled =
-        currentInvitationIndex === 0;
+        currentInvitationIndex <= 0;
+
 
     nextButton.disabled =
-        currentInvitationIndex ===
+        currentInvitationIndex >=
         invitations.length - 1;
 
 }
 
 
 /* =====================================================
-   QR الخاص بالدعوة
+   QR للمعاينة
 ===================================================== */
 
 function updatePreviewQR(qrValue) {
@@ -1880,6 +2111,7 @@ function updatePreviewQR(qrValue) {
         document.getElementById(
             "previewQrImage"
         );
+
 
     if (!qrValue) {
 
@@ -1891,24 +2123,37 @@ function updatePreviewQR(qrValue) {
 
     }
 
+
     QRCode.toDataURL(
+
         String(qrValue),
+
         {
+
             width: 1000,
+
             margin: 0,
+
             errorCorrectionLevel: "H",
+
             color: {
+
                 dark:
                     designData.qrColor,
+
                 light:
                     "#ffffff"
+
             }
+
         },
+
         function(error, url) {
 
             if (error) {
 
                 console.error(
+                    "QR ERROR:",
                     error
                 );
 
@@ -1916,10 +2161,12 @@ function updatePreviewQR(qrValue) {
 
             }
 
+
             previewQrImage.src =
                 url;
 
         }
+
     );
 
 }
@@ -1936,47 +2183,60 @@ function applyAllStyles() {
             "nameElement"
         );
 
+
     const previewName =
         document.getElementById(
             "previewName"
         );
 
+
     name.style.fontSize =
         designData.nameSize + "px";
+
 
     previewName.style.fontSize =
         designData.nameSize + "px";
 
+
     name.style.fontFamily =
         designData.nameFont;
+
 
     previewName.style.fontFamily =
         designData.nameFont;
 
+
     name.style.color =
         designData.nameColor;
 
+
     previewName.style.color =
         designData.nameColor;
+
 
     const qr =
         document.getElementById(
             "qrElement"
         );
 
+
     qr.style.width =
         designData.qrSize + "px";
 
+
     qr.style.height =
         designData.qrSize + "px";
+
 
     const previewQr =
         document.getElementById(
             "previewQr"
         );
 
+
     previewQr.style.width =
         designData.qrSize + "px";
+
 
     previewQr.style.height =
         designData.qrSize + "px";
@@ -1995,25 +2255,30 @@ function positionElements() {
             "nameElement"
         );
 
+
     const qr =
         document.getElementById(
             "qrElement"
         );
+
 
     name.style.left =
         (
             designData.nameX * 100
         ) + "%";
 
+
     name.style.top =
         (
             designData.nameY * 100
         ) + "%";
 
+
     qr.style.left =
         (
             designData.qrX * 100
         ) + "%";
+
 
     qr.style.top =
         (
@@ -2028,18 +2293,15 @@ function positionElements() {
 ===================================================== */
 
 document
-    .getElementById(
-        "nameElement"
-    )
+    .getElementById("nameElement")
     .addEventListener(
         "pointerdown",
         startPointerDrag
     );
 
+
 document
-    .getElementById(
-        "qrElement"
-    )
+    .getElementById("qrElement")
     .addEventListener(
         "pointerdown",
         startPointerDrag
@@ -2052,39 +2314,50 @@ function startPointerDrag(event) {
 
     event.stopPropagation();
 
+
     activeElement =
         event.currentTarget;
 
+
     dragging = true;
+
 
     const canvas =
         document.getElementById(
             "designCanvas"
         );
 
+
     const canvasRect =
         canvas.getBoundingClientRect();
+
 
     const elementRect =
         activeElement.getBoundingClientRect();
 
+
     dragStartX =
         event.clientX;
 
+
     dragStartY =
         event.clientY;
+
 
     startLeft =
         elementRect.left -
         canvasRect.left;
 
+
     startTop =
         elementRect.top -
         canvasRect.top;
 
+
     activeElement.classList.add(
         "selected"
     );
+
 
     try {
 
@@ -2098,6 +2371,10 @@ function startPointerDrag(event) {
 
 }
 
+
+/* =====================================================
+   تحريك العناصر
+===================================================== */
 
 document.addEventListener(
     "pointermove",
@@ -2116,31 +2393,39 @@ function movePointerDrag(event) {
 
     }
 
+
     event.preventDefault();
+
 
     const canvas =
         document.getElementById(
             "designCanvas"
         );
 
+
     const rect =
         canvas.getBoundingClientRect();
+
 
     const deltaX =
         event.clientX -
         dragStartX;
 
+
     const deltaY =
         event.clientY -
         dragStartY;
+
 
     let x =
         startLeft +
         deltaX;
 
+
     let y =
         startTop +
         deltaY;
+
 
     const maxX =
         Math.max(
@@ -2149,12 +2434,14 @@ function movePointerDrag(event) {
             activeElement.offsetWidth
         );
 
+
     const maxY =
         Math.max(
             0,
             rect.height -
             activeElement.offsetHeight
         );
+
 
     x =
         Math.max(
@@ -2165,6 +2452,7 @@ function movePointerDrag(event) {
             )
         );
 
+
     y =
         Math.max(
             0,
@@ -2173,6 +2461,7 @@ function movePointerDrag(event) {
                 maxY
             )
         );
+
 
     if (
         activeElement.id ===
@@ -2186,6 +2475,7 @@ function movePointerDrag(event) {
             y / rect.height;
 
     }
+
     else {
 
         designData.qrX =
@@ -2196,6 +2486,7 @@ function movePointerDrag(event) {
 
     }
 
+
     positionElements();
 
     updatePreview();
@@ -2203,10 +2494,15 @@ function movePointerDrag(event) {
 }
 
 
+/* =====================================================
+   إنهاء السحب
+===================================================== */
+
 document.addEventListener(
     "pointerup",
     stopPointerDrag
 );
+
 
 document.addEventListener(
     "pointercancel",
@@ -2217,8 +2513,11 @@ document.addEventListener(
 function stopPointerDrag() {
 
     if (!dragging) {
+
         return;
+
     }
+
 
     if (activeElement) {
 
@@ -2227,6 +2526,7 @@ function stopPointerDrag() {
         );
 
     }
+
 
     dragging = false;
 
@@ -2251,6 +2551,7 @@ function alignElement(
             "designCanvas"
         );
 
+
     const element =
         type === "name"
             ? document.getElementById(
@@ -2260,27 +2561,33 @@ function alignElement(
                 "qrElement"
             );
 
+
     const width =
         canvas.clientWidth;
 
+
     const height =
         canvas.clientHeight;
+
 
     let x =
         type === "name"
             ? designData.nameX * width
             : designData.qrX * width;
 
+
     let y =
         type === "name"
             ? designData.nameY * height
             : designData.qrY * height;
+
 
     if (direction === "left") {
 
         x = 0;
 
     }
+
     else if (direction === "center") {
 
         x =
@@ -2290,6 +2597,7 @@ function alignElement(
             ) / 2;
 
     }
+
     else if (direction === "right") {
 
         x =
@@ -2297,11 +2605,13 @@ function alignElement(
             element.offsetWidth;
 
     }
+
     else if (direction === "top") {
 
         y = 0;
 
     }
+
     else if (direction === "middle") {
 
         y =
@@ -2311,6 +2621,7 @@ function alignElement(
             ) / 2;
 
     }
+
     else if (direction === "bottom") {
 
         y =
@@ -2318,6 +2629,7 @@ function alignElement(
             element.offsetHeight;
 
     }
+
 
     if (type === "name") {
 
@@ -2328,6 +2640,7 @@ function alignElement(
             y / height;
 
     }
+
     else {
 
         designData.qrX =
@@ -2337,6 +2650,7 @@ function alignElement(
             y / height;
 
     }
+
 
     positionElements();
 
@@ -2352,9 +2666,7 @@ function alignElement(
 ===================================================== */
 
 document
-    .getElementById(
-        "applyNameSize"
-    )
+    .getElementById("applyNameSize")
     .addEventListener(
         "click",
         function() {
@@ -2365,6 +2677,7 @@ document
                         "nameSize"
                     ).value
                 );
+
 
             if (
                 size < 8 ||
@@ -2380,8 +2693,10 @@ document
 
             }
 
+
             designData.nameSize =
                 size;
+
 
             applyAllStyles();
 
@@ -2398,9 +2713,7 @@ document
 ===================================================== */
 
 document
-    .getElementById(
-        "applyQrSize"
-    )
+    .getElementById("applyQrSize")
     .addEventListener(
         "click",
         function() {
@@ -2411,6 +2724,7 @@ document
                         "qrSize"
                     ).value
                 );
+
 
             if (
                 size < 50 ||
@@ -2426,8 +2740,10 @@ document
 
             }
 
+
             designData.qrSize =
                 size;
+
 
             applyAllStyles();
 
@@ -2444,9 +2760,7 @@ document
 ===================================================== */
 
 document
-    .getElementById(
-        "nameFont"
-    )
+    .getElementById("nameFont")
     .addEventListener(
         "change",
         function() {
@@ -2469,9 +2783,7 @@ document
 ===================================================== */
 
 document
-    .getElementById(
-        "nameColor"
-    )
+    .getElementById("nameColor")
     .addEventListener(
         "input",
         function() {
@@ -2494,9 +2806,7 @@ document
 ===================================================== */
 
 document
-    .getElementById(
-        "qrColor"
-    )
+    .getElementById("qrColor")
     .addEventListener(
         "input",
         function() {
@@ -2506,6 +2816,7 @@ document
 
             updateQR();
 
+
             if (
                 invitations.length
             ) {
@@ -2514,6 +2825,7 @@ document
 
             }
 
+
             saveSettings();
 
         }
@@ -2521,14 +2833,17 @@ document
 
 
 /* =====================================================
-   QR الأساسي أثناء التصميم
+   QR الأساسي
 ===================================================== */
 
 function updateQR() {
 
     if (!eventId) {
+
         return;
+
     }
+
 
     const qrValue =
         "https://example.com/check?event_id=" +
@@ -2536,24 +2851,37 @@ function updateQR() {
             eventId
         );
 
+
     const qrImage =
         document.getElementById(
             "qrImage"
         );
 
+
     QRCode.toDataURL(
+
         qrValue,
+
         {
+
             width: 1000,
+
             margin: 0,
+
             errorCorrectionLevel: "H",
+
             color: {
+
                 dark:
                     designData.qrColor,
+
                 light:
                     "#ffffff"
+
             }
+
         },
+
         function(error, url) {
 
             if (error) {
@@ -2566,10 +2894,12 @@ function updateQR() {
 
             }
 
+
             qrImage.src =
                 url;
 
         }
+
     );
 
 }
@@ -2582,50 +2912,63 @@ function updateQR() {
 function updatePreview() {
 
     if (!designBlob) {
+
         return;
+
     }
+
 
     const previewName =
         document.getElementById(
             "previewName"
         );
 
+
     const previewQr =
         document.getElementById(
             "previewQr"
         );
+
 
     previewName.style.left =
         (
             designData.nameX * 100
         ) + "%";
 
+
     previewName.style.top =
         (
             designData.nameY * 100
         ) + "%";
 
+
     previewName.style.fontSize =
         designData.nameSize + "px";
+
 
     previewName.style.fontFamily =
         designData.nameFont;
 
+
     previewName.style.color =
         designData.nameColor;
+
 
     previewQr.style.left =
         (
             designData.qrX * 100
         ) + "%";
 
+
     previewQr.style.top =
         (
             designData.qrY * 100
         ) + "%";
 
+
     previewQr.style.width =
         designData.qrSize + "px";
+
 
     previewQr.style.height =
         designData.qrSize + "px";
@@ -2640,18 +2983,25 @@ function updatePreview() {
 function saveSettings() {
 
     if (!eventId) {
+
         return false;
+
     }
+
 
     try {
 
         localStorage.setItem(
+
             "invitation_settings_" +
             eventId,
+
             JSON.stringify(
                 designData
             )
+
         );
+
 
         return true;
 
@@ -2672,13 +3022,11 @@ function saveSettings() {
 
 
 /* =====================================================
-   حفظ التصميم
+   زر حفظ التصميم
 ===================================================== */
 
 document
-    .getElementById(
-        "saveButton"
-    )
+    .getElementById("saveButton")
     .addEventListener(
         "click",
         async function() {
@@ -2694,13 +3042,16 @@ document
 
             }
 
+
             try {
 
                 await saveImageToDB(
                     designBlob
                 );
 
+
                 saveSettings();
+
 
                 showMessage(
                     "تم حفظ التصميم ومواقع الاسم والـ QR 🤍",
@@ -2714,6 +3065,7 @@ document
                 console.error(
                     error
                 );
+
 
                 showMessage(
                     "تعذر حفظ التصميم.",
@@ -2731,9 +3083,7 @@ document
 ===================================================== */
 
 document
-    .getElementById(
-        "generateButton"
-    )
+    .getElementById("generateButton")
     .addEventListener(
         "click",
         async function(event) {
@@ -2741,6 +3091,7 @@ document
             event.preventDefault();
 
             event.stopPropagation();
+
 
             if (!designBlob) {
 
@@ -2753,13 +3104,16 @@ document
 
             }
 
+
             try {
 
                 await saveImageToDB(
                     designBlob
                 );
 
+
                 saveSettings();
+
 
                 window.location.href =
                     "generate.html?event_id=" +
@@ -2774,6 +3128,7 @@ document
                 console.error(
                     error
                 );
+
 
                 showMessage(
                     "تعذر حفظ التصميم.",
@@ -2820,8 +3175,10 @@ function showMessage(
             "message"
         );
 
+
     message.innerText =
         text;
+
 
     message.className =
         "message " +
