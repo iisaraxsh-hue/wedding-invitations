@@ -340,15 +340,15 @@ button:disabled {
 }
 
 .invitation-navigation button:first-child {
-    order: 1;
+    grid-column: 1;
 }
 
 .invitation-navigation button:last-child {
-    order: 3;
+    grid-column: 3;
 }
 
 .invitation-counter {
-    order: 2;
+    grid-column: 2;
     min-width: 110px;
     text-align: center;
     font-weight: bold;
@@ -356,6 +356,7 @@ button:disabled {
     background: #faf9f7;
     padding: 12px 15px;
     border-radius: 11px;
+    white-space: nowrap;
 }
 
 .current-invitation-name {
@@ -424,11 +425,13 @@ button:disabled {
 
     .invitation-navigation {
         grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
 
     .invitation-counter {
         grid-column: 1 / -1;
         grid-row: 1;
+        width: 100%;
     }
 
     .invitation-navigation button:first-child {
@@ -581,50 +584,43 @@ button:disabled {
 
 <div class="alignment-buttons">
 
-<button
-    type="button"
-    onclick="alignElement('name','left')">
+<button type="button"
+onclick="alignElement('name','left')">
 يمين
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('name','center')">
+<button type="button"
+onclick="alignElement('name','center')">
 وسط
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('name','right')">
+<button type="button"
+onclick="alignElement('name','right')">
 يسار
 </button>
 
 </div>
 
 
-<div
-    class="alignment-title"
-    style="margin-top:12px;">
+<div class="alignment-title"
+style="margin-top:12px;">
 محاذاة الاسم رأسيًا
 </div>
 
 <div class="alignment-buttons">
 
-<button
-    type="button"
-    onclick="alignElement('name','top')">
+<button type="button"
+onclick="alignElement('name','top')">
 أعلى
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('name','middle')">
+<button type="button"
+onclick="alignElement('name','middle')">
 وسط
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('name','bottom')">
+<button type="button"
+onclick="alignElement('name','bottom')">
 أسفل
 </button>
 
@@ -668,50 +664,43 @@ button:disabled {
 
 <div class="alignment-buttons">
 
-<button
-    type="button"
-    onclick="alignElement('qr','left')">
+<button type="button"
+onclick="alignElement('qr','left')">
 يمين
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('qr','center')">
+<button type="button"
+onclick="alignElement('qr','center')">
 وسط
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('qr','right')">
+<button type="button"
+onclick="alignElement('qr','right')">
 يسار
 </button>
 
 </div>
 
 
-<div
-    class="alignment-title"
-    style="margin-top:12px;">
+<div class="alignment-title"
+style="margin-top:12px;">
 محاذاة QR رأسيًا
 </div>
 
 <div class="alignment-buttons">
 
-<button
-    type="button"
-    onclick="alignElement('qr','top')">
+<button type="button"
+onclick="alignElement('qr','top')">
 أعلى
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('qr','middle')">
+<button type="button"
+onclick="alignElement('qr','middle')">
 وسط
 </button>
 
-<button
-    type="button"
-    onclick="alignElement('qr','bottom')">
+<button type="button"
+onclick="alignElement('qr','bottom')">
 أسفل
 </button>
 
@@ -861,12 +850,12 @@ Courier New
 
 <div
     id="invitationNavigation"
-    class="invitation-navigation"
-    style="display:none;">
+    class="invitation-navigation">
 
 <button
     id="previousInvitation"
-    type="button">
+    type="button"
+    disabled>
 
 السابق
 
@@ -884,7 +873,8 @@ Courier New
 
 <button
     id="nextInvitation"
-    type="button">
+    type="button"
+    disabled>
 
 التالي
 
@@ -895,8 +885,9 @@ Courier New
 
 <div
     id="currentInvitationName"
-    class="current-invitation-name"
-    style="display:none;">
+    class="current-invitation-name">
+
+جاري تحميل الدعوات...
 
 </div>
 
@@ -911,9 +902,9 @@ Courier New
 </div>
 
 
-<div
-    id="previewHint"
-    class="hint">
+<div class="hint">
+
+استخدمي السابق والتالي لمراجعة كل دعوة والتأكد من أن الاسم والـ QR ظاهرين في المكان الصحيح قبل التوليد.
 
 </div>
 
@@ -983,8 +974,7 @@ const eventId =
 const DB_NAME =
     "InvitationDesignDB";
 
-const DB_VERSION =
-    1;
+const DB_VERSION = 1;
 
 const STORE_NAME =
     "designs";
@@ -1188,7 +1178,7 @@ let designData = {
 
 
 /* =====================================================
-   الصورة
+   صورة التصميم
 ===================================================== */
 
 let designBlob = null;
@@ -1326,7 +1316,7 @@ async function loadSavedDesign() {
    عرض الصورة المحفوظة
 ===================================================== */
 
-async function showSavedImage() {
+function showSavedImage() {
 
     if (!designBlob) {
 
@@ -1401,7 +1391,7 @@ async function showSavedImage() {
 
 
 /* =====================================================
-   رفع تصميم جديد
+   إدراج تصميم جديد
 ===================================================== */
 
 document
@@ -1590,6 +1580,18 @@ function showDesignSections() {
     ).style.display =
         "block";
 
+
+    /*
+       مهم:
+       إظهار السابق والتالي دائمًا
+       بعد ظهور المعاينة
+    */
+
+    document.getElementById(
+        "invitationNavigation"
+    ).style.display =
+        "grid";
+
 }
 
 
@@ -1655,26 +1657,24 @@ async function loadInvitations() {
         );
 
 
-    const previewHint =
-        document.getElementById(
-            "previewHint"
-        );
+    /*
+       لا نخفي الأزرار
+    */
+
+    navigation.style.display =
+        "grid";
 
 
     loading.style.display =
         "block";
 
 
-    navigation.style.display =
-        "none";
-
-
     currentName.style.display =
-        "none";
+        "block";
 
 
-    previewHint.innerText =
-        "";
+    currentName.innerText =
+        "جاري تحميل الدعوات...";
 
 
     if (
@@ -1684,6 +1684,27 @@ async function loadInvitations() {
 
         loading.style.display =
             "none";
+
+
+        currentName.innerText =
+            "تعذر الاتصال بقاعدة البيانات.";
+
+
+        document.getElementById(
+            "previousInvitation"
+        ).disabled = true;
+
+
+        document.getElementById(
+            "nextInvitation"
+        ).disabled = true;
+
+
+        document.getElementById(
+            "invitationCounter"
+        ).innerText =
+            "لا توجد بيانات";
+
 
         showMessage(
             "لم يتم تحميل Supabase. تأكدي من ملف config.js.",
@@ -1742,50 +1763,54 @@ async function loadInvitations() {
 
 
         /*
-         * إذا لم توجد دعوات:
-         * نخفي أزرار السابق والتالي
-         */
-        if (
-            invitations.length === 0
-        ) {
+           حتى لو لم توجد دعوات:
+           الأزرار تبقى موجودة
+        */
 
-            navigation.style.display =
-                "none";
-
-
-            currentName.style.display =
-                "none";
-
-
-            previewHint.innerText =
-                "لم تتم إضافة أسماء المدعوين بعد.";
-
-
-            updatePreview();
-
-            return;
-
-        }
-
-
-        /*
-         * توجد دعوات:
-         * نظهر التنقل بشكل واضح
-         */
         navigation.style.display =
             "grid";
 
 
-        currentName.style.display =
-            "block";
+        if (
+            invitations.length === 0
+        ) {
+
+            document.getElementById(
+                "invitationCounter"
+            ).innerText =
+                "لا توجد دعوات";
 
 
-        /*
-         * نوضح للمستخدمة أن بإمكانها
-         * التنقل بين الدعوات
-         */
-        previewHint.innerText =
-            "استخدمي «السابق» و«التالي» لمراجعة كل دعوة قبل التوليد.";
+            currentName.innerText =
+                "لم يتم العثور على دعوات لهذا الحفل";
+
+
+            document.getElementById(
+                "previousInvitation"
+            ).disabled = true;
+
+
+            document.getElementById(
+                "nextInvitation"
+            ).disabled = true;
+
+
+            /*
+               نخلي المعاينة الأساسية موجودة
+            */
+
+            document.getElementById(
+                "previewName"
+            ).innerText =
+                "اسم المدعو";
+
+
+            updatePreview();
+
+
+            return;
+
+        }
 
 
         updateInvitationPreview();
@@ -1805,15 +1830,27 @@ async function loadInvitations() {
 
 
         navigation.style.display =
-            "none";
+            "grid";
 
 
-        currentName.style.display =
-            "none";
+        document.getElementById(
+            "invitationCounter"
+        ).innerText =
+            "خطأ";
 
 
-        previewHint.innerText =
-            "";
+        currentName.innerText =
+            "تعذر تحميل الدعوات";
+
+
+        document.getElementById(
+            "previousInvitation"
+        ).disabled = true;
+
+
+        document.getElementById(
+            "nextInvitation"
+        ).disabled = true;
 
 
         showMessage(
@@ -1846,15 +1883,14 @@ function updateInvitationPreview() {
 
 
     /*
-     * حماية من خروج المؤشر
-     * عن عدد الدعوات
-     */
+       حماية من أي رقم خارج المصفوفة
+    */
+
     if (
         currentInvitationIndex < 0
     ) {
 
-        currentInvitationIndex =
-            0;
+        currentInvitationIndex = 0;
 
     }
 
@@ -1876,6 +1912,13 @@ function updateInvitationPreview() {
         ];
 
 
+    if (!invitation) {
+
+        return;
+
+    }
+
+
     const previewName =
         document.getElementById(
             "previewName"
@@ -1895,16 +1938,18 @@ function updateInvitationPreview() {
 
 
     /*
-     * اسم المدعو
-     */
+       الاسم
+    */
+
     previewName.innerText =
         invitation.guest_name ||
         "اسم المدعو";
 
 
     /*
-     * العداد
-     */
+       العداد
+    */
+
     counter.innerText =
         (
             currentInvitationIndex + 1
@@ -1914,8 +1959,9 @@ function updateInvitationPreview() {
 
 
     /*
-     * اسم الدعوة أسفل المعاينة
-     */
+       اسم الدعوة أسفل المعاينة
+    */
+
     currentName.innerText =
         invitation.guest_name
             ? "المدعو: " +
@@ -1927,22 +1973,25 @@ function updateInvitationPreview() {
 
 
     /*
-     * تحديث QR الخاص بالدعوة
-     */
+       QR الخاص بهذه الدعوة
+    */
+
     updatePreviewQR(
         invitation.qr_code
     );
 
 
     /*
-     * تحديث مكان الاسم والـ QR
-     */
+       تحديث مكان الاسم والحجم
+    */
+
     updatePreview();
 
 
     /*
-     * تحديث حالة أزرار السابق والتالي
-     */
+       تحديث حالة الأزرار
+    */
+
     updateNavigationButtons();
 
 }
@@ -1962,9 +2011,6 @@ function updatePreviewQR(
         );
 
 
-    /*
-     * إذا ما فيه QR
-     */
     if (!qrValue) {
 
         previewQrImage.removeAttribute(
@@ -2014,27 +2060,8 @@ function updatePreviewQR(
             }
 
 
-            /*
-             * نتأكد أن الدعوة الحالية
-             * ما زالت نفسها قبل وضع QR
-             */
-            if (
-                invitations.length &&
-                invitations[
-                    currentInvitationIndex
-                ] &&
-                String(
-                    invitations[
-                        currentInvitationIndex
-                    ].qr_code
-                ) ===
-                String(qrValue)
-            ) {
-
-                previewQrImage.src =
-                    url;
-
-            }
+            previewQrImage.src =
+                url;
 
         }
 
@@ -2053,16 +2080,10 @@ document
     )
     .addEventListener(
         "click",
-        function(event) {
+        function() {
 
-            event.preventDefault();
-
-
-            /*
-             * لا نسمح بالنزول تحت أول دعوة
-             */
             if (
-                currentInvitationIndex <= 0
+                !invitations.length
             ) {
 
                 return;
@@ -2070,10 +2091,16 @@ document
             }
 
 
-            currentInvitationIndex--;
+            if (
+                currentInvitationIndex >
+                0
+            ) {
 
+                currentInvitationIndex--;
 
-            updateInvitationPreview();
+                updateInvitationPreview();
+
+            }
 
         }
     );
@@ -2089,17 +2116,10 @@ document
     )
     .addEventListener(
         "click",
-        function(event) {
+        function() {
 
-            event.preventDefault();
-
-
-            /*
-             * لا نسمح بتجاوز آخر دعوة
-             */
             if (
-                currentInvitationIndex >=
-                invitations.length - 1
+                !invitations.length
             ) {
 
                 return;
@@ -2107,64 +2127,57 @@ document
             }
 
 
-            currentInvitationIndex++;
+            if (
+                currentInvitationIndex <
+                invitations.length - 1
+            ) {
 
+                currentInvitationIndex++;
 
-            updateInvitationPreview();
+                updateInvitationPreview();
+
+            }
 
         }
     );
 
 
 /* =====================================================
-   أزرار التنقل
+   حالة أزرار السابق والتالي
 ===================================================== */
 
 function updateNavigationButtons() {
 
-    const previousButton =
+    const previous =
         document.getElementById(
             "previousInvitation"
         );
 
 
-    const nextButton =
+    const next =
         document.getElementById(
             "nextInvitation"
         );
 
 
-    /*
-     * إذا كانت دعوة واحدة فقط
-     */
     if (
-        invitations.length <= 1
+        !invitations.length
     ) {
 
-        previousButton.disabled =
-            true;
+        previous.disabled = true;
 
-
-        nextButton.disabled =
-            true;
-
+        next.disabled = true;
 
         return;
 
     }
 
 
-    /*
-     * أول دعوة
-     */
-    previousButton.disabled =
+    previous.disabled =
         currentInvitationIndex === 0;
 
 
-    /*
-     * آخر دعوة
-     */
-    nextButton.disabled =
+    next.disabled =
         currentInvitationIndex ===
         invitations.length - 1;
 
@@ -2288,7 +2301,7 @@ function positionElements() {
 
 
 /* =====================================================
-   السحب
+   بدء السحب
 ===================================================== */
 
 document
@@ -2906,9 +2919,7 @@ function updateQR() {
 
             if (error) {
 
-                console.error(
-                    error
-                );
+                console.error(error);
 
                 return;
 
@@ -3144,10 +3155,7 @@ document
 
             catch (error) {
 
-                console.error(
-                    error
-                );
-
+                console.error(error);
 
                 showMessage(
                     "تعذر حفظ التصميم.",
