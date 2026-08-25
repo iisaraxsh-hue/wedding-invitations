@@ -962,7 +962,6 @@ const eventId =
 
 /* =====================================================
    IndexedDB
-   لحفظ صورة التصميم بدون ضغط
 ===================================================== */
 
 const DB_NAME =
@@ -1171,7 +1170,6 @@ let designData = {
 };
 
 
-/* الصورة كـ Blob */
 let designBlob = null;
 
 let designObjectURL = null;
@@ -1443,12 +1441,6 @@ async function loadDesign(event) {
         );
 
 
-        /*
-           لا ضغط
-           لا تغيير جودة
-           نحفظ الملف الأصلي كما هو
-        */
-
         designBlob =
             file;
 
@@ -1705,11 +1697,12 @@ async function loadInvitations() {
 
 
         invitations =
-            data || [];
+            Array.isArray(data)
+                ? data
+                : [];
 
 
-        currentInvitationIndex =
-            0;
+        currentInvitationIndex = 0;
 
 
         loading.style.display =
@@ -1788,10 +1781,33 @@ async function loadInvitations() {
 function updateInvitationPreview() {
 
     if (
-        !invitations.length
+        !Array.isArray(invitations) ||
+        invitations.length === 0
     ) {
 
         return;
+
+    }
+
+
+    /* حماية من تجاوز الحدود */
+
+    if (
+        currentInvitationIndex < 0
+    ) {
+
+        currentInvitationIndex = 0;
+
+    }
+
+
+    if (
+        currentInvitationIndex >=
+        invitations.length
+    ) {
+
+        currentInvitationIndex =
+            invitations.length - 1;
 
     }
 
@@ -1820,12 +1836,20 @@ function updateInvitationPreview() {
         );
 
 
-    previewName.innerText =
+    /* =========================
+       اسم المدعو
+    ========================= */
+
+    previewName.textContent =
         invitation.guest_name ||
         "اسم المدعو";
 
 
-    counter.innerText =
+    /* =========================
+       العداد
+    ========================= */
+
+    counter.textContent =
         (
             currentInvitationIndex + 1
         ) +
@@ -1833,7 +1857,11 @@ function updateInvitationPreview() {
         invitations.length;
 
 
-    currentName.innerText =
+    /* =========================
+       اسم المدعو أسفل المعاينة
+    ========================= */
+
+    currentName.textContent =
         invitation.guest_name
             ? "المدعو: " +
               invitation.guest_name
@@ -1843,12 +1871,25 @@ function updateInvitationPreview() {
               );
 
 
+    /* =========================
+       QR
+    ========================= */
+
     updatePreviewQR(
         invitation.qr_code
     );
 
 
+    /* =========================
+       تحديث المعاينة
+    ========================= */
+
     updatePreview();
+
+
+    /* =========================
+       تحديث الأزرار
+    ========================= */
 
     updateNavigationButtons();
 
@@ -1867,6 +1908,13 @@ function updatePreviewQR(
         document.getElementById(
             "previewQrImage"
         );
+
+
+    if (!previewQrImage) {
+
+        return;
+
+    }
 
 
     if (!qrValue) {
@@ -1909,6 +1957,7 @@ function updatePreviewQR(
             if (error) {
 
                 console.error(
+                    "QR PREVIEW ERROR:",
                     error
                 );
 
@@ -1917,8 +1966,29 @@ function updatePreviewQR(
             }
 
 
-            previewQrImage.src =
-                url;
+            /*
+             نتأكد أن QR الذي تم إنشاؤه
+             ما زال يخص الدعوة الحالية
+            */
+
+            const currentInvitation =
+                invitations[
+                    currentInvitationIndex
+                ];
+
+
+            if (
+                currentInvitation &&
+                String(
+                    currentInvitation.qr_code
+                ) ===
+                String(qrValue)
+            ) {
+
+                previewQrImage.src =
+                    url;
+
+            }
 
         }
 
@@ -1937,11 +2007,23 @@ document
     )
     .addEventListener(
         "click",
-        function() {
+        function(event) {
+
+            event.preventDefault();
+
 
             if (
-                currentInvitationIndex >
-                0
+                !Array.isArray(invitations) ||
+                invitations.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                currentInvitationIndex > 0
             ) {
 
                 currentInvitationIndex--;
@@ -1964,7 +2046,20 @@ document
     )
     .addEventListener(
         "click",
-        function() {
+        function(event) {
+
+            event.preventDefault();
+
+
+            if (
+                !Array.isArray(invitations) ||
+                invitations.length === 0
+            ) {
+
+                return;
+
+            }
+
 
             if (
                 currentInvitationIndex <
@@ -1987,15 +2082,47 @@ document
 
 function updateNavigationButtons() {
 
-    document.getElementById(
-        "previousInvitation"
-    ).disabled =
+    const previousButton =
+        document.getElementById(
+            "previousInvitation"
+        );
+
+
+    const nextButton =
+        document.getElementById(
+            "nextInvitation"
+        );
+
+
+    if (
+        !previousButton ||
+        !nextButton
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !invitations ||
+        invitations.length <= 1
+    ) {
+
+        previousButton.disabled = true;
+
+        nextButton.disabled = true;
+
+        return;
+
+    }
+
+
+    previousButton.disabled =
         currentInvitationIndex === 0;
 
 
-    document.getElementById(
-        "nextInvitation"
-    ).disabled =
+    nextButton.disabled =
         currentInvitationIndex ===
         invitations.length - 1;
 
