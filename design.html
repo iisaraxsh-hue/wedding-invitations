@@ -181,6 +181,7 @@ button:disabled {
     width: 110px;
     height: 110px;
     padding: 5px;
+    background: #ffffff;
 }
 
 #qrElement img {
@@ -307,6 +308,7 @@ button:disabled {
     position: absolute;
     z-index: 2;
     padding: 0;
+    background: #ffffff;
 }
 
 .preview-qr img {
@@ -479,7 +481,7 @@ button:disabled {
 
 <div class="hint">
 
-ارفعي تصميم الدعوة بصيغة PNG أو JPG أو WEBP بأي مقاس.
+ارفعي تصميم الدعوة بصيغة PNG أو JPG أو WEBP بأي مقاس، وسيتم تصغير وضغط الصورة تلقائيًا لتسهيل الحفظ.
 
 </div>
 
@@ -1015,19 +1017,9 @@ let designData = {
 
     image: null,
 
-    /*
-       نخزن أبعاد التصميم الأصلية
-       حتى نعرف مقاسه الحقيقي
-    */
-
     imageWidth: 0,
 
     imageHeight: 0,
-
-    /*
-       المواقع كنسبة من التصميم
-       وليس بالبكسل
-    */
 
     nameX: 0.50,
     nameY: 0.50,
@@ -1072,6 +1064,26 @@ let dragStartY = 0;
 let startLeft = 0;
 
 let startTop = 0;
+
+
+/* =========================
+   إعدادات ضغط الصور
+========================= */
+
+/*
+   الهدف أن تبقى الصورة تحت حجم
+   مناسب لـ localStorage.
+
+   لا نحتاج صورة ضخمة جدًا
+   لأن الدعوة النهائية ستحتفظ
+   بجودة جيدة مع حجم أخف.
+*/
+
+const MAX_IMAGE_WIDTH = 1800;
+
+const MAX_IMAGE_HEIGHT = 1800;
+
+const TARGET_IMAGE_BYTES = 3 * 1024 * 1024;
 
 
 /* =========================
@@ -1190,8 +1202,33 @@ function loadSavedDesign() {
             error
         );
 
+        /*
+           إذا كان localStorage يحتوي
+           على نسخة قديمة كبيرة أو تالفة،
+           نحذفها حتى يستطيع المستخدم
+           رفع التصميم من جديد.
+        */
+
+        try {
+
+            localStorage.removeItem(
+                "invitation_design_" +
+                eventId
+            );
+
+        }
+
+        catch (removeError) {
+
+            console.error(
+                removeError
+            );
+
+        }
+
+
         showMessage(
-            "تعذر استرجاع التصميم المحفوظ.",
+            "تعذر استرجاع التصميم المحفوظ. يمكنك رفع التصميم من جديد.",
             "error"
         );
 
@@ -1228,12 +1265,6 @@ function showSavedDesign() {
 
     image.onload =
         async function() {
-
-            /*
-               إذا كان التصميم قديمًا
-               ولم تكن أبعاده محفوظة
-               نقرأها الآن
-            */
 
             designData.imageWidth =
                 image.naturalWidth;
@@ -1274,7 +1305,7 @@ document
     );
 
 
-function loadDesign(event) {
+async function loadDesign(event) {
 
     const file =
         event.target.files[0];
@@ -1303,7 +1334,7 @@ function loadDesign(event) {
     ) {
 
         showMessage(
-            "صيغة الصورة غير مدعومة.",
+            "صيغة الصورة غير مدعومة. استخدمي PNG أو JPG أو WEBP.",
             "error"
         );
 
@@ -1312,77 +1343,515 @@ function loadDesign(event) {
     }
 
 
-    const reader =
-        new FileReader();
+    showMessage(
+        "جاري تجهيز وضغط التصميم...",
+        "success"
+    );
 
 
-    reader.onload =
-        async function(e) {
+    try {
 
-            designData.image =
-                e.target.result;
+        /*
+           ضغط الصورة قبل وضعها
+           في localStorage.
+        */
 
-
-            const image =
-                document.getElementById(
-                    "designImage"
-                );
+        const compressedImage =
+            await compressImage(file);
 
 
-            const previewImage =
-                document.getElementById(
-                    "previewImage"
-                );
+        designData.image =
+            compressedImage.dataUrl;
 
 
-            image.src =
-                designData.image;
+        const image =
+            document.getElementById(
+                "designImage"
+            );
 
 
-            previewImage.src =
-                designData.image;
+        const previewImage =
+            document.getElementById(
+                "previewImage"
+            );
 
 
-            image.onload =
-                async function() {
-
-                    /*
-                       حفظ المقاس الأصلي
-                    */
-
-                    designData.imageWidth =
-                        image.naturalWidth;
+        image.src =
+            designData.image;
 
 
-                    designData.imageHeight =
-                        image.naturalHeight;
+        previewImage.src =
+            designData.image;
 
 
-                    showDesignSections();
+        image.onload =
+            async function() {
 
-                    applyAllStyles();
+                designData.imageWidth =
+                    image.naturalWidth;
 
-                    positionElements();
 
-                    updatePreview();
+                designData.imageHeight =
+                    image.naturalHeight;
 
-                    updateQR();
 
+                /*
+                   إظهار التصميم والـ QR
+                   مباشرة.
+                */
+
+                showDesignSections();
+
+                applyAllStyles();
+
+                positionElements();
+
+                updatePreview();
+
+                updateQR();
+
+                /*
+                   حفظ النسخة المضغوطة.
+                */
+
+                const saved =
                     autoSave();
 
-                    await loadInvitations();
 
-                    showMessage(
-                        "تم تحميل التصميم 🤍",
-                        "success"
+                if (!saved) {
+
+                    return;
+
+                }
+
+
+                /*
+                   تحميل الدعوات
+                   بعد تجهيز التصميم.
+                */
+
+                await loadInvitations();
+
+
+                showMessage(
+                    "تم تحميل التصميم وضغطه تلقائيًا 🤍",
+                    "success"
+                );
+
+            };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "IMAGE PROCESSING ERROR:",
+            error
+        );
+
+
+        showMessage(
+            "تعذر تجهيز الصورة. جرّبي صورة أخرى أو صورة بحجم أصغر.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ضغط الصورة
+========================= */
+
+function compressImage(file) {
+
+    return new Promise(
+        function(resolve, reject) {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(event) {
+
+                    const image =
+                        new Image();
+
+
+                    image.onload =
+                        async function() {
+
+                            try {
+
+                                let width =
+                                    image.naturalWidth;
+
+
+                                let height =
+                                    image.naturalHeight;
+
+
+                                /*
+                                   تصغير الأبعاد إذا كانت
+                                   الصورة ضخمة جدًا.
+                                */
+
+                                const scale =
+                                    Math.min(
+
+                                        1,
+
+                                        MAX_IMAGE_WIDTH /
+                                            width,
+
+                                        MAX_IMAGE_HEIGHT /
+                                            height
+
+                                    );
+
+
+                                width =
+                                    Math.round(
+                                        width * scale
+                                    );
+
+
+                                height =
+                                    Math.round(
+                                        height * scale
+                                    );
+
+
+                                /*
+                                   نستخدم Canvas
+                                   لإنتاج نسخة أخف.
+                                */
+
+                                const canvas =
+                                    document.createElement(
+                                        "canvas"
+                                    );
+
+
+                                canvas.width =
+                                    width;
+
+
+                                canvas.height =
+                                    height;
+
+
+                                const context =
+                                    canvas.getContext(
+                                        "2d"
+                                    );
+
+
+                                /*
+                                   تحسين جودة التصغير.
+                                */
+
+                                context.imageSmoothingEnabled =
+                                    true;
+
+
+                                context.imageSmoothingQuality =
+                                    "high";
+
+
+                                /*
+                                   نضع خلفية بيضاء فقط
+                                   عند استخدام JPEG.
+
+                                   WebP سيحافظ على الشفافية
+                                   إذا كانت موجودة.
+                                */
+
+                                context.drawImage(
+                                    image,
+                                    0,
+                                    0,
+                                    width,
+                                    height
+                                );
+
+
+                                /*
+                                   أول محاولة:
+                                   WebP بجودة جيدة.
+                                */
+
+                                let quality =
+                                    0.82;
+
+
+                                let dataUrl =
+                                    canvas.toDataURL(
+                                        "image/webp",
+                                        quality
+                                    );
+
+
+                                /*
+                                   بعض المتصفحات قد لا تدعم
+                                   WebP بشكل صحيح.
+                                */
+
+                                if (
+                                    !dataUrl.startsWith(
+                                        "data:image/webp"
+                                    )
+                                ) {
+
+                                    /*
+                                       fallback إلى JPG.
+                                    */
+
+                                    const jpgCanvas =
+                                        document.createElement(
+                                            "canvas"
+                                        );
+
+
+                                    jpgCanvas.width =
+                                        width;
+
+
+                                    jpgCanvas.height =
+                                        height;
+
+
+                                    const jpgContext =
+                                        jpgCanvas.getContext(
+                                            "2d"
+                                        );
+
+
+                                    jpgContext.fillStyle =
+                                        "#ffffff";
+
+
+                                    jpgContext.fillRect(
+                                        0,
+                                        0,
+                                        width,
+                                        height
+                                    );
+
+
+                                    jpgContext.drawImage(
+                                        image,
+                                        0,
+                                        0,
+                                        width,
+                                        height
+                                    );
+
+
+                                    dataUrl =
+                                        jpgCanvas.toDataURL(
+                                            "image/jpeg",
+                                            0.82
+                                        );
+
+                                }
+
+
+                                /*
+                                   إذا كانت الصورة لا تزال
+                                   كبيرة، نقلل الجودة تدريجيًا.
+                                */
+
+                                while (
+                                    dataUrl.length >
+                                    TARGET_IMAGE_BYTES *
+                                    1.37 &&
+                                    quality >
+                                    0.45
+                                ) {
+
+                                    quality -=
+                                        0.07;
+
+
+                                    if (
+                                        dataUrl.startsWith(
+                                            "data:image/webp"
+                                        )
+                                    ) {
+
+                                        dataUrl =
+                                            canvas.toDataURL(
+                                                "image/webp",
+                                                quality
+                                            );
+
+                                    }
+
+                                }
+
+
+                                /*
+                                   إذا بقيت الصورة كبيرة جدًا،
+                                   نقلل الأبعاد مرة أخرى.
+                                */
+
+                                if (
+                                    dataUrl.length >
+                                    TARGET_IMAGE_BYTES *
+                                    1.37
+                                ) {
+
+                                    const secondScale =
+                                        0.75;
+
+
+                                    const secondCanvas =
+                                        document.createElement(
+                                            "canvas"
+                                        );
+
+
+                                    secondCanvas.width =
+                                        Math.max(
+                                            1,
+                                            Math.round(
+                                                width *
+                                                secondScale
+                                            )
+                                        );
+
+
+                                    secondCanvas.height =
+                                        Math.max(
+                                            1,
+                                            Math.round(
+                                                height *
+                                                secondScale
+                                            )
+                                        );
+
+
+                                    const secondContext =
+                                        secondCanvas.getContext(
+                                            "2d"
+                                        );
+
+
+                                    secondContext.imageSmoothingEnabled =
+                                        true;
+
+
+                                    secondContext.imageSmoothingQuality =
+                                        "high";
+
+
+                                    secondContext.drawImage(
+                                        image,
+                                        0,
+                                        0,
+                                        secondCanvas.width,
+                                        secondCanvas.height
+                                    );
+
+
+                                    dataUrl =
+                                        secondCanvas.toDataURL(
+                                            "image/webp",
+                                            0.75
+                                        );
+
+
+                                    /*
+                                       fallback أخير إلى JPG
+                                       إذا لم يدعم المتصفح WebP.
+                                    */
+
+                                    if (
+                                        !dataUrl.startsWith(
+                                            "data:image/webp"
+                                        )
+                                    ) {
+
+                                        dataUrl =
+                                            secondCanvas.toDataURL(
+                                                "image/jpeg",
+                                                0.75
+                                            );
+
+                                    }
+
+
+                                    width =
+                                        secondCanvas.width;
+
+
+                                    height =
+                                        secondCanvas.height;
+
+                                }
+
+
+                                resolve({
+
+                                    dataUrl:
+                                        dataUrl,
+
+                                    width:
+                                        width,
+
+                                    height:
+                                        height
+
+                                });
+
+                            }
+
+                            catch (error) {
+
+                                reject(error);
+
+                            }
+
+                        };
+
+
+                    image.onerror =
+                        function() {
+
+                            reject(
+                                new Error(
+                                    "تعذر قراءة الصورة."
+                                )
+                            );
+
+                        };
+
+
+                    image.src =
+                        event.target.result;
+
+                };
+
+
+            reader.onerror =
+                function() {
+
+                    reject(
+                        new Error(
+                            "تعذر قراءة الملف."
+                        )
                     );
 
                 };
 
-        };
 
+            reader.readAsDataURL(file);
 
-    reader.readAsDataURL(file);
+        }
+    );
 
 }
 
@@ -1468,6 +1937,13 @@ async function loadInvitations() {
             "error"
         );
 
+        /*
+           نعرض QR التجريبي حتى لو
+           لم يتم تحميل الدعوات.
+        */
+
+        updateQR();
+
         return;
 
     }
@@ -1529,12 +2005,26 @@ async function loadInvitations() {
                 "none";
 
 
-            showMessage(
-                "لا توجد دعوات لهذا الحفل حتى الآن.",
-                "error"
+            /*
+               لا نخفي QR الأساسي.
+            */
+
+            updateQR();
+
+            updatePreviewQR(
+                "https://example.com/check?event_id=" +
+                encodeURIComponent(
+                    eventId
+                )
             );
 
+
             updatePreview();
+
+            showMessage(
+                "لا توجد دعوات لهذا الحفل حتى الآن. يظهر QR تجريبي لمساعدتك في تحديد مكانه.",
+                "error"
+            );
 
             return;
 
@@ -1573,12 +2063,28 @@ async function loadInvitations() {
             "none";
 
 
+        /*
+           حتى في حالة وجود مشكلة
+           في Supabase، يبقى QR ظاهرًا
+           حتى يتمكن المستخدم من تصميم
+           مكانه.
+        */
+
+        updateQR();
+
+        updatePreviewQR(
+            "https://example.com/check?event_id=" +
+            encodeURIComponent(
+                eventId
+            )
+        );
+
+
+        updatePreview();
+
+
         showMessage(
-            "تعذر تحميل الدعوات: " +
-            (
-                error.message ||
-                "خطأ غير معروف"
-            ),
+            "تعذر تحميل الدعوات، لكن يمكنك متابعة تحديد مكان الـ QR.",
             "error"
         );
 
@@ -2597,14 +3103,35 @@ document
                 this.value;
 
 
+            /*
+               تحديث QR الأساسي
+               باللون الجديد.
+            */
+
             updateQR();
 
+
+            /*
+               تحديث QR الموجود
+               في المعاينة.
+            */
 
             if (
                 invitations.length
             ) {
 
                 updateInvitationPreview();
+
+            }
+
+            else {
+
+                updatePreviewQR(
+                    "https://example.com/check?event_id=" +
+                    encodeURIComponent(
+                        eventId
+                    )
+                );
 
             }
 
@@ -2641,6 +3168,13 @@ function updateQR() {
         );
 
 
+    if (!qrImage) {
+
+        return;
+
+    }
+
+
     QRCode.toDataURL(
 
         qrValue,
@@ -2654,6 +3188,11 @@ function updateQR() {
             errorCorrectionLevel: "H",
 
             color: {
+
+                /*
+                   نفس اللون الذي يختاره
+                   المستخدم من لوحة التحكم.
+                */
 
                 dark:
                     designData.qrColor,
@@ -2681,6 +3220,21 @@ function updateQR() {
 
             qrImage.src =
                 url;
+
+
+            /*
+               نتأكد أن QR ظاهر
+               بعد إنشائه.
+            */
+
+            qrImage.style.display =
+                "block";
+
+
+            document.getElementById(
+                "qrElement"
+            ).style.display =
+                "block";
 
         }
 
@@ -2748,7 +3302,7 @@ function updatePreview() {
 
     /*
        المعاينة لها نفس
-       مقاس التصميم تمامًا
+       مقاس التصميم تمامًا.
     */
 
     previewCanvas.style.width =
@@ -2802,6 +3356,10 @@ function updatePreview() {
     previewQr.style.height =
         designData.qrSize + "px";
 
+
+    previewQr.style.display =
+        "block";
+
 }
 
 
@@ -2828,11 +3386,41 @@ function autoSave() {
             eventId;
 
 
-        localStorage.setItem(
-            key,
+        const data =
             JSON.stringify(
                 designData
-            )
+            );
+
+
+        /*
+           فحص تقريبي لحجم البيانات
+           قبل محاولة localStorage.
+        */
+
+        const dataSize =
+            new Blob(
+                [data]
+            ).size;
+
+
+        if (
+            dataSize >
+            TARGET_IMAGE_BYTES
+        ) {
+
+            showMessage(
+                "الصورة ما زالت كبيرة. سيتم ضغطها أكثر تلقائيًا عند إعادة رفعها.",
+                "error"
+            );
+
+            return false;
+
+        }
+
+
+        localStorage.setItem(
+            key,
+            data
         );
 
 
@@ -2849,7 +3437,7 @@ function autoSave() {
 
 
         showMessage(
-            "الصورة كبيرة جدًا على الحفظ المحلي. جرّبي صورة أصغر حجمًا.",
+            "الصورة كبيرة جدًا على الحفظ المحلي. ارفعي صورة أصغر أو أعيدي رفع نفس الصورة ليتم ضغطها تلقائيًا.",
             "error"
         );
 
@@ -3001,7 +3589,7 @@ async function saveQRCodesOnly() {
 
             /*
                تأخير بسيط حتى لا يمنع
-               المتصفح تنزيل الملفات دفعة واحدة
+               المتصفح تنزيل الملفات دفعة واحدة.
             */
 
             await wait(250);
