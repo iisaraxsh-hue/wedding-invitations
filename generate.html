@@ -20,6 +20,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
 <style>
 
 * {
@@ -341,6 +343,19 @@ button:disabled {
     type="button">
 
 تنزيل الدعوات ZIP
+
+</button>
+
+
+<!-- =========================
+     حفظ الأكواد فقط
+========================= -->
+
+<button
+    id="downloadQrOnlyButton"
+    type="button">
+
+حفظ الأكواد فقط بدون تصميم
 
 </button>
 
@@ -989,14 +1004,22 @@ function createInvitationCard(
         );
 
 
-    qrImage.crossOrigin =
-        "anonymous";
+    /*
+       مهم:
+       يتم إنشاء QR داخل الصفحة
+       بدل الاعتماد على موقع خارجي.
+    */
+
+    qrImage.alt =
+        "QR";
 
 
-    qrImage.src =
-        createQR(
-            invitation.qr_code
-        );
+    qrImage.width =
+        800;
+
+
+    qrImage.height =
+        800;
 
 
     qr.appendChild(
@@ -1006,6 +1029,16 @@ function createInvitationCard(
 
     canvas.appendChild(
         qr
+    );
+
+
+    /*
+       إنشاء QR الفعلي
+    */
+
+    generateQRImage(
+        invitation.qr_code,
+        qrImage
     );
 
 
@@ -1052,19 +1085,90 @@ function createInvitationCard(
 
 
 /* =========================
-   QR
+   إنشاء QR فعلي
 ========================= */
 
-function createQR(
-    value
+function generateQRImage(
+    value,
+    imageElement
 ) {
 
-    return (
-        "https://api.qrserver.com/v1/create-qr-code/" +
-        "?size=800x800&margin=0&data=" +
-        encodeURIComponent(
-            value || "DEMO"
-        )
+    if (
+        !imageElement
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !value
+    ) {
+
+        console.error(
+            "QR CODE MISSING:",
+            value
+        );
+
+
+        imageElement.removeAttribute(
+            "src"
+        );
+
+
+        return;
+
+    }
+
+
+    QRCode.toDataURL(
+
+        String(value),
+
+        {
+
+            width: 800,
+
+            margin: 0,
+
+            errorCorrectionLevel: "H",
+
+            color: {
+
+                dark:
+                    designData.qrColor ||
+                    "#000000",
+
+                light:
+                    "#ffffff"
+
+            }
+
+        },
+
+        function(
+            error,
+            url
+        ) {
+
+            if (error) {
+
+                console.error(
+                    "QR GENERATION ERROR:",
+                    error
+                );
+
+                return;
+
+            }
+
+
+            imageElement.src =
+                url;
+
+        }
+
     );
 
 }
@@ -1809,6 +1913,413 @@ async function downloadZIP() {
             "تنزيل الدعوات ZIP";
 
     }
+
+}
+
+
+/* =========================
+   حفظ الأكواد فقط
+========================= */
+
+document
+    .getElementById(
+        "downloadQrOnlyButton"
+    )
+    .addEventListener(
+        "click",
+        downloadQrOnly
+    );
+
+
+async function downloadQrOnly() {
+
+    const button =
+        document.getElementById(
+            "downloadQrOnlyButton"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    button.innerText =
+        "جاري تجهيز الأكواد...";
+
+
+    try {
+
+        /*
+           نتأكد أن الدعوات موجودة
+        */
+
+        if (
+            !invitations ||
+            !invitations.length
+        ) {
+
+            throw new Error(
+                "لا توجد أكواد محفوظة لهذا الحفل."
+            );
+
+        }
+
+
+        /*
+           نتأكد أن مكتبة QR موجودة
+        */
+
+        if (
+            typeof QRCode ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "تعذر تحميل أداة إنشاء QR."
+            );
+
+        }
+
+
+        const zip =
+            new JSZip();
+
+
+        const folder =
+            zip.folder(
+                "الأكواد"
+            );
+
+
+        let savedCount =
+            0;
+
+
+        for (
+            let i = 0;
+            i < invitations.length;
+            i++
+        ) {
+
+            const invitation =
+                invitations[i];
+
+
+            /*
+               نأخذ الكود الفعلي
+               الموجود في قاعدة البيانات
+            */
+
+            const qrValue =
+                invitation.qr_code;
+
+
+            if (!qrValue) {
+
+                console.warn(
+                    "Invitation has no qr_code:",
+                    invitation
+                );
+
+                continue;
+
+            }
+
+
+            /*
+               إنشاء QR كصورة PNG
+            */
+
+            const qrDataUrl =
+                await createQrDataUrl(
+                    qrValue
+                );
+
+
+            /*
+               تحويل Data URL إلى Blob
+            */
+
+            const blob =
+                dataURLToBlob(
+                    qrDataUrl
+                );
+
+
+            /*
+               اسم الملف باسم المدعو
+            */
+
+            const guestName =
+                safeFileName(
+                    invitation.guest_name ||
+                    `كود-${invitation.invitation_number || i + 1}`
+                );
+
+
+            folder.file(
+                `${guestName}.png`,
+                blob
+            );
+
+
+            savedCount++;
+
+
+            button.innerText =
+                `جاري تجهيز الكود ${savedCount} من ${invitations.length}...`;
+
+
+            await wait(50);
+
+        }
+
+
+        /*
+           إذا لم نجد أي كود
+        */
+
+        if (
+            savedCount === 0
+        ) {
+
+            throw new Error(
+                "لا توجد أكواد QR مرتبطة بالدعوات. تأكدي أن حقل qr_code يحتوي على الأكواد."
+            );
+
+        }
+
+
+        /*
+           إنشاء ZIP
+        */
+
+        button.innerText =
+            "جاري ضغط الأكواد...";
+
+
+        const content =
+            await zip.generateAsync(
+                {
+
+                    type: "blob",
+
+                    compression:
+                        "DEFLATE",
+
+                    compressionOptions:
+                        {
+                            level: 6
+                        }
+
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                content
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+
+        link.download =
+            safeFileName(
+                eventData.event_name ||
+                "الأكواد"
+            ) +
+            "-الأكواد.zip";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        setTimeout(
+            function() {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1000
+        );
+
+
+        showMessage(
+            `تم حفظ ${savedCount} كود QR بدون تصميم بنجاح 🤍`,
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "QR ONLY ERROR:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "تعذر حفظ الأكواد.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        button.disabled =
+            false;
+
+        button.innerText =
+            "حفظ الأكواد فقط بدون تصميم";
+
+    }
+
+}
+
+
+/* =========================
+   إنشاء QR كـ Data URL
+========================= */
+
+function createQrDataUrl(
+    value
+) {
+
+    return new Promise(
+        function(
+            resolve,
+            reject
+        ) {
+
+            QRCode.toDataURL(
+
+                String(value),
+
+                {
+
+                    width: 1200,
+
+                    margin: 20,
+
+                    errorCorrectionLevel:
+                        "H",
+
+                    color: {
+
+                        dark:
+                            designData.qrColor ||
+                            "#000000",
+
+                        light:
+                            "#ffffff"
+
+                    }
+
+                },
+
+                function(
+                    error,
+                    url
+                ) {
+
+                    if (error) {
+
+                        reject(
+                            error
+                        );
+
+                        return;
+
+                    }
+
+
+                    resolve(
+                        url
+                    );
+
+                }
+
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================
+   تحويل Data URL إلى Blob
+========================= */
+
+function dataURLToBlob(
+    dataURL
+) {
+
+    const parts =
+        dataURL.split(",");
+
+
+    const mime =
+        parts[0]
+            .match(
+                /:(.*?);/
+            )[1];
+
+
+    const binary =
+        atob(
+            parts[1]
+        );
+
+
+    const array =
+        new Uint8Array(
+            binary.length
+        );
+
+
+    for (
+        let i = 0;
+        i < binary.length;
+        i++
+    ) {
+
+        array[i] =
+            binary.charCodeAt(i);
+
+    }
+
+
+    return new Blob(
+        [
+            array
+        ],
+        {
+            type: mime
+        }
+    );
 
 }
 
