@@ -184,16 +184,30 @@ button:disabled {
     transform-origin: center center;
 }
 
+
+/* =====================================================
+   QR داخل التصميم
+===================================================== */
+
 #qrElement {
+    position: absolute;
     width: 110px;
     height: 110px;
     padding: 5px;
+    display: block;
+    background: #ffffff;
+    z-index: 20;
+    cursor: move;
+    border: 2px dashed rgba(0,0,0,0.45);
+    overflow: hidden;
 }
 
 #qrElement img {
     width: 100%;
     height: 100%;
     display: block;
+    object-fit: contain;
+    background: #ffffff;
 }
 
 .selected {
@@ -314,14 +328,16 @@ button:disabled {
 
 .preview-qr {
     position: absolute;
-    z-index: 2;
+    z-index: 20;
     padding: 0;
+    background: #ffffff;
 }
 
 .preview-qr img {
     width: 100%;
     height: 100%;
     display: block;
+    object-fit: contain;
 }
 
 
@@ -1657,8 +1673,6 @@ async function loadInvitations() {
         "none";
 
 
-    /* التأكد من Supabase */
-
     if (
         typeof supabaseClient ===
         "undefined"
@@ -1676,8 +1690,6 @@ async function loadInvitations() {
 
     }
 
-
-    /* التأكد من event_id */
 
     if (!eventId) {
 
@@ -1701,13 +1713,6 @@ async function loadInvitations() {
             eventId
         );
 
-
-        /*
-         * مهم:
-         * نستخدم select("*")
-         * حتى لا تتعطل الصفحة بسبب اسم عمود
-         * غير موجود في جدول invitations.
-         */
 
         const {
             data,
@@ -1761,10 +1766,6 @@ async function loadInvitations() {
             "none";
 
 
-        /*
-         * لا توجد دعوات
-         */
-
         if (
             invitations.length === 0
         ) {
@@ -1788,10 +1789,6 @@ async function loadInvitations() {
         }
 
 
-        /*
-         * توجد دعوات
-         */
-
         navigation.style.display =
             "grid";
 
@@ -1806,10 +1803,6 @@ async function loadInvitations() {
             invitations.length +
             " دعوة بنجاح.";
 
-
-        /*
-         * عرض أول دعوة
-         */
 
         updateInvitationPreview();
 
@@ -1920,19 +1913,11 @@ function updateInvitationPreview() {
         );
 
 
-    /*
-     * اسم المدعو
-     */
-
     previewName.innerText =
         invitation.guest_name ||
         invitation.name ||
         "اسم المدعو";
 
-
-    /*
-     * العداد
-     */
 
     counter.innerText =
         (
@@ -1941,10 +1926,6 @@ function updateInvitationPreview() {
         " من " +
         invitations.length;
 
-
-    /*
-     * اسم الدعوة أسفل الأزرار
-     */
 
     currentName.innerText =
         (
@@ -1967,6 +1948,19 @@ function updateInvitationPreview() {
      */
 
     updatePreviewQR(
+        invitation.qr_code ||
+        invitation.qr ||
+        invitation.code ||
+        invitation.id
+    );
+
+
+    /*
+     * تحديث QR الموجود داخل مساحة التصميم
+     * حتى يظهر QR فعليًا على التصميم
+     */
+
+    updateDesignQR(
         invitation.qr_code ||
         invitation.qr ||
         invitation.code ||
@@ -2102,22 +2096,40 @@ function updateNavigationButtons() {
 
 
 /* =====================================================
-   QR للمعاينة
+   QR الخاص بالدعوة داخل التصميم
 ===================================================== */
 
-function updatePreviewQR(qrValue) {
+function updateDesignQR(qrValue) {
 
-    const previewQrImage =
+    const qrElement =
         document.getElementById(
-            "previewQrImage"
+            "qrElement"
         );
+
+    const qrImage =
+        document.getElementById(
+            "qrImage"
+        );
+
+
+    if (
+        !qrElement ||
+        !qrImage
+    ) {
+
+        return;
+
+    }
 
 
     if (!qrValue) {
 
-        previewQrImage.removeAttribute(
+        qrImage.removeAttribute(
             "src"
         );
+
+        qrElement.style.display =
+            "none";
 
         return;
 
@@ -2132,6 +2144,8 @@ function updatePreviewQR(qrValue) {
 
             width: 1000,
 
+            height: 1000,
+
             margin: 0,
 
             errorCorrectionLevel: "H",
@@ -2139,7 +2153,8 @@ function updatePreviewQR(qrValue) {
             color: {
 
                 dark:
-                    designData.qrColor,
+                    designData.qrColor ||
+                    "#000000",
 
                 light:
                     "#ffffff"
@@ -2153,9 +2168,102 @@ function updatePreviewQR(qrValue) {
             if (error) {
 
                 console.error(
-                    "QR ERROR:",
+                    "DESIGN QR ERROR:",
                     error
                 );
+
+                qrElement.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            qrImage.src =
+                url;
+
+
+            qrElement.style.display =
+                "block";
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   QR للمعاينة
+===================================================== */
+
+function updatePreviewQR(qrValue) {
+
+    const previewQrImage =
+        document.getElementById(
+            "previewQrImage"
+        );
+
+
+    const previewQr =
+        document.getElementById(
+            "previewQr"
+        );
+
+
+    if (!qrValue) {
+
+        previewQrImage.removeAttribute(
+            "src"
+        );
+
+        previewQr.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    QRCode.toDataURL(
+
+        String(qrValue),
+
+        {
+
+            width: 1000,
+
+            height: 1000,
+
+            margin: 0,
+
+            errorCorrectionLevel: "H",
+
+            color: {
+
+                dark:
+                    designData.qrColor ||
+                    "#000000",
+
+                light:
+                    "#ffffff"
+
+            }
+
+        },
+
+        function(error, url) {
+
+            if (error) {
+
+                console.error(
+                    "PREVIEW QR ERROR:",
+                    error
+                );
+
+                previewQr.style.display =
+                    "none";
 
                 return;
 
@@ -2164,6 +2272,10 @@ function updatePreviewQR(qrValue) {
 
             previewQrImage.src =
                 url;
+
+
+            previewQr.style.display =
+                "block";
 
         }
 
@@ -2814,14 +2926,41 @@ document
             designData.qrColor =
                 this.value;
 
-            updateQR();
 
+            /*
+             * تحديث QR الموجود داخل التصميم
+             */
 
             if (
                 invitations.length
             ) {
 
-                updateInvitationPreview();
+                const invitation =
+                    invitations[
+                        currentInvitationIndex
+                    ];
+
+
+                updateDesignQR(
+                    invitation.qr_code ||
+                    invitation.qr ||
+                    invitation.code ||
+                    invitation.id
+                );
+
+
+                updatePreviewQR(
+                    invitation.qr_code ||
+                    invitation.qr ||
+                    invitation.code ||
+                    invitation.id
+                );
+
+            }
+
+            else {
+
+                updateQR();
 
             }
 
@@ -2838,23 +2977,46 @@ document
 
 function updateQR() {
 
-    if (!eventId) {
+    const qrElement =
+        document.getElementById(
+            "qrElement"
+        );
+
+    const qrImage =
+        document.getElementById(
+            "qrImage"
+        );
+
+
+    if (
+        !qrElement ||
+        !qrImage
+    ) {
 
         return;
 
     }
 
 
+    if (!eventId) {
+
+        qrElement.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    /*
+     * إذا لم توجد دعوات بعد،
+     * نعرض QR مؤقت للحفل.
+     */
+
     const qrValue =
         "https://example.com/check?event_id=" +
         encodeURIComponent(
             eventId
-        );
-
-
-    const qrImage =
-        document.getElementById(
-            "qrImage"
         );
 
 
@@ -2866,6 +3028,8 @@ function updateQR() {
 
             width: 1000,
 
+            height: 1000,
+
             margin: 0,
 
             errorCorrectionLevel: "H",
@@ -2873,7 +3037,8 @@ function updateQR() {
             color: {
 
                 dark:
-                    designData.qrColor,
+                    designData.qrColor ||
+                    "#000000",
 
                 light:
                     "#ffffff"
@@ -2887,8 +3052,12 @@ function updateQR() {
             if (error) {
 
                 console.error(
+                    "QR GENERATION ERROR:",
                     error
                 );
+
+                qrElement.style.display =
+                    "none";
 
                 return;
 
@@ -2897,6 +3066,10 @@ function updateQR() {
 
             qrImage.src =
                 url;
+
+
+            qrElement.style.display =
+                "block";
 
         }
 
