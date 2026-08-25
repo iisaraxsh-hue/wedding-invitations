@@ -133,48 +133,25 @@ button:disabled {
     background: #eee;
     border-radius: 15px;
     padding: 15px;
-
-    /*
-       لا يوجد تحريك أفقي للصورة نفسها
-    */
     overflow: hidden;
-
     text-align: center;
 }
 
-
-/*
-   الصورة تظهر كاملة وثابتة.
-   لا تأخذ عرض شاشة اللابتوب.
-*/
 #designCanvas {
     position: relative;
     display: inline-block;
     line-height: 0;
     user-select: none;
     touch-action: none;
-
-    /*
-       الحجم الفعلي للتصميم.
-       يتم تصغير العرض بصريًا فقط إذا كان أكبر
-       من المساحة المتاحة، بدون قص الصورة.
-    */
     width: min(1080px, 100%);
     height: auto;
 }
 
-
 #designImage {
     display: block;
-
     width: 100%;
     height: auto;
-
-    /*
-       لا يتم قص الصورة
-    */
     object-fit: contain;
-
     user-select: none;
     pointer-events: none;
 }
@@ -311,10 +288,6 @@ button:disabled {
     position: relative;
     display: inline-block;
     line-height: 0;
-
-    /*
-       نفس حجم التصميم بصريًا
-    */
     width: min(1080px, 100%);
     height: auto;
 }
@@ -944,15 +917,6 @@ Courier New
     type="button">
 
 حفظ التصميم
-
-</button>
-
-
-<button
-    id="saveQRCodesButton"
-    type="button">
-
-حفظ الأكواد فقط بدون التصميم
 
 </button>
 
@@ -2958,251 +2922,6 @@ document
 
         }
     );
-
-
-/* =====================================================
-   حفظ الأكواد فقط
-===================================================== */
-
-document
-    .getElementById(
-        "saveQRCodesButton"
-    )
-    .addEventListener(
-        "click",
-        saveQRCodesOnly
-    );
-
-
-async function saveQRCodesOnly() {
-
-    if (
-        !invitations.length
-    ) {
-
-        showMessage(
-            "لا توجد أكواد لحفظها.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const button =
-        document.getElementById(
-            "saveQRCodesButton"
-        );
-
-
-    button.disabled =
-        true;
-
-
-    button.innerText =
-        "جاري تجهيز الأكواد...";
-
-
-    try {
-
-        for (
-            let i = 0;
-            i < invitations.length;
-            i++
-        ) {
-
-            const invitation =
-                invitations[i];
-
-
-            if (
-                !invitation.qr_code
-            ) {
-
-                continue;
-
-            }
-
-
-            const guestName =
-                cleanFileName(
-                    invitation.guest_name ||
-                    "دعوة_" +
-                    (
-                        i + 1
-                    )
-                );
-
-
-            await downloadQRCode(
-                invitation.qr_code,
-                guestName +
-                "_QR.png"
-            );
-
-
-            await wait(250);
-
-        }
-
-
-        showMessage(
-            "تم تجهيز وحفظ جميع الأكواد 🤍",
-            "success"
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        showMessage(
-            "حدث خطأ أثناء حفظ الأكواد.",
-            "error"
-        );
-
-    }
-
-
-    button.disabled =
-        false;
-
-
-    button.innerText =
-        "حفظ الأكواد فقط بدون التصميم";
-
-}
-
-
-/* =====================================================
-   تنزيل QR
-===================================================== */
-
-function downloadQRCode(
-    value,
-    fileName
-) {
-
-    return new Promise(
-        function(resolve, reject) {
-
-            QRCode.toDataURL(
-
-                String(value),
-
-                {
-
-                    width: 1200,
-
-                    margin: 0,
-
-                    errorCorrectionLevel: "H",
-
-                    color: {
-
-                        dark:
-                            designData.qrColor,
-
-                        light:
-                            "#ffffff"
-
-                    }
-
-                },
-
-                function(error, url) {
-
-                    if (error) {
-
-                        reject(error);
-
-                        return;
-
-                    }
-
-
-                    const link =
-                        document.createElement(
-                            "a"
-                        );
-
-
-                    link.href =
-                        url;
-
-
-                    link.download =
-                        fileName;
-
-
-                    document.body.appendChild(
-                        link
-                    );
-
-
-                    link.click();
-
-
-                    document.body.removeChild(
-                        link
-                    );
-
-
-                    resolve();
-
-                }
-
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   تنظيف الاسم
-===================================================== */
-
-function cleanFileName(name) {
-
-    return String(name)
-
-        .replace(
-            /[\\\/:*?"<>|]/g,
-            ""
-        )
-
-        .replace(
-            /\s+/g,
-            "_"
-        )
-
-        .substring(
-            0,
-            100
-        );
-
-}
-
-
-/* =====================================================
-   انتظار
-===================================================== */
-
-function wait(milliseconds) {
-
-    return new Promise(
-        resolve =>
-            setTimeout(
-                resolve,
-                milliseconds
-            )
-    );
-
-}
 
 
 /* =====================================================
