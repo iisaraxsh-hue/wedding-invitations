@@ -352,7 +352,7 @@ button:disabled {
 ========================= -->
 
 <button
-    id="downloadQrOnlyButton"
+    id="downloadCodesButton"
     type="button">
 
 حفظ الأكواد فقط بدون تصميم
@@ -573,6 +573,15 @@ async function loadDesign() {
 
 
     /*
+       دعم الخط
+    */
+
+    designData.nameFont =
+        designData.nameFont ||
+        "Arial";
+
+
+    /*
        دعم المحاذاة إذا كانت موجودة
        في التصميم الجديد.
     */
@@ -589,7 +598,6 @@ async function loadDesign() {
 
     /*
        دعم لون الاسم والـ QR
-       إذا تمت إضافتهما في التصميم.
     */
 
     designData.nameColor =
@@ -912,6 +920,10 @@ function createInvitationCard(
         "px";
 
 
+    name.style.fontFamily =
+        designData.nameFont;
+
+
     name.style.color =
         designData.nameColor;
 
@@ -998,28 +1010,29 @@ function createInvitationCard(
         "px";
 
 
+    /*
+       صورة QR محلية
+    */
+
     const qrImage =
         document.createElement(
             "img"
         );
 
 
-    /*
-       مهم:
-       يتم إنشاء QR داخل الصفحة
-       بدل الاعتماد على موقع خارجي.
-    */
-
     qrImage.alt =
         "QR";
 
 
-    qrImage.width =
-        800;
+    /*
+       إنشاء QR من الكود الخاص
+       بهذه الدعوة
+    */
 
-
-    qrImage.height =
-        800;
+    createQRImage(
+        invitation.qr_code,
+        qrImage
+    );
 
 
     qr.appendChild(
@@ -1029,16 +1042,6 @@ function createInvitationCard(
 
     canvas.appendChild(
         qr
-    );
-
-
-    /*
-       إنشاء QR الفعلي
-    */
-
-    generateQRImage(
-        invitation.qr_code,
-        qrImage
     );
 
 
@@ -1085,10 +1088,10 @@ function createInvitationCard(
 
 
 /* =========================
-   إنشاء QR فعلي
+   إنشاء QR محلي
 ========================= */
 
-function generateQRImage(
+function createQRImage(
     value,
     imageElement
 ) {
@@ -1102,20 +1105,21 @@ function generateQRImage(
     }
 
 
+    const qrValue =
+        String(
+            value ||
+            "DEMO"
+        );
+
+
     if (
-        !value
+        typeof QRCode ===
+        "undefined"
     ) {
 
         console.error(
-            "QR CODE MISSING:",
-            value
+            "QRCode library not loaded."
         );
-
-
-        imageElement.removeAttribute(
-            "src"
-        );
-
 
         return;
 
@@ -1124,7 +1128,7 @@ function generateQRImage(
 
     QRCode.toDataURL(
 
-        String(value),
+        qrValue,
 
         {
 
@@ -1132,7 +1136,8 @@ function generateQRImage(
 
             margin: 0,
 
-            errorCorrectionLevel: "H",
+            errorCorrectionLevel:
+                "H",
 
             color: {
 
@@ -1155,7 +1160,7 @@ function generateQRImage(
             if (error) {
 
                 console.error(
-                    "QR GENERATION ERROR:",
+                    "QR CREATE ERROR:",
                     error
                 );
 
@@ -1923,19 +1928,19 @@ async function downloadZIP() {
 
 document
     .getElementById(
-        "downloadQrOnlyButton"
+        "downloadCodesButton"
     )
     .addEventListener(
         "click",
-        downloadQrOnly
+        downloadCodesOnly
     );
 
 
-async function downloadQrOnly() {
+async function downloadCodesOnly() {
 
     const button =
         document.getElementById(
-            "downloadQrOnlyButton"
+            "downloadCodesButton"
         );
 
 
@@ -1949,46 +1954,15 @@ async function downloadQrOnly() {
 
     try {
 
-        /*
-           نتأكد أن الدعوات موجودة
-        */
-
         if (
-            !invitations ||
             !invitations.length
         ) {
 
             throw new Error(
-                "لا توجد أكواد محفوظة لهذا الحفل."
+                "لا توجد أكواد لحفظها."
             );
 
         }
-
-
-        /*
-           نتأكد أن مكتبة QR موجودة
-        */
-
-        if (
-            typeof QRCode ===
-            "undefined"
-        ) {
-
-            throw new Error(
-                "تعذر تحميل أداة إنشاء QR."
-            );
-
-        }
-
-
-        const zip =
-            new JSZip();
-
-
-        const folder =
-            zip.folder(
-                "الأكواد"
-            );
 
 
         let savedCount =
@@ -2005,21 +1979,9 @@ async function downloadQrOnly() {
                 invitations[i];
 
 
-            /*
-               نأخذ الكود الفعلي
-               الموجود في قاعدة البيانات
-            */
-
-            const qrValue =
-                invitation.qr_code;
-
-
-            if (!qrValue) {
-
-                console.warn(
-                    "Invitation has no qr_code:",
-                    invitation
-                );
+            if (
+                !invitation.qr_code
+            ) {
 
                 continue;
 
@@ -2027,144 +1989,73 @@ async function downloadQrOnly() {
 
 
             /*
-               إنشاء QR كصورة PNG
+               إنشاء QR كـ Data URL
+               بدون تصميم الدعوة
             */
 
             const qrDataUrl =
-                await createQrDataUrl(
-                    qrValue
+                await generateQRDataURL(
+                    invitation.qr_code
                 );
 
 
-            /*
-               تحويل Data URL إلى Blob
-            */
-
-            const blob =
-                dataURLToBlob(
-                    qrDataUrl
+            const link =
+                document.createElement(
+                    "a"
                 );
 
 
-            /*
-               اسم الملف باسم المدعو
-            */
-
-            const guestName =
+            const name =
                 safeFileName(
                     invitation.guest_name ||
                     `كود-${invitation.invitation_number || i + 1}`
                 );
 
 
-            folder.file(
-                `${guestName}.png`,
-                blob
+            link.download =
+                `${name}-QR.png`;
+
+
+            link.href =
+                qrDataUrl;
+
+
+            document.body.appendChild(
+                link
             );
+
+
+            link.click();
+
+
+            link.remove();
 
 
             savedCount++;
 
 
             button.innerText =
-                `جاري تجهيز الكود ${savedCount} من ${invitations.length}...`;
+                `جاري حفظ ${savedCount} من ${invitations.length}...`;
 
 
-            await wait(50);
+            await wait(300);
 
         }
 
-
-        /*
-           إذا لم نجد أي كود
-        */
 
         if (
             savedCount === 0
         ) {
 
             throw new Error(
-                "لا توجد أكواد QR مرتبطة بالدعوات. تأكدي أن حقل qr_code يحتوي على الأكواد."
+                "لا توجد أكواد لحفظها."
             );
 
         }
 
 
-        /*
-           إنشاء ZIP
-        */
-
-        button.innerText =
-            "جاري ضغط الأكواد...";
-
-
-        const content =
-            await zip.generateAsync(
-                {
-
-                    type: "blob",
-
-                    compression:
-                        "DEFLATE",
-
-                    compressionOptions:
-                        {
-                            level: 6
-                        }
-
-                }
-            );
-
-
-        const url =
-            URL.createObjectURL(
-                content
-            );
-
-
-        const link =
-            document.createElement(
-                "a"
-            );
-
-
-        link.href =
-            url;
-
-
-        link.download =
-            safeFileName(
-                eventData.event_name ||
-                "الأكواد"
-            ) +
-            "-الأكواد.zip";
-
-
-        document.body.appendChild(
-            link
-        );
-
-
-        link.click();
-
-
-        link.remove();
-
-
-        setTimeout(
-            function() {
-
-                URL.revokeObjectURL(
-                    url
-                );
-
-            },
-            1000
-        );
-
-
         showMessage(
-            `تم حفظ ${savedCount} كود QR بدون تصميم بنجاح 🤍`,
+            `تم حفظ ${savedCount} كود كصور PNG بدون تصميم 🤍`,
             "success"
         );
 
@@ -2173,14 +2064,14 @@ async function downloadQrOnly() {
     catch (error) {
 
         console.error(
-            "QR ONLY ERROR:",
+            "CODES ERROR:",
             error
         );
 
 
         showMessage(
-            error.message ||
-            "تعذر حفظ الأكواد.",
+            "تعذر حفظ الأكواد: " +
+            error.message,
             "error"
         );
 
@@ -2200,18 +2091,31 @@ async function downloadQrOnly() {
 
 
 /* =========================
-   إنشاء QR كـ Data URL
+   إنشاء صورة QR للحفظ
 ========================= */
 
-function createQrDataUrl(
+function generateQRDataURL(
     value
 ) {
 
     return new Promise(
-        function(
-            resolve,
-            reject
-        ) {
+        function(resolve, reject) {
+
+            if (
+                typeof QRCode ===
+                "undefined"
+            ) {
+
+                reject(
+                    new Error(
+                        "لم يتم تحميل مكتبة QR."
+                    )
+                );
+
+                return;
+
+            }
+
 
             QRCode.toDataURL(
 
@@ -2221,7 +2125,7 @@ function createQrDataUrl(
 
                     width: 1200,
 
-                    margin: 20,
+                    margin: 0,
 
                     errorCorrectionLevel:
                         "H",
@@ -2263,61 +2167,6 @@ function createQrDataUrl(
 
             );
 
-        }
-    );
-
-}
-
-
-/* =========================
-   تحويل Data URL إلى Blob
-========================= */
-
-function dataURLToBlob(
-    dataURL
-) {
-
-    const parts =
-        dataURL.split(",");
-
-
-    const mime =
-        parts[0]
-            .match(
-                /:(.*?);/
-            )[1];
-
-
-    const binary =
-        atob(
-            parts[1]
-        );
-
-
-    const array =
-        new Uint8Array(
-            binary.length
-        );
-
-
-    for (
-        let i = 0;
-        i < binary.length;
-        i++
-    ) {
-
-        array[i] =
-            binary.charCodeAt(i);
-
-    }
-
-
-    return new Blob(
-        [
-            array
-        ],
-        {
-            type: mime
         }
     );
 
