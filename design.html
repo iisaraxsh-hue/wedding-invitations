@@ -18,10 +18,6 @@
 
 <style>
 
-/* =====================================================
-   الأساسيات
-===================================================== */
-
 * {
     box-sizing: border-box;
 }
@@ -326,7 +322,7 @@ button:disabled {
 
 
 /* =====================================================
-   تنقل الدعوات
+   السابق والتالي
 ===================================================== */
 
 .invitation-navigation {
@@ -339,9 +335,12 @@ button:disabled {
 }
 
 .invitation-navigation button {
+    width: 100%;
     margin-top: 0;
-    display: block;
     min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #222;
     color: white;
     border: none;
@@ -385,7 +384,7 @@ button:disabled {
 
 
 /* =====================================================
-   حالة تحميل الدعوات
+   حالة التحميل
 ===================================================== */
 
 .invitations-loading {
@@ -394,11 +393,6 @@ button:disabled {
     color: #888;
     font-size: 13px;
 }
-
-
-/* =====================================================
-   معلومات التشخيص
-===================================================== */
 
 .invitations-debug {
     margin-top: 10px;
@@ -483,16 +477,13 @@ button:disabled {
 
 <body>
 
-
 <div class="container">
 
 <div class="box">
 
-
 <h1>
 تصميم الدعوات
 </h1>
-
 
 <div class="subtitle">
 ارفعي تصميمك وحددي مكان الاسم والـ QR مرة واحدة
@@ -575,11 +566,8 @@ button:disabled {
 تحكم بالعناصر
 </h3>
 
-
 <div class="controls">
 
-
-<!-- الاسم -->
 
 <div class="control-box">
 
@@ -679,8 +667,6 @@ button:disabled {
 
 </div>
 
-
-<!-- QR -->
 
 <div class="control-box">
 
@@ -788,7 +774,6 @@ button:disabled {
 ===================================================== -->
 
 <div class="style-grid">
-
 
 <div class="color-control">
 
@@ -913,20 +898,19 @@ Courier New
 
 
 <!-- =====================================================
-     السابق والتالي
+     أزرار السابق والتالي
 ===================================================== -->
 
 <div
     id="invitationNavigation"
-    class="invitation-navigation"
-    style="display:none;">
+    class="invitation-navigation">
 
 <button
     id="previousInvitation"
     type="button"
     onclick="goPrevious()">
 
-السابق
+← السابق
 
 </button>
 
@@ -945,7 +929,7 @@ Courier New
     type="button"
     onclick="goNext()">
 
-التالي
+التالي →
 
 </button>
 
@@ -954,8 +938,7 @@ Courier New
 
 <div
     id="currentInvitationName"
-    class="current-invitation-name"
-    style="display:none;">
+    class="current-invitation-name">
 
 </div>
 
@@ -974,13 +957,6 @@ Courier New
     id="invitationsDebug"
     class="invitations-debug"
     style="display:none;">
-
-</div>
-
-
-<div class="hint">
-
-استخدمي السابق والتالي لمراجعة كل دعوة والتأكد من أن الاسم والـ QR ظاهرين في المكان الصحيح قبل التوليد.
 
 </div>
 
@@ -1116,13 +1092,10 @@ function openDesignDB() {
 }
 
 
-async function saveImageToDB(
-    imageBlob
-) {
+async function saveImageToDB(imageBlob) {
 
     const db =
         await openDesignDB();
-
 
     return new Promise(
         function(resolve, reject) {
@@ -1133,12 +1106,10 @@ async function saveImageToDB(
                     "readwrite"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
-
 
             const request =
                 store.put(
@@ -1146,22 +1117,14 @@ async function saveImageToDB(
                     "image_" + eventId
                 );
 
-
             request.onsuccess =
                 function() {
-
                     resolve(true);
-
                 };
-
 
             request.onerror =
                 function() {
-
-                    reject(
-                        request.error
-                    );
-
+                    reject(request.error);
                 };
 
         }
@@ -1175,7 +1138,6 @@ async function getImageFromDB() {
     const db =
         await openDesignDB();
 
-
     return new Promise(
         function(resolve, reject) {
 
@@ -1185,18 +1147,15 @@ async function getImageFromDB() {
                     "readonly"
                 );
 
-
             const store =
                 transaction.objectStore(
                     STORE_NAME
                 );
 
-
             const request =
                 store.get(
                     "image_" + eventId
                 );
-
 
             request.onsuccess =
                 function() {
@@ -1206,7 +1165,6 @@ async function getImageFromDB() {
                     );
 
                 };
-
 
             request.onerror =
                 function() {
@@ -1308,7 +1266,6 @@ async function initPage() {
 
     }
 
-
     await loadSavedDesign();
 
 }
@@ -1326,12 +1283,10 @@ async function loadSavedDesign() {
             "invitation_settings_" +
             eventId;
 
-
         const savedSettings =
             localStorage.getItem(
                 settingsKey
             );
-
 
         if (savedSettings) {
 
@@ -1340,7 +1295,6 @@ async function loadSavedDesign() {
                     savedSettings
                 );
 
-
             designData = {
                 ...designData,
                 ...parsed
@@ -1348,10 +1302,8 @@ async function loadSavedDesign() {
 
         }
 
-
         const savedImage =
             await getImageFromDB();
-
 
         if (!savedImage) {
 
@@ -1359,10 +1311,8 @@ async function loadSavedDesign() {
 
         }
 
-
         designBlob =
             savedImage;
-
 
         showSavedImage();
 
@@ -1392,11 +1342,8 @@ async function loadSavedDesign() {
 async function showSavedImage() {
 
     if (!designBlob) {
-
         return;
-
     }
-
 
     if (designObjectURL) {
 
@@ -1406,32 +1353,26 @@ async function showSavedImage() {
 
     }
 
-
     designObjectURL =
         URL.createObjectURL(
             designBlob
         );
-
 
     const image =
         document.getElementById(
             "designImage"
         );
 
-
     const previewImage =
         document.getElementById(
             "previewImage"
         );
 
-
     image.src =
         designObjectURL;
 
-
     previewImage.src =
         designObjectURL;
-
 
     image.onload =
         async function() {
@@ -1439,10 +1380,8 @@ async function showSavedImage() {
             designData.imageWidth =
                 image.naturalWidth;
 
-
             designData.imageHeight =
                 image.naturalHeight;
-
 
             showDesignSections();
 
@@ -1468,9 +1407,7 @@ async function showSavedImage() {
 ===================================================== */
 
 document
-    .getElementById(
-        "designFile"
-    )
+    .getElementById("designFile")
     .addEventListener(
         "change",
         loadDesign
@@ -1482,24 +1419,15 @@ async function loadDesign(event) {
     const file =
         event.target.files[0];
 
-
     if (!file) {
-
         return;
-
     }
 
-
     const allowedTypes = [
-
         "image/png",
-
         "image/jpeg",
-
         "image/webp"
-
     ];
-
 
     if (
         !allowedTypes.includes(
@@ -1516,7 +1444,6 @@ async function loadDesign(event) {
 
     }
 
-
     try {
 
         showMessage(
@@ -1524,27 +1451,22 @@ async function loadDesign(event) {
             "success"
         );
 
-
         designBlob =
             file;
-
 
         await saveImageToDB(
             designBlob
         );
-
 
         const image =
             document.getElementById(
                 "designImage"
             );
 
-
         const previewImage =
             document.getElementById(
                 "previewImage"
             );
-
 
         if (designObjectURL) {
 
@@ -1554,20 +1476,16 @@ async function loadDesign(event) {
 
         }
 
-
         designObjectURL =
             URL.createObjectURL(
                 designBlob
             );
 
-
         image.src =
             designObjectURL;
 
-
         previewImage.src =
             designObjectURL;
-
 
         image.onload =
             async function() {
@@ -1575,10 +1493,8 @@ async function loadDesign(event) {
                 designData.imageWidth =
                     image.naturalWidth;
 
-
                 designData.imageHeight =
                     image.naturalHeight;
-
 
                 showDesignSections();
 
@@ -1596,7 +1512,6 @@ async function loadDesign(event) {
 
                 await loadInvitations();
 
-
                 showMessage(
                     "تم حفظ التصميم بنجاح 🤍",
                     "success"
@@ -1612,7 +1527,6 @@ async function loadDesign(event) {
             "IMAGE SAVE ERROR:",
             error
         );
-
 
         showMessage(
             "تعذر حفظ التصميم محليًا.",
@@ -1635,18 +1549,15 @@ function showDesignSections() {
     ).style.display =
         "block";
 
-
     document.getElementById(
         "controlsSection"
     ).style.display =
         "block";
 
-
     document.getElementById(
         "previewSection"
     ).style.display =
         "block";
-
 
     document.getElementById(
         "buttonsSection"
@@ -1667,24 +1578,20 @@ function applyInputs() {
     ).value =
         designData.nameSize;
 
-
     document.getElementById(
         "qrSize"
     ).value =
         designData.qrSize;
-
 
     document.getElementById(
         "nameFont"
     ).value =
         designData.nameFont;
 
-
     document.getElementById(
         "nameColor"
     ).value =
         designData.nameColor;
-
 
     document.getElementById(
         "qrColor"
@@ -1695,50 +1602,23 @@ function applyInputs() {
 
 
 /* =====================================================
-   تحميل الدعوات من Supabase
+   تحميل الدعوات
 ===================================================== */
 
 async function loadInvitations() {
-
-    const navigation =
-        document.getElementById(
-            "invitationNavigation"
-        );
-
-
-    const currentName =
-        document.getElementById(
-            "currentInvitationName"
-        );
-
-
-    const loading =
-        document.getElementById(
-            "invitationsLoading"
-        );
-
 
     const debug =
         document.getElementById(
             "invitationsDebug"
         );
 
+    const loading =
+        document.getElementById(
+            "invitationsLoading"
+        );
 
     loading.style.display =
         "block";
-
-
-    navigation.style.display =
-        "none";
-
-
-    currentName.style.display =
-        "none";
-
-
-    debug.style.display =
-        "none";
-
 
     if (
         typeof supabaseClient ===
@@ -1748,41 +1628,31 @@ async function loadInvitations() {
         loading.style.display =
             "none";
 
-        showMessage(
-            "لم يتم تحميل Supabase. تأكدي من ملف config.js.",
-            "error"
-        );
+        debug.style.display =
+            "block";
+
+        debug.innerText =
+            "لم يتم تحميل Supabase. تأكدي من ملف config.js.";
 
         return;
 
     }
 
-
     try {
-
-        console.log(
-            "EVENT ID:",
-            eventId
-        );
-
 
         const {
             data,
             error
         } =
         await supabaseClient
-
             .from("invitations")
-
             .select(
                 "id, created_at, event_id, guest_name, invitation_number, guest_count, qr_code, companion_count"
             )
-
             .eq(
                 "event_id",
                 eventId
             )
-
             .order(
                 "invitation_number",
                 {
@@ -1790,94 +1660,44 @@ async function loadInvitations() {
                 }
             );
 
-
-        console.log(
-            "SUPABASE INVITATIONS:",
-            data
-        );
-
-
-        console.log(
-            "SUPABASE ERROR:",
-            error
-        );
-
-
         if (error) {
-
             throw error;
-
         }
-
 
         invitations =
             Array.isArray(data)
                 ? data
                 : [];
 
-
         currentInvitationIndex =
             0;
-
 
         loading.style.display =
             "none";
 
-
         debug.style.display =
             "block";
-
-
-        /*
-         =================================================
-         لا توجد دعوات
-         =================================================
-        */
-
-        if (
-            invitations.length === 0
-        ) {
-
-            navigation.style.display =
-                "none";
-
-
-            currentName.style.display =
-                "none";
-
-
-            updatePreview();
-
-
-            debug.innerText =
-                "لم يتم العثور على أي دعوة مرتبطة بهذا الحفل. تأكدي من أن event_id في جدول invitations يطابق event_id الموجود في الرابط.";
-
-            return;
-
-        }
-
-
-        /*
-         =================================================
-         توجد دعوات
-         =================================================
-        */
 
         debug.innerText =
             "تم تحميل " +
             invitations.length +
             " دعوة للحفل الحالي.";
 
+        if (
+            invitations.length > 0
+        ) {
 
-        navigation.style.display =
-            "grid";
+            updateInvitationPreview();
 
+        }
+        else {
 
-        currentName.style.display =
-            "block";
+            document.getElementById(
+                "invitationCounter"
+            ).innerText =
+                "0 من 0";
 
-
-        updateInvitationPreview();
+        }
 
     }
 
@@ -1888,26 +1708,14 @@ async function loadInvitations() {
             error
         );
 
-
         loading.style.display =
             "none";
-
-
-        navigation.style.display =
-            "none";
-
-
-        currentName.style.display =
-            "none";
-
 
         debug.style.display =
             "block";
 
-
         debug.innerText =
-            "حدث خطأ أثناء تحميل الدعوات من Supabase.";
-
+            "تعذر تحميل الدعوات من Supabase.";
 
         showMessage(
             "تعذر تحميل الدعوات: " +
@@ -1924,92 +1732,42 @@ async function loadInvitations() {
 
 
 /* =====================================================
-   الدعوة الحالية
+   تحديث الدعوة الحالية
 ===================================================== */
 
 function updateInvitationPreview() {
 
     if (
-        !Array.isArray(invitations) ||
-        invitations.length === 0
+        !invitations.length
     ) {
 
         return;
 
     }
 
-
-    /*
-     * التأكد من أن رقم الدعوة الحالية صحيح
-     */
-
-    if (
-        currentInvitationIndex < 0
-    ) {
-
-        currentInvitationIndex =
-            0;
-
-    }
-
-
-    if (
-        currentInvitationIndex >=
-        invitations.length
-    ) {
-
-        currentInvitationIndex =
-            invitations.length - 1;
-
-    }
-
-
-    /*
-     * الحصول على الدعوة الحالية
-     */
-
     const invitation =
         invitations[
             currentInvitationIndex
         ];
-
 
     const previewName =
         document.getElementById(
             "previewName"
         );
 
-
     const counter =
         document.getElementById(
             "invitationCounter"
         );
-
 
     const currentName =
         document.getElementById(
             "currentInvitationName"
         );
 
-
-    const navigation =
-        document.getElementById(
-            "invitationNavigation"
-        );
-
-
-    /*
-     * اسم المدعو
-     */
-
     previewName.innerText =
         invitation.guest_name ||
         "اسم المدعو";
-
-
-    /*
-     * رقم الدعوة
-     */
 
     counter.innerText =
         (
@@ -2018,52 +1776,17 @@ function updateInvitationPreview() {
         " من " +
         invitations.length;
 
-
-    /*
-     * اسم المدعو أسفل المعاينة
-     */
-
     currentName.innerText =
         invitation.guest_name
             ? "المدعو: " +
               invitation.guest_name
-            : "الدعوة رقم " +
-              (
-                  currentInvitationIndex + 1
-              );
-
-
-    /*
-     * إظهار التنقل
-     */
-
-    navigation.style.display =
-        "grid";
-
-
-    currentName.style.display =
-        "block";
-
-
-    /*
-     * تحديث QR الخاص بالدعوة الحالية
-     */
+            : "";
 
     updatePreviewQR(
         invitation.qr_code
     );
 
-
-    /*
-     * تحديث شكل المعاينة
-     */
-
     updatePreview();
-
-
-    /*
-     * تحديث أزرار السابق والتالي
-     */
 
     updateNavigationButtons();
 
@@ -2076,43 +1799,19 @@ function updateInvitationPreview() {
 
 function goPrevious() {
 
-    console.log(
-        "PREVIOUS CLICKED",
-        currentInvitationIndex,
-        invitations.length
-    );
-
-
     if (
-        !Array.isArray(invitations)
+        !invitations.length
     ) {
-
         return;
-
     }
-
-
-    if (
-        invitations.length === 0
-    ) {
-
-        return;
-
-    }
-
 
     if (
         currentInvitationIndex <= 0
     ) {
-
         return;
-
     }
 
-
-    currentInvitationIndex =
-        currentInvitationIndex - 1;
-
+    currentInvitationIndex--;
 
     updateInvitationPreview();
 
@@ -2125,44 +1824,20 @@ function goPrevious() {
 
 function goNext() {
 
-    console.log(
-        "NEXT CLICKED",
-        currentInvitationIndex,
-        invitations.length
-    );
-
-
     if (
-        !Array.isArray(invitations)
+        !invitations.length
     ) {
-
         return;
-
     }
-
-
-    if (
-        invitations.length === 0
-    ) {
-
-        return;
-
-    }
-
 
     if (
         currentInvitationIndex >=
         invitations.length - 1
     ) {
-
         return;
-
     }
 
-
-    currentInvitationIndex =
-        currentInvitationIndex + 1;
-
+    currentInvitationIndex++;
 
     updateInvitationPreview();
 
@@ -2170,7 +1845,7 @@ function goNext() {
 
 
 /* =====================================================
-   أزرار التنقل
+   تعطيل الأزرار عند البداية والنهاية
 ===================================================== */
 
 function updateNavigationButtons() {
@@ -2180,66 +1855,31 @@ function updateNavigationButtons() {
             "previousInvitation"
         );
 
-
     const nextButton =
         document.getElementById(
             "nextInvitation"
         );
 
-
-    if (
-        !previousButton ||
-        !nextButton
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-     * السابق يتعطل عند أول دعوة
-     */
-
     previousButton.disabled =
-        currentInvitationIndex <= 0;
-
-
-    /*
-     * التالي يتعطل عند آخر دعوة
-     */
+        currentInvitationIndex === 0;
 
     nextButton.disabled =
-        currentInvitationIndex >=
+        currentInvitationIndex ===
         invitations.length - 1;
 
 }
 
 
 /* =====================================================
-   QR للمعاينة
+   QR الخاص بالدعوة
 ===================================================== */
 
-function updatePreviewQR(
-    qrValue
-) {
+function updatePreviewQR(qrValue) {
 
     const previewQrImage =
         document.getElementById(
             "previewQrImage"
         );
-
-
-    if (!previewQrImage) {
-
-        return;
-
-    }
-
-
-    /*
-     * إذا لم يوجد QR
-     */
 
     if (!qrValue) {
 
@@ -2251,41 +1891,24 @@ function updatePreviewQR(
 
     }
 
-
-    /*
-     * توليد QR للدعوة الحالية
-     */
-
     QRCode.toDataURL(
-
         String(qrValue),
-
         {
-
             width: 1000,
-
             margin: 0,
-
             errorCorrectionLevel: "H",
-
             color: {
-
                 dark:
                     designData.qrColor,
-
                 light:
                     "#ffffff"
-
             }
-
         },
-
         function(error, url) {
 
             if (error) {
 
                 console.error(
-                    "QR PREVIEW ERROR:",
                     error
                 );
 
@@ -2293,12 +1916,10 @@ function updatePreviewQR(
 
             }
 
-
             previewQrImage.src =
                 url;
 
         }
-
     );
 
 }
@@ -2315,60 +1936,47 @@ function applyAllStyles() {
             "nameElement"
         );
 
-
     const previewName =
         document.getElementById(
             "previewName"
         );
 
-
     name.style.fontSize =
         designData.nameSize + "px";
-
 
     previewName.style.fontSize =
         designData.nameSize + "px";
 
-
     name.style.fontFamily =
         designData.nameFont;
-
 
     previewName.style.fontFamily =
         designData.nameFont;
 
-
     name.style.color =
         designData.nameColor;
 
-
     previewName.style.color =
         designData.nameColor;
-
 
     const qr =
         document.getElementById(
             "qrElement"
         );
 
-
     qr.style.width =
         designData.qrSize + "px";
 
-
     qr.style.height =
         designData.qrSize + "px";
-
 
     const previewQr =
         document.getElementById(
             "previewQr"
         );
 
-
     previewQr.style.width =
         designData.qrSize + "px";
-
 
     previewQr.style.height =
         designData.qrSize + "px";
@@ -2387,30 +1995,25 @@ function positionElements() {
             "nameElement"
         );
 
-
     const qr =
         document.getElementById(
             "qrElement"
         );
-
 
     name.style.left =
         (
             designData.nameX * 100
         ) + "%";
 
-
     name.style.top =
         (
             designData.nameY * 100
         ) + "%";
 
-
     qr.style.left =
         (
             designData.qrX * 100
         ) + "%";
-
 
     qr.style.top =
         (
@@ -2433,7 +2036,6 @@ document
         startPointerDrag
     );
 
-
 document
     .getElementById(
         "qrElement"
@@ -2450,50 +2052,39 @@ function startPointerDrag(event) {
 
     event.stopPropagation();
 
-
     activeElement =
         event.currentTarget;
 
-
     dragging = true;
-
 
     const canvas =
         document.getElementById(
             "designCanvas"
         );
 
-
     const canvasRect =
         canvas.getBoundingClientRect();
-
 
     const elementRect =
         activeElement.getBoundingClientRect();
 
-
     dragStartX =
         event.clientX;
 
-
     dragStartY =
         event.clientY;
-
 
     startLeft =
         elementRect.left -
         canvasRect.left;
 
-
     startTop =
         elementRect.top -
         canvasRect.top;
 
-
     activeElement.classList.add(
         "selected"
     );
-
 
     try {
 
@@ -2507,10 +2098,6 @@ function startPointerDrag(event) {
 
 }
 
-
-/* =====================================================
-   تحريك العناصر
-===================================================== */
 
 document.addEventListener(
     "pointermove",
@@ -2529,39 +2116,31 @@ function movePointerDrag(event) {
 
     }
 
-
     event.preventDefault();
-
 
     const canvas =
         document.getElementById(
             "designCanvas"
         );
 
-
     const rect =
         canvas.getBoundingClientRect();
-
 
     const deltaX =
         event.clientX -
         dragStartX;
 
-
     const deltaY =
         event.clientY -
         dragStartY;
-
 
     let x =
         startLeft +
         deltaX;
 
-
     let y =
         startTop +
         deltaY;
-
 
     const maxX =
         Math.max(
@@ -2570,14 +2149,12 @@ function movePointerDrag(event) {
             activeElement.offsetWidth
         );
 
-
     const maxY =
         Math.max(
             0,
             rect.height -
             activeElement.offsetHeight
         );
-
 
     x =
         Math.max(
@@ -2588,7 +2165,6 @@ function movePointerDrag(event) {
             )
         );
 
-
     y =
         Math.max(
             0,
@@ -2598,7 +2174,6 @@ function movePointerDrag(event) {
             )
         );
 
-
     if (
         activeElement.id ===
         "nameElement"
@@ -2607,23 +2182,19 @@ function movePointerDrag(event) {
         designData.nameX =
             x / rect.width;
 
-
         designData.nameY =
             y / rect.height;
 
     }
-
     else {
 
         designData.qrX =
             x / rect.width;
 
-
         designData.qrY =
             y / rect.height;
 
     }
-
 
     positionElements();
 
@@ -2632,15 +2203,10 @@ function movePointerDrag(event) {
 }
 
 
-/* =====================================================
-   إنهاء السحب
-===================================================== */
-
 document.addEventListener(
     "pointerup",
     stopPointerDrag
 );
-
 
 document.addEventListener(
     "pointercancel",
@@ -2651,11 +2217,8 @@ document.addEventListener(
 function stopPointerDrag() {
 
     if (!dragging) {
-
         return;
-
     }
-
 
     if (activeElement) {
 
@@ -2664,7 +2227,6 @@ function stopPointerDrag() {
         );
 
     }
-
 
     dragging = false;
 
@@ -2689,7 +2251,6 @@ function alignElement(
             "designCanvas"
         );
 
-
     const element =
         type === "name"
             ? document.getElementById(
@@ -2699,33 +2260,27 @@ function alignElement(
                 "qrElement"
             );
 
-
     const width =
         canvas.clientWidth;
 
-
     const height =
         canvas.clientHeight;
-
 
     let x =
         type === "name"
             ? designData.nameX * width
             : designData.qrX * width;
 
-
     let y =
         type === "name"
             ? designData.nameY * height
             : designData.qrY * height;
-
 
     if (direction === "left") {
 
         x = 0;
 
     }
-
     else if (direction === "center") {
 
         x =
@@ -2735,7 +2290,6 @@ function alignElement(
             ) / 2;
 
     }
-
     else if (direction === "right") {
 
         x =
@@ -2743,13 +2297,11 @@ function alignElement(
             element.offsetWidth;
 
     }
-
     else if (direction === "top") {
 
         y = 0;
 
     }
-
     else if (direction === "middle") {
 
         y =
@@ -2759,7 +2311,6 @@ function alignElement(
             ) / 2;
 
     }
-
     else if (direction === "bottom") {
 
         y =
@@ -2768,29 +2319,24 @@ function alignElement(
 
     }
 
-
     if (type === "name") {
 
         designData.nameX =
             x / width;
 
-
         designData.nameY =
             y / height;
 
     }
-
     else {
 
         designData.qrX =
             x / width;
 
-
         designData.qrY =
             y / height;
 
     }
-
 
     positionElements();
 
@@ -2820,7 +2366,6 @@ document
                     ).value
                 );
 
-
             if (
                 size < 8 ||
                 size > 500
@@ -2835,10 +2380,8 @@ document
 
             }
 
-
             designData.nameSize =
                 size;
-
 
             applyAllStyles();
 
@@ -2869,7 +2412,6 @@ document
                     ).value
                 );
 
-
             if (
                 size < 50 ||
                 size > 1000
@@ -2884,10 +2426,8 @@ document
 
             }
 
-
             designData.qrSize =
                 size;
-
 
             applyAllStyles();
 
@@ -2914,7 +2454,6 @@ document
             designData.nameFont =
                 this.value;
 
-
             applyAllStyles();
 
             updatePreview();
@@ -2939,7 +2478,6 @@ document
 
             designData.nameColor =
                 this.value;
-
 
             applyAllStyles();
 
@@ -2966,9 +2504,7 @@ document
             designData.qrColor =
                 this.value;
 
-
             updateQR();
-
 
             if (
                 invitations.length
@@ -2978,7 +2514,6 @@ document
 
             }
 
-
             saveSettings();
 
         }
@@ -2986,17 +2521,14 @@ document
 
 
 /* =====================================================
-   QR الأساسي
+   QR الأساسي أثناء التصميم
 ===================================================== */
 
 function updateQR() {
 
     if (!eventId) {
-
         return;
-
     }
-
 
     const qrValue =
         "https://example.com/check?event_id=" +
@@ -3004,53 +2536,40 @@ function updateQR() {
             eventId
         );
 
-
     const qrImage =
         document.getElementById(
             "qrImage"
         );
 
-
     QRCode.toDataURL(
-
         qrValue,
-
         {
-
             width: 1000,
-
             margin: 0,
-
             errorCorrectionLevel: "H",
-
             color: {
-
                 dark:
                     designData.qrColor,
-
                 light:
                     "#ffffff"
-
             }
-
         },
-
         function(error, url) {
 
             if (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
 
                 return;
 
             }
 
-
             qrImage.src =
                 url;
 
         }
-
     );
 
 }
@@ -3063,63 +2582,50 @@ function updateQR() {
 function updatePreview() {
 
     if (!designBlob) {
-
         return;
-
     }
-
 
     const previewName =
         document.getElementById(
             "previewName"
         );
 
-
     const previewQr =
         document.getElementById(
             "previewQr"
         );
-
 
     previewName.style.left =
         (
             designData.nameX * 100
         ) + "%";
 
-
     previewName.style.top =
         (
             designData.nameY * 100
         ) + "%";
 
-
     previewName.style.fontSize =
         designData.nameSize + "px";
-
 
     previewName.style.fontFamily =
         designData.nameFont;
 
-
     previewName.style.color =
         designData.nameColor;
-
 
     previewQr.style.left =
         (
             designData.qrX * 100
         ) + "%";
 
-
     previewQr.style.top =
         (
             designData.qrY * 100
         ) + "%";
 
-
     previewQr.style.width =
         designData.qrSize + "px";
-
 
     previewQr.style.height =
         designData.qrSize + "px";
@@ -3134,25 +2640,18 @@ function updatePreview() {
 function saveSettings() {
 
     if (!eventId) {
-
         return false;
-
     }
-
 
     try {
 
         localStorage.setItem(
-
             "invitation_settings_" +
             eventId,
-
             JSON.stringify(
                 designData
             )
-
         );
-
 
         return true;
 
@@ -3173,7 +2672,7 @@ function saveSettings() {
 
 
 /* =====================================================
-   زر حفظ التصميم
+   حفظ التصميم
 ===================================================== */
 
 document
@@ -3195,16 +2694,13 @@ document
 
             }
 
-
             try {
 
                 await saveImageToDB(
                     designBlob
                 );
 
-
                 saveSettings();
-
 
                 showMessage(
                     "تم حفظ التصميم ومواقع الاسم والـ QR 🤍",
@@ -3218,7 +2714,6 @@ document
                 console.error(
                     error
                 );
-
 
                 showMessage(
                     "تعذر حفظ التصميم.",
@@ -3247,7 +2742,6 @@ document
 
             event.stopPropagation();
 
-
             if (!designBlob) {
 
                 showMessage(
@@ -3259,16 +2753,13 @@ document
 
             }
 
-
             try {
 
                 await saveImageToDB(
                     designBlob
                 );
 
-
                 saveSettings();
-
 
                 window.location.href =
                     "generate.html?event_id=" +
@@ -3283,7 +2774,6 @@ document
                 console.error(
                     error
                 );
-
 
                 showMessage(
                     "تعذر حفظ التصميم.",
@@ -3304,9 +2794,7 @@ window.addEventListener(
     "resize",
     function() {
 
-        if (
-            designBlob
-        ) {
+        if (designBlob) {
 
             positionElements();
 
@@ -3332,10 +2820,8 @@ function showMessage(
             "message"
         );
 
-
     message.innerText =
         text;
-
 
     message.className =
         "message " +
