@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -332,37 +331,23 @@ button:disabled {
 
 .invitation-navigation {
     margin-top: 18px;
-
     display: grid;
-
     grid-template-columns: 1fr auto 1fr;
-
     gap: 10px;
-
     align-items: center;
-
     width: 100%;
 }
 
 .invitation-navigation button {
     margin-top: 0;
-
     display: block;
-
     min-height: 48px;
-
     background: #222;
-
     color: white;
-
     border: none;
-
     border-radius: 11px;
-
     font-size: 15px;
-
     cursor: pointer;
-
     transition: 0.2s;
 }
 
@@ -373,43 +358,28 @@ button:disabled {
 
 .invitation-navigation button:disabled {
     background: #d8d8d8;
-
     color: #999;
-
     opacity: 1;
-
     cursor: not-allowed;
-
     transform: none;
 }
 
 .invitation-counter {
     min-width: 120px;
-
     text-align: center;
-
     font-weight: bold;
-
     color: #333;
-
     background: #faf9f7;
-
     padding: 12px 15px;
-
     border-radius: 11px;
-
     white-space: nowrap;
 }
 
 .current-invitation-name {
     margin-top: 12px;
-
     text-align: center;
-
     font-size: 15px;
-
     font-weight: bold;
-
     color: #555;
 }
 
@@ -420,11 +390,8 @@ button:disabled {
 
 .invitations-loading {
     margin-top: 15px;
-
     text-align: center;
-
     color: #888;
-
     font-size: 13px;
 }
 
@@ -435,19 +402,12 @@ button:disabled {
 
 .invitations-debug {
     margin-top: 10px;
-
     padding: 10px 12px;
-
     background: #f8f6f3;
-
     border-radius: 9px;
-
     text-align: center;
-
     color: #777;
-
     font-size: 12px;
-
     line-height: 1.7;
 }
 
@@ -458,11 +418,8 @@ button:disabled {
 
 .message {
     text-align: center;
-
     margin-top: 15px;
-
     font-size: 14px;
-
     line-height: 1.7;
 }
 
@@ -1871,15 +1828,9 @@ async function loadInvitations() {
             "block";
 
 
-        debug.innerText =
-            "تم تحميل " +
-            invitations.length +
-            " دعوة للحفل الحالي.";
-
-
         /*
          =================================================
-         إذا كانت الدعوات صفر
+         لا توجد دعوات
          =================================================
         */
 
@@ -1901,7 +1852,6 @@ async function loadInvitations() {
             debug.innerText =
                 "لم يتم العثور على أي دعوة مرتبطة بهذا الحفل. تأكدي من أن event_id في جدول invitations يطابق event_id الموجود في الرابط.";
 
-
             return;
 
         }
@@ -1909,35 +1859,15 @@ async function loadInvitations() {
 
         /*
          =================================================
-         إذا كانت دعوة واحدة
+         توجد دعوات
          =================================================
         */
 
-        if (
-            invitations.length === 1
-        ) {
+        debug.innerText =
+            "تم تحميل " +
+            invitations.length +
+            " دعوة للحفل الحالي.";
 
-            navigation.style.display =
-                "grid";
-
-
-            currentName.style.display =
-                "block";
-
-
-            updateInvitationPreview();
-
-
-            return;
-
-        }
-
-
-        /*
-         =================================================
-         أكثر من دعوة
-         =================================================
-        */
 
         navigation.style.display =
             "grid";
@@ -2000,13 +1930,18 @@ async function loadInvitations() {
 function updateInvitationPreview() {
 
     if (
-        !invitations.length
+        !Array.isArray(invitations) ||
+        invitations.length === 0
     ) {
 
         return;
 
     }
 
+
+    /*
+     * التأكد من أن رقم الدعوة الحالية صحيح
+     */
 
     if (
         currentInvitationIndex < 0
@@ -2028,6 +1963,10 @@ function updateInvitationPreview() {
 
     }
 
+
+    /*
+     * الحصول على الدعوة الحالية
+     */
 
     const invitation =
         invitations[
@@ -2053,10 +1992,24 @@ function updateInvitationPreview() {
         );
 
 
+    const navigation =
+        document.getElementById(
+            "invitationNavigation"
+        );
+
+
+    /*
+     * اسم المدعو
+     */
+
     previewName.innerText =
         invitation.guest_name ||
         "اسم المدعو";
 
+
+    /*
+     * رقم الدعوة
+     */
 
     counter.innerText =
         (
@@ -2065,6 +2018,10 @@ function updateInvitationPreview() {
         " من " +
         invitations.length;
 
+
+    /*
+     * اسم المدعو أسفل المعاينة
+     */
 
     currentName.innerText =
         invitation.guest_name
@@ -2076,12 +2033,37 @@ function updateInvitationPreview() {
               );
 
 
+    /*
+     * إظهار التنقل
+     */
+
+    navigation.style.display =
+        "grid";
+
+
+    currentName.style.display =
+        "block";
+
+
+    /*
+     * تحديث QR الخاص بالدعوة الحالية
+     */
+
     updatePreviewQR(
         invitation.qr_code
     );
 
 
+    /*
+     * تحديث شكل المعاينة
+     */
+
     updatePreview();
+
+
+    /*
+     * تحديث أزرار السابق والتالي
+     */
 
     updateNavigationButtons();
 
@@ -2090,7 +2072,6 @@ function updateInvitationPreview() {
 
 /* =====================================================
    السابق
-   استخدمنا دالة مستقلة بدل EventListener
 ===================================================== */
 
 function goPrevious() {
@@ -2140,7 +2121,6 @@ function goPrevious() {
 
 /* =====================================================
    التالي
-   استخدمنا دالة مستقلة بدل EventListener
 ===================================================== */
 
 function goNext() {
@@ -2218,7 +2198,7 @@ function updateNavigationButtons() {
 
 
     /*
-     * السابق يتعطل فقط إذا كنا عند أول دعوة
+     * السابق يتعطل عند أول دعوة
      */
 
     previousButton.disabled =
@@ -2226,29 +2206,12 @@ function updateNavigationButtons() {
 
 
     /*
-     * التالي يتعطل فقط إذا كنا عند آخر دعوة
+     * التالي يتعطل عند آخر دعوة
      */
 
     nextButton.disabled =
         currentInvitationIndex >=
         invitations.length - 1;
-
-
-    /*
-     * إذا كان عندنا أكثر من دعوة
-     * نتأكد أن الأزرار ظاهرة
-     */
-
-    if (
-        invitations.length > 1
-    ) {
-
-        document.getElementById(
-            "invitationNavigation"
-        ).style.display =
-            "grid";
-
-    }
 
 }
 
@@ -2267,6 +2230,17 @@ function updatePreviewQR(
         );
 
 
+    if (!previewQrImage) {
+
+        return;
+
+    }
+
+
+    /*
+     * إذا لم يوجد QR
+     */
+
     if (!qrValue) {
 
         previewQrImage.removeAttribute(
@@ -2277,6 +2251,10 @@ function updatePreviewQR(
 
     }
 
+
+    /*
+     * توليد QR للدعوة الحالية
+     */
 
     QRCode.toDataURL(
 
@@ -2307,6 +2285,7 @@ function updatePreviewQR(
             if (error) {
 
                 console.error(
+                    "QR PREVIEW ERROR:",
                     error
                 );
 
@@ -3369,4 +3348,3 @@ function showMessage(
 </body>
 
 </html>
-```
