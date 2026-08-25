@@ -1065,17 +1065,6 @@ let startTop = 0;
 
 
 /* =========================
-   إعدادات ضغط الصورة
-========================= */
-
-const MAX_STORAGE_SIZE =
-    4.5 * 1024 * 1024;
-
-const JPEG_QUALITY =
-    0.92;
-
-
-/* =========================
    بدء الصفحة
 ========================= */
 
@@ -1315,14 +1304,19 @@ async function loadDesign(event) {
 
     try {
 
+        /*
+           هنا يتم ضغط الصورة فعليًا
+           قبل حفظها في localStorage.
+        */
+
         const compressedImage =
-            await compressImage(
+            await compressDesignImage(
                 file
             );
 
 
         designData.image =
-            compressedImage.dataUrl;
+            compressedImage;
 
 
         const image =
@@ -1364,23 +1358,34 @@ async function loadDesign(event) {
 
                 updatePreview();
 
+                /*
+                   إظهار QR مباشرة
+                */
+
                 updateQR();
+
+                /*
+                   حفظ التصميم المضغوط
+                */
 
                 const saved =
                     autoSave();
 
 
+                if (!saved) {
+
+                    return;
+
+                }
+
+
                 await loadInvitations();
 
 
-                if (saved) {
-
-                    showMessage(
-                        "تم تحميل وضغط التصميم وحفظه بنجاح 🤍",
-                        "success"
-                    );
-
-                }
+                showMessage(
+                    "تم تجهيز التصميم وحفظه بنجاح 🤍",
+                    "success"
+                );
 
             };
 
@@ -1405,212 +1410,73 @@ async function loadDesign(event) {
 
 
 /* =========================
-   ضغط الصورة
+   ضغط التصميم
 ========================= */
 
-function compressImage(file) {
+async function compressDesignImage(
+    file
+) {
 
-    return new Promise(
-        function(resolve, reject) {
+    const image =
+        await loadImageFromFile(
+            file
+        );
 
-            const reader =
-                new FileReader();
 
+    /*
+       الحد الأقصى لأبعاد الصورة.
 
-            reader.onload =
-                function(event) {
+       هذا يمنع الصور الضخمة جدًا
+       من استهلاك localStorage.
 
-                    const img =
-                        new Image();
+       لا نغير نسبة التصميم.
+    */
 
+    const MAX_WIDTH = 3000;
 
-                    img.onload =
-                        function() {
+    const MAX_HEIGHT = 3000;
 
-                            const canvas =
-                                document.createElement(
-                                    "canvas"
-                                );
 
+    let width =
+        image.naturalWidth;
 
-                            /*
-                               نحافظ على نفس
-                               أبعاد التصميم.
-                            */
+    let height =
+        image.naturalHeight;
 
-                            canvas.width =
-                                img.naturalWidth;
 
+    /*
+       تصغير الأبعاد فقط إذا كانت
+       أكبر من الحد المسموح.
+    */
 
-                            canvas.height =
-                                img.naturalHeight;
+    if (
+        width > MAX_WIDTH ||
+        height > MAX_HEIGHT
+    ) {
 
+        const ratio =
+            Math.min(
 
-                            const ctx =
-                                canvas.getContext(
-                                    "2d"
-                                );
+                MAX_WIDTH / width,
 
+                MAX_HEIGHT / height
 
-                            ctx.imageSmoothingEnabled =
-                                true;
+            );
 
 
-                            ctx.imageSmoothingQuality =
-                                "high";
+        width =
+            Math.round(
+                width * ratio
+            );
 
 
-                            /*
-                               خلفية بيضاء فقط
-                               عند تحويل الصورة
-                               إلى JPG.
-                            */
+        height =
+            Math.round(
+                height * ratio
+            );
 
-                            const hasTransparency =
-                                checkTransparency(
-                                    img
-                                );
+    }
 
-
-                            if (
-                                !hasTransparency
-                            ) {
-
-                                ctx.fillStyle =
-                                    "#ffffff";
-
-                                ctx.fillRect(
-                                    0,
-                                    0,
-                                    canvas.width,
-                                    canvas.height
-                                );
-
-                            }
-
-
-                            ctx.drawImage(
-                                img,
-                                0,
-                                0,
-                                canvas.width,
-                                canvas.height
-                            );
-
-
-                            /*
-                               إذا كانت الصورة
-                               شفافة نحفظها PNG.
-                               غير ذلك JPG بجودة عالية.
-                            */
-
-                            let dataUrl;
-
-
-                            if (
-                                hasTransparency
-                            ) {
-
-                                dataUrl =
-                                    canvas.toDataURL(
-                                        "image/png"
-                                    );
-
-                            }
-
-                            else {
-
-                                dataUrl =
-                                    canvas.toDataURL(
-                                        "image/jpeg",
-                                        JPEG_QUALITY
-                                    );
-
-                            }
-
-
-                            /*
-                               إذا كانت الصورة ما زالت
-                               كبيرة جدًا، نضغط الجودة
-                               تدريجيًا بدون تغيير
-                               مقاس التصميم.
-                            */
-
-                            if (
-                                getDataUrlSize(
-                                    dataUrl
-                                ) >
-                                MAX_STORAGE_SIZE &&
-                                !hasTransparency
-                            ) {
-
-                                dataUrl =
-                                    compressJPEGUntilSmall(
-                                        canvas
-                                    );
-
-                            }
-
-
-                            resolve({
-
-                                dataUrl:
-                                    dataUrl,
-
-                                width:
-                                    img.naturalWidth,
-
-                                height:
-                                    img.naturalHeight
-
-                            });
-
-                        };
-
-
-                    img.onerror =
-                        function() {
-
-                            reject(
-                                new Error(
-                                    "تعذر قراءة الصورة"
-                                )
-                            );
-
-                        };
-
-
-                    img.src =
-                        event.target.result;
-
-                };
-
-
-            reader.onerror =
-                function() {
-
-                    reject(
-                        new Error(
-                            "تعذر قراءة الملف"
-                        )
-                    );
-
-                };
-
-
-            reader.readAsDataURL(file);
-
-        }
-    );
-
-}
-
-
-/* =========================
-   معرفة هل الصورة شفافة
-========================= */
-
-function checkTransparency(img) {
 
     const canvas =
         document.createElement(
@@ -1618,135 +1484,248 @@ function checkTransparency(img) {
         );
 
 
-    const sampleSize = 100;
-
-
     canvas.width =
-        sampleSize;
+        width;
 
 
     canvas.height =
-        sampleSize;
+        height;
 
 
     const ctx =
         canvas.getContext(
-            "2d",
-            {
-                willReadFrequently: true
-            }
+            "2d"
         );
+
+
+    /*
+       جودة عالية جدًا مع الحفاظ
+       على الشكل الأصلي.
+    */
+
+    ctx.imageSmoothingEnabled =
+        true;
+
+
+    ctx.imageSmoothingQuality =
+        "high";
 
 
     ctx.drawImage(
-        img,
+        image,
         0,
         0,
-        sampleSize,
-        sampleSize
+        width,
+        height
     );
 
 
-    try {
+    /*
+       نحاول WebP أولًا لأنه عادة
+       يعطي حجمًا أصغر مع جودة عالية.
+    */
 
-        const pixels =
-            ctx.getImageData(
-                0,
-                0,
-                sampleSize,
-                sampleSize
-            ).data;
-
-
-        for (
-            let i = 3;
-            i < pixels.length;
-            i += 4
-        ) {
-
-            if (
-                pixels[i] < 255
-            ) {
-
-                return true;
-
-            }
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.log(
-            "Transparency check skipped:",
-            error
-        );
-
-    }
-
-
-    return false;
-
-}
-
-
-/* =========================
-   ضغط JPG تدريجيًا
-========================= */
-
-function compressJPEGUntilSmall(
-    canvas
-) {
-
-    let quality =
-        0.90;
-
-
-    let dataUrl =
+    let result =
         canvas.toDataURL(
-            "image/jpeg",
-            quality
+            "image/webp",
+            0.92
         );
 
 
-    while (
-        getDataUrlSize(dataUrl) >
-        MAX_STORAGE_SIZE &&
-        quality > 0.55
+    /*
+       إذا لم يدعم المتصفح WebP
+       نستخدم JPEG.
+    */
+
+    if (
+        !result.startsWith(
+            "data:image/webp"
+        )
     ) {
 
-        quality -= 0.05;
-
-
-        dataUrl =
+        result =
             canvas.toDataURL(
                 "image/jpeg",
-                quality
+                0.92
             );
 
     }
 
 
-    return dataUrl;
+    /*
+       إذا كانت الصورة لا تزال كبيرة
+       جدًا، نضغطها تدريجيًا.
+    */
+
+    const MAX_DATA_SIZE =
+        4.2 * 1024 * 1024;
+
+
+    if (
+        result.length >
+        MAX_DATA_SIZE
+    ) {
+
+        let quality = 0.88;
+
+        while (
+            result.length >
+            MAX_DATA_SIZE &&
+            quality >= 0.55
+        ) {
+
+            result =
+                canvas.toDataURL(
+                    "image/webp",
+                    quality
+                );
+
+
+            if (
+                !result.startsWith(
+                    "data:image/webp"
+                )
+            ) {
+
+                result =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        quality
+                    );
+
+            }
+
+
+            quality -= 0.05;
+
+        }
+
+    }
+
+
+    /*
+       إذا كانت لا تزال أكبر من الحد،
+       نقلل الأبعاد تدريجيًا بدل التأثير
+       على شكل التصميم.
+    */
+
+    while (
+        result.length >
+        MAX_DATA_SIZE &&
+        width > 1200
+    ) {
+
+        width =
+            Math.round(
+                width * 0.85
+            );
+
+
+        height =
+            Math.round(
+                height * 0.85
+            );
+
+
+        canvas.width =
+            width;
+
+
+        canvas.height =
+            height;
+
+
+        ctx.drawImage(
+            image,
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        result =
+            canvas.toDataURL(
+                "image/webp",
+                0.90
+            );
+
+
+        if (
+            !result.startsWith(
+                "data:image/webp"
+            )
+        ) {
+
+            result =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    0.90
+                );
+
+        }
+
+    }
+
+
+    return result;
 
 }
 
 
 /* =========================
-   حساب حجم Data URL
+   تحميل الصورة
 ========================= */
 
-function getDataUrlSize(
-    dataUrl
+function loadImageFromFile(
+    file
 ) {
 
-    const base64 =
-        dataUrl.split(",")[1] || "";
+    return new Promise(
+        function(resolve, reject) {
+
+            const url =
+                URL.createObjectURL(
+                    file
+                );
 
 
-    return Math.floor(
-        base64.length * 0.75
+            const image =
+                new Image();
+
+
+            image.onload =
+                function() {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                    resolve(
+                        image
+                    );
+
+                };
+
+
+            image.onerror =
+                function(error) {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                    reject(
+                        error
+                    );
+
+                };
+
+
+            image.src =
+                url;
+
+        }
     );
 
 }
@@ -1894,12 +1873,8 @@ async function loadInvitations() {
                 "none";
 
 
-            showMessage(
-                "لا توجد دعوات لهذا الحفل حتى الآن.",
-                "error"
-            );
-
             updatePreview();
+
 
             return;
 
@@ -2064,9 +2039,13 @@ function updatePreviewQR(
 
     if (!qrValue) {
 
-        previewQrImage.removeAttribute(
-            "src"
-        );
+        /*
+           إذا لم يوجد كود للمدعو،
+           نترك QR الأساسي ظاهرًا
+           في التصميم.
+        */
+
+        updateQR();
 
         return;
 
@@ -2962,6 +2941,11 @@ document
                 this.value;
 
 
+            /*
+               إعادة إنشاء QR مباشرة
+               باللون الجديد.
+            */
+
             updateQR();
 
 
@@ -3004,6 +2988,13 @@ function updateQR() {
         document.getElementById(
             "qrImage"
         );
+
+
+    if (!qrImage) {
+
+        return;
+
+    }
 
 
     QRCode.toDataURL(
@@ -3209,35 +3200,35 @@ function autoSave() {
 
 
         /*
-           محاولة أخيرة:
-           ضغط الصورة أكثر إذا كان
-           المتصفح ما زال يرفض الحفظ.
+           محاولة أخيرة بضغط أقوى
+           إذا كان المتصفح يرفض الحفظ.
         */
 
         try {
 
             if (
-                designData.image &&
-                designData.image.startsWith(
-                    "data:image/jpeg"
-                )
+                designData.image
             ) {
 
                 const compressed =
-                    recompressCurrentImage();
+                    compressDataURLFurther(
+                        designData.image
+                    );
+
 
                 if (compressed) {
 
                     designData.image =
                         compressed;
 
+
                     localStorage.setItem(
-                        "invitation_design_" +
-                        eventId,
+                        key,
                         JSON.stringify(
                             designData
                         )
                     );
+
 
                     return true;
 
@@ -3250,7 +3241,7 @@ function autoSave() {
         catch (secondError) {
 
             console.error(
-                "Second save attempt error:",
+                "Second save error:",
                 secondError
             );
 
@@ -3258,7 +3249,7 @@ function autoSave() {
 
 
         showMessage(
-            "الصورة ما زالت كبيرة على الحفظ المحلي. جرّبي صورة أصغر حجمًا.",
+            "تعذر حفظ التصميم. جرّبي صورة أصغر قليلًا.",
             "error"
         );
 
@@ -3271,84 +3262,122 @@ function autoSave() {
 
 
 /* =========================
-   إعادة ضغط الصورة الحالية
+   ضغط إضافي عند الحاجة
 ========================= */
 
-function recompressCurrentImage() {
+function compressDataURLFurther(
+    dataURL
+) {
 
-    const image =
-        document.getElementById(
-            "designImage"
-        );
+    return new Promise(
+        function(resolve) {
 
-
-    if (
-        !image ||
-        !image.naturalWidth
-    ) {
-
-        return null;
-
-    }
+            const image =
+                new Image();
 
 
-    const canvas =
-        document.createElement(
-            "canvas"
-        );
+            image.onload =
+                function() {
+
+                    let width =
+                        image.naturalWidth;
 
 
-    canvas.width =
-        image.naturalWidth;
+                    let height =
+                        image.naturalHeight;
 
 
-    canvas.height =
-        image.naturalHeight;
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
 
 
-    const ctx =
-        canvas.getContext(
-            "2d"
-        );
+                    width =
+                        Math.round(
+                            width * 0.75
+                        );
 
 
-    ctx.drawImage(
-        image,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+                    height =
+                        Math.round(
+                            height * 0.75
+                        );
+
+
+                    canvas.width =
+                        width;
+
+
+                    canvas.height =
+                        height;
+
+
+                    const ctx =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+
+                    ctx.imageSmoothingEnabled =
+                        true;
+
+
+                    ctx.imageSmoothingQuality =
+                        "high";
+
+
+                    ctx.drawImage(
+                        image,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+
+                    let result =
+                        canvas.toDataURL(
+                            "image/webp",
+                            0.78
+                        );
+
+
+                    if (
+                        !result.startsWith(
+                            "data:image/webp"
+                        )
+                    ) {
+
+                        result =
+                            canvas.toDataURL(
+                                "image/jpeg",
+                                0.78
+                            );
+
+                    }
+
+
+                    resolve(
+                        result
+                    );
+
+                };
+
+
+            image.onerror =
+                function() {
+
+                    resolve(null);
+
+                };
+
+
+            image.src =
+                dataURL;
+
+        }
     );
-
-
-    let quality =
-        0.80;
-
-
-    let dataUrl;
-
-
-    do {
-
-        dataUrl =
-            canvas.toDataURL(
-                "image/jpeg",
-                quality
-            );
-
-
-        quality -= 0.05;
-
-    }
-
-    while (
-        getDataUrlSize(dataUrl) >
-        MAX_STORAGE_SIZE &&
-        quality >= 0.45
-    );
-
-
-    return dataUrl;
 
 }
 
