@@ -152,6 +152,76 @@ input:focus {
 
 
 /* =========================
+   خيارات نوع الدعوات
+========================= */
+
+.invitation-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.type-option {
+    position: relative;
+}
+
+.type-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.type-card {
+    display: block;
+    padding: 18px 12px;
+    text-align: center;
+    border: 2px solid #e5e2de;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.type-card:hover {
+    border-color: #aaa;
+}
+
+.type-title {
+    display: block;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.type-description {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.type-option input:checked + .type-card {
+    border-color: #222;
+    background: #faf9f7;
+}
+
+.type-option input:checked + .type-card .type-title {
+    font-weight: bold;
+}
+
+.type-warning {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #fff8e8;
+    color: #8a6d1d;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* =========================
    إضافة يدوية
 ========================= */
 
@@ -329,6 +399,10 @@ td input {
         grid-template-columns: 1fr;
     }
 
+    .invitation-types {
+        grid-template-columns: 1fr;
+    }
+
     table {
         min-width: 520px;
     }
@@ -359,7 +433,7 @@ td input {
 
 <div class="subtitle">
 
-أضيفي أسماء المدعوين والمرافقين بالطريقة التي تناسبك
+اختاري طريقة إدراج الدعوات المناسبة لك
 
 </div>
 
@@ -394,6 +468,106 @@ td input {
 <strong id="eventInvitationCount">
 -
 </strong>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     نوع الدعوات
+========================= -->
+
+<div class="section">
+
+<h3>
+طريقة إدراج الدعوات
+</h3>
+
+<div class="hint">
+اختاري خيارًا واحدًا فقط، وسيتم استخدامه عند تعبئة الدعوات.
+</div>
+
+
+<div class="invitation-types">
+
+
+<label class="type-option">
+
+<input
+    type="radio"
+    name="invitationType"
+    value="name"
+>
+
+<span class="type-card">
+
+<span class="type-title">
+اسم
+</span>
+
+<span class="type-description">
+دعوات تحتوي على أسماء المدعوين
+</span>
+
+</span>
+
+</label>
+
+
+<label class="type-option">
+
+<input
+    type="radio"
+    name="invitationType"
+    value="number"
+>
+
+<span class="type-card">
+
+<span class="type-title">
+رقم
+</span>
+
+<span class="type-description">
+دعوات تحتوي على أرقام بدل الأسماء
+</span>
+
+</span>
+
+</label>
+
+
+<label class="type-option">
+
+<input
+    type="radio"
+    name="invitationType"
+    value="blank"
+>
+
+<span class="type-card">
+
+<span class="type-title">
+فراغ
+</span>
+
+<span class="type-description">
+دعوات فارغة، ويكون الاعتماد على الكود فقط
+</span>
+
+</span>
+
+</label>
+
+</div>
+
+
+<div
+    id="typeWarning"
+    class="type-warning">
+
+لازم تختارين أحد الخيارات الثلاثة قبل إدراج الدعوات.
 
 </div>
 
@@ -457,7 +631,9 @@ td input {
      إضافة يدوية
 ========================= -->
 
-<div class="section">
+<div
+    id="manualSection"
+    class="section">
 
 <h3>
 إضافة مدعو يدويًا
@@ -469,7 +645,7 @@ td input {
 
 <div>
 
-<label>
+<label id="manualValueLabel">
 اسم المدعو
 </label>
 
@@ -503,16 +679,18 @@ td input {
     id="addGuestButton"
     type="button">
 
-إضافة المدعو
+إضافة
 
 </button>
 
 </div>
 
 
-<div class="hint">
+<div
+    id="manualHint"
+    class="hint">
 
-سيتم استخدام أول دعوة فارغة متاحة. لا يمكن تجاوز العدد المحدد للحفل.
+اختاري طريقة الإدراج أولًا.
 
 </div>
 
@@ -541,7 +719,7 @@ td input {
 <input
     id="fileInput"
     type="file"
-    accept=".csv,.xlsx,.xls,.xlsm,.xltx,.xlt,.xlsb,.ods,.xml,.fods,.numbers,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.oasis.opendocument.spreadsheet,application/vnd.apple.numbers"
+    accept=".csv,.xlsx,.xls,.xlsm,.xltx,.xlt,.xlsb,.ods,.xml,.fods,.numbers,.tsv,.txt,text/csv,text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.oasis.opendocument.spreadsheet,application/vnd.apple.numbers"
 >
 
 
@@ -549,56 +727,42 @@ td input {
 
 يمكنك رفع ملفات:
 
-<strong>
-CSV
-</strong>،
-<strong>
-XLS
-</strong>،
-<strong>
-XLSX
-</strong>،
-<strong>
-XLSM
-</strong>،
-<strong>
-XLTX
-</strong>،
-<strong>
-XLT
-</strong>،
-<strong>
-XLSB
-</strong>،
-<strong>
-ODS
-</strong>،
-<strong>
-XML
-</strong>،
-<strong>
-FODS
-</strong>،
-<strong>
-NUMBERS
-</strong>.
+<strong>CSV</strong>،
+<strong>XLS</strong>،
+<strong>XLSX</strong>،
+<strong>XLSM</strong>،
+<strong>XLTX</strong>،
+<strong>XLT</strong>،
+<strong>XLSB</strong>،
+<strong>ODS</strong>،
+<strong>XML</strong>،
+<strong>FODS</strong>،
+<strong>NUMBERS</strong>،
+<strong>TSV</strong>،
+<strong>TXT</strong>.
+
+<br><br>
+
+<strong>في وضع الاسم:</strong>
+يفضل وجود عمود الاسم وعمود اختياري للمرافقين.
 
 <br>
 
-يفضل أن يحتوي الجدول على عمود:
+<strong>في وضع الرقم:</strong>
+يفضل وجود عمود الرقم وعمود اختياري للمرافقين.
 
-<strong>الاسم</strong>
+<br>
 
-وعمود اختياري:
-
-<strong>المرافقين</strong>
+<strong>في وضع الفراغ:</strong>
+لا تحتاجين ملفًا، لأن الدعوات تكون فارغة ويستخدم الكود فقط.
 
 </div>
 
 
 <button
     id="importButton"
-    type="button">
+    type="button"
+    disabled>
 
 استيراد الملف
 
@@ -639,7 +803,7 @@ NUMBERS
 
 <tr>
 
-<th>
+<th id="valueTableHeader">
 الاسم
 </th>
 
@@ -795,26 +959,18 @@ let eventData = null;
 
 let invitations = [];
 
-
-/*
-   عدد الدعوات المحدد للحفل
-*/
-
 let allowedInvitationCount = 0;
 
-
-/*
-   عدد العناصر في الصفحة
-*/
+let currentPage = 1;
 
 const ITEMS_PER_PAGE = 10;
 
 
 /*
-   الصفحة الحالية
+   نوع الدعوات المختار
 */
 
-let currentPage = 1;
+let invitationType = null;
 
 
 /* =========================
@@ -847,6 +1003,8 @@ async function loadPage() {
 
         await loadInvitations();
 
+        restoreInvitationType();
+
         renderTable();
 
         updateStats();
@@ -867,6 +1025,265 @@ async function loadPage() {
         );
 
     }
+
+}
+
+
+/* =========================
+   اختيار نوع الدعوات
+========================= */
+
+document
+    .querySelectorAll(
+        'input[name="invitationType"]'
+    )
+    .forEach(
+        function(input) {
+
+            input.addEventListener(
+                "change",
+                function() {
+
+                    invitationType =
+                        this.value;
+
+
+                    localStorage.setItem(
+                        "invitationType_" +
+                        eventId,
+                        invitationType
+                    );
+
+
+                    updateTypeInterface();
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================
+   استرجاع الاختيار
+========================= */
+
+function restoreInvitationType() {
+
+    const saved =
+        localStorage.getItem(
+            "invitationType_" +
+            eventId
+        );
+
+
+    if (
+        saved === "name" ||
+        saved === "number" ||
+        saved === "blank"
+    ) {
+
+        invitationType =
+            saved;
+
+
+        const radio =
+            document.querySelector(
+                `input[name="invitationType"][value="${saved}"]`
+            );
+
+
+        if (radio) {
+
+            radio.checked =
+                true;
+
+        }
+
+    }
+
+
+    updateTypeInterface();
+
+}
+
+
+/* =========================
+   تحديث واجهة النوع
+========================= */
+
+function updateTypeInterface() {
+
+    const warning =
+        document.getElementById(
+            "typeWarning"
+        );
+
+
+    const importButton =
+        document.getElementById(
+            "importButton"
+        );
+
+
+    const fileInput =
+        document.getElementById(
+            "fileInput"
+        );
+
+
+    const manualValueLabel =
+        document.getElementById(
+            "manualValueLabel"
+        );
+
+
+    const guestName =
+        document.getElementById(
+            "guestName"
+        );
+
+
+    const manualHint =
+        document.getElementById(
+            "manualHint"
+        );
+
+
+    const tableHeader =
+        document.getElementById(
+            "valueTableHeader"
+        );
+
+
+    if (!invitationType) {
+
+        warning.style.display =
+            "block";
+
+        importButton.disabled =
+            true;
+
+        fileInput.disabled =
+            true;
+
+        manualValueLabel.innerText =
+            "اسم المدعو";
+
+        guestName.placeholder =
+            "اختاري نوع الدعوة أولًا";
+
+        manualHint.innerText =
+            "اختاري طريقة الإدراج أولًا.";
+
+        tableHeader.innerText =
+            "الاسم";
+
+        return;
+
+    }
+
+
+    warning.style.display =
+        "none";
+
+
+    fileInput.disabled =
+        false;
+
+
+    if (
+        invitationType === "name"
+    ) {
+
+        importButton.disabled =
+            false;
+
+        importButton.innerText =
+            "استيراد ملف الأسماء";
+
+
+        manualValueLabel.innerText =
+            "اسم المدعو";
+
+
+        guestName.placeholder =
+            "مثال: سارة محمد";
+
+
+        manualHint.innerText =
+            "أضيفي اسم المدعو وعدد المرافقين، وسيتم استخدام أول دعوة فارغة.";
+
+
+        tableHeader.innerText =
+            "الاسم";
+
+    }
+
+
+    if (
+        invitationType === "number"
+    ) {
+
+        importButton.disabled =
+            false;
+
+        importButton.innerText =
+            "استيراد ملف الأرقام";
+
+
+        manualValueLabel.innerText =
+            "رقم المدعو";
+
+
+        guestName.placeholder =
+            "مثال: 1001";
+
+
+        manualHint.innerText =
+            "أضيفي رقم المدعو وعدد المرافقين، وسيتم استخدام أول دعوة فارغة.";
+
+
+        tableHeader.innerText =
+            "الرقم";
+
+    }
+
+
+    if (
+        invitationType === "blank"
+    ) {
+
+        importButton.disabled =
+            true;
+
+        importButton.innerText =
+            "الفراغ لا يحتاج ملفًا";
+
+
+        fileInput.disabled =
+            true;
+
+
+        manualValueLabel.innerText =
+            "المدعو";
+
+
+        guestName.placeholder =
+            "الدعوات فارغة";
+
+
+        manualHint.innerText =
+            "هذا الخيار ينشئ دعوات فارغة تعتمد على الكود فقط.";
+
+
+        tableHeader.innerText =
+            "البيان";
+
+    }
+
+
+    renderTable();
 
 }
 
@@ -915,11 +1332,6 @@ async function loadEvent() {
         data;
 
 
-    /*
-       محاولة قراءة عدد الدعوات
-       من أكثر من اسم محتمل للعمود
-    */
-
     allowedInvitationCount =
         getEventInvitationCount(
             data
@@ -937,12 +1349,11 @@ async function loadEvent() {
     ).innerText =
         allowedInvitationCount;
 
-
 }
 
 
 /* =========================
-   معرفة عدد الدعوات المحدد
+   معرفة عدد الدعوات
 ========================= */
 
 function getEventInvitationCount(
@@ -1006,11 +1417,6 @@ function getEventInvitationCount(
     }
 
 
-    /*
-       إذا لم نجد العدد
-       نستخدم عدد الدعوات الموجودة
-    */
-
     return 0;
 
 }
@@ -1056,18 +1462,8 @@ async function loadInvitations() {
         data || [];
 
 
-    /*
-       إذا كان عدد الدعوات الموجود
-       أقل من العدد المحدد للحفل
-       ننشئ الصفوف الفارغة الناقصة.
-    */
-
     await ensureInvitationSlots();
 
-
-    /*
-       إعادة ترتيب الدعوات
-    */
 
     invitations.sort(
         function(a, b) {
@@ -1115,11 +1511,6 @@ async function ensureInvitationSlots() {
     if (
         missing <= 0
     ) {
-
-        /*
-           إذا كان العدد الموجود أكبر
-           لا نحذف أي شيء تلقائيًا.
-        */
 
         return;
 
@@ -1199,11 +1590,6 @@ async function ensureInvitationSlots() {
             "ENSURE SLOTS ERROR:",
             error
         );
-
-        /*
-           لا نوقف الصفحة إذا كان
-           السبب من صلاحيات قاعدة البيانات.
-        */
 
         return;
 
@@ -1314,44 +1700,66 @@ function renderTable() {
 
 
             /* =========================
-               الاسم
+               القيمة
             ========================= */
 
-            const nameCell =
+            const valueCell =
                 document.createElement(
                     "td"
                 );
 
 
-            const nameInput =
+            const valueInput =
                 document.createElement(
                     "input"
                 );
 
 
-            nameInput.type =
+            valueInput.type =
                 "text";
 
 
-            nameInput.value =
+            valueInput.value =
                 invitation.guest_name ||
                 "";
 
 
-            nameInput.placeholder =
-                "اسم المدعو";
+            if (
+                invitationType === "number"
+            ) {
+
+                valueInput.placeholder =
+                    "رقم المدعو";
+
+            }
+
+            else if (
+                invitationType === "blank"
+            ) {
+
+                valueInput.placeholder =
+                    "فارغ";
+
+            }
+
+            else {
+
+                valueInput.placeholder =
+                    "اسم المدعو";
+
+            }
 
 
-            nameInput.dataset.id =
+            valueInput.dataset.id =
                 invitation.id;
 
 
-            nameInput.className =
+            valueInput.className =
                 "guest-name-input";
 
 
-            nameCell.appendChild(
-                nameInput
+            valueCell.appendChild(
+                valueInput
             );
 
 
@@ -1466,7 +1874,7 @@ function renderTable() {
 
 
             row.appendChild(
-                nameCell
+                valueCell
             );
 
 
@@ -1653,11 +2061,6 @@ function updateStats() {
         ).length;
 
 
-    /*
-       لا نسمح أن يتجاوز المعبأ
-       العدد المحدد.
-    */
-
     const safeFilled =
         Math.min(
             filled,
@@ -1715,7 +2118,7 @@ function getCompanionCount(
 
 
 /* =========================
-   إيجاد دعوة فارغة
+   الدعوات الفارغة
 ========================= */
 
 function getEmptyInvitations() {
@@ -1732,7 +2135,7 @@ function getEmptyInvitations() {
 
 
 /* =========================
-   إضافة مدعو يدوي
+   إضافة يدوي
 ========================= */
 
 document
@@ -1747,7 +2150,33 @@ document
 
 async function addGuest() {
 
-    const nameInput =
+    if (!invitationType) {
+
+        showMessage(
+            "اختاري أولًا: اسم أو رقم أو فراغ.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        invitationType === "blank"
+    ) {
+
+        showMessage(
+            "خيار الفراغ لا يحتاج إضافة يدوية. الدعوات تكون فارغة ويستخدم فيها الكود فقط.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const valueInput =
         document.getElementById(
             "guestName"
         );
@@ -1759,8 +2188,8 @@ async function addGuest() {
         );
 
 
-    const name =
-        nameInput.value.trim();
+    const value =
+        valueInput.value.trim();
 
 
     const companions =
@@ -1769,10 +2198,12 @@ async function addGuest() {
         );
 
 
-    if (!name) {
+    if (!value) {
 
         showMessage(
-            "اكتبي اسم المدعو أولًا.",
+            invitationType === "number"
+                ? "اكتبي رقم المدعو أولًا."
+                : "اكتبي اسم المدعو أولًا.",
             "error"
         );
 
@@ -1797,10 +2228,6 @@ async function addGuest() {
 
     }
 
-
-    /*
-       نبحث عن صف فارغ
-    */
 
     const emptyInvitation =
         getEmptyInvitations()[0];
@@ -1831,7 +2258,7 @@ async function addGuest() {
                 .update({
 
                     guest_name:
-                        name,
+                        value,
 
                     guest_count:
                         1 +
@@ -1876,7 +2303,7 @@ async function addGuest() {
         }
 
 
-        nameInput.value =
+        valueInput.value =
             "";
 
 
@@ -1890,7 +2317,7 @@ async function addGuest() {
 
 
         showMessage(
-            "تمت إضافة المدعو بنجاح 🤍",
+            "تمت إضافة الدعوة بنجاح 🤍",
             "success"
         );
 
@@ -1901,7 +2328,7 @@ async function addGuest() {
         console.error(error);
 
         showMessage(
-            "تعذر إضافة المدعو: " +
+            "تعذر إضافة الدعوة: " +
             (
                 error.message ||
                 ""
@@ -2052,6 +2479,32 @@ document
 
 async function importFile() {
 
+    if (!invitationType) {
+
+        showMessage(
+            "اختاري أولًا نوع الدعوات.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        invitationType === "blank"
+    ) {
+
+        showMessage(
+            "خيار الفراغ لا يحتاج إلى ملف.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     const input =
         document.getElementById(
             "fileInput"
@@ -2065,7 +2518,7 @@ async function importFile() {
     if (!file) {
 
         showMessage(
-            "اختاري ملف Excel أو CSV أولًا.",
+            "اختاري ملفًا أولًا.",
             "error"
         );
 
@@ -2142,10 +2595,6 @@ async function importFile() {
         }
 
 
-        /*
-           تنظيف الصفوف الفارغة تمامًا
-        */
-
         const validRows =
             rows.filter(
                 function(row) {
@@ -2174,11 +2623,6 @@ async function importFile() {
         }
 
 
-        /*
-           الصفوف الفارغة الموجودة مسبقًا
-           هي الأماكن التي سيتم تعبئتها.
-        */
-
         const emptyInvitations =
             getEmptyInvitations();
 
@@ -2188,8 +2632,9 @@ async function importFile() {
 
 
         /*
-           إذا كان الملف أكبر من الأماكن
-           المتاحة نوقف الاستيراد بالكامل.
+           مهم:
+           لا نبدأ الإدراج إذا كان الملف
+           أكبر من الدعوات المتبقية.
         */
 
         if (
@@ -2207,11 +2652,6 @@ async function importFile() {
         let added =
             0;
 
-
-        /*
-           نعبئ الصفوف الفارغة
-           واحدًا تلو الآخر.
-        */
 
         for (
             let i = 0;
@@ -2234,51 +2674,88 @@ async function importFile() {
             }
 
 
-            const name =
-                findValue(
-                    row,
-                    [
-                        "الاسم",
-                        "اسم",
-                        "اسم المدعو",
-                        "المدعو",
-                        "المدعوة",
-                        "اسم المدعو/المدعوة",
-                        "الاسم الكامل",
-                        "اسم الشخص",
-                        "الاسماء",
-                        "أسماء",
-                        "الضيوف",
-                        "ضيف",
-                        "name",
-                        "guest",
-                        "guest_name",
-                        "fullname",
-                        "full_name",
-                        "guestname",
-                        "invitee",
-                        "invitee_name"
-                    ]
-                );
+            let value = "";
 
 
-            /*
-               الاسم مطلوب في حالة
-               الاستيراد الحالي.
-            */
+            /* =========================
+               وضع الأسماء
+            ========================= */
 
-            const cleanName =
+            if (
+                invitationType === "name"
+            ) {
+
+                value =
+                    findValue(
+                        row,
+                        [
+                            "الاسم",
+                            "اسم",
+                            "اسم المدعو",
+                            "المدعو",
+                            "المدعوة",
+                            "اسم المدعو/المدعوة",
+                            "الاسم الكامل",
+                            "اسم الشخص",
+                            "الاسماء",
+                            "أسماء",
+                            "الضيوف",
+                            "ضيف",
+                            "name",
+                            "guest",
+                            "guest_name",
+                            "fullname",
+                            "full_name",
+                            "guestname",
+                            "invitee",
+                            "invitee_name"
+                        ]
+                    );
+
+            }
+
+
+            /* =========================
+               وضع الأرقام
+            ========================= */
+
+            if (
+                invitationType === "number"
+            ) {
+
+                value =
+                    findValue(
+                        row,
+                        [
+                            "الرقم",
+                            "رقم",
+                            "رقم المدعو",
+                            "رقم الدعوة",
+                            "رقم الضيف",
+                            "العدد",
+                            "رقم المدعوة",
+                            "number",
+                            "no",
+                            "num",
+                            "guest_number",
+                            "guestnumber",
+                            "invitation_number",
+                            "invite_number",
+                            "id",
+                            "code"
+                        ]
+                    );
+
+            }
+
+
+            const cleanValue =
                 String(
-                    name ?? ""
+                    value ?? ""
                 ).trim();
 
 
-            if (!cleanName) {
-
-                /*
-                   نتجاوز الصف الفارغ
-                   بدل إنشاء دعوة جديدة.
-                */
+            if (!cleanValue) {
 
                 continue;
 
@@ -2325,10 +2802,6 @@ async function importFile() {
             }
 
 
-            /*
-               تحديث الصف الموجود
-            */
-
             const {
                 data,
                 error
@@ -2340,7 +2813,7 @@ async function importFile() {
                     .update({
 
                         guest_name:
-                            cleanName,
+                            cleanValue,
 
                         guest_count:
                             1 +
@@ -2390,10 +2863,6 @@ async function importFile() {
         }
 
 
-        /*
-           إعادة ترتيب الدعوات
-        */
-
         invitations.sort(
             function(a, b) {
 
@@ -2424,7 +2893,9 @@ async function importFile() {
 
 
         showMessage(
-            `تم تعبئة ${added} دعوة من الملف بنجاح 🤍`,
+            invitationType === "number"
+                ? `تم تعبئة ${added} دعوة بالأرقام بنجاح 🤍`
+                : `تم تعبئة ${added} دعوة بالأسماء بنجاح 🤍`,
             "success"
         );
 
@@ -2449,10 +2920,33 @@ async function importFile() {
     finally {
 
         button.disabled =
-            false;
+            invitationType === "blank";
 
-        button.innerText =
-            "استيراد الملف";
+
+        if (
+            invitationType === "name"
+        ) {
+
+            button.innerText =
+                "استيراد ملف الأسماء";
+
+        }
+
+        else if (
+            invitationType === "number"
+        ) {
+
+            button.innerText =
+                "استيراد ملف الأرقام";
+
+        }
+
+        else {
+
+            button.innerText =
+                "الفراغ لا يحتاج ملفًا";
+
+        }
 
     }
 
@@ -2475,7 +2969,7 @@ function findValue(
 
 
     /*
-       أولًا بحث مطابق
+       بحث مطابق
     */
 
     for (
@@ -2507,9 +3001,7 @@ function findValue(
 
 
     /*
-       ثانيًا بحث مرن
-       في حال كان اسم العمود
-       مختلفًا قليلًا.
+       بحث مرن
     */
 
     for (
@@ -2663,7 +3155,7 @@ async function saveChanges() {
             }
 
 
-            const name =
+            const value =
                 names[i]
                     .value
                     .trim();
@@ -2701,7 +3193,7 @@ async function saveChanges() {
                     .update({
 
                         guest_name:
-                            name ||
+                            value ||
                             null,
 
                         guest_count:
@@ -2795,8 +3287,7 @@ document
                     eventId
                 );
 
-        }
-    );
+        });
 
 
 /* =========================
@@ -2814,8 +3305,7 @@ document
             window.location.href =
                 "create.html";
 
-        }
-    );
+        });
 
 
 /* =========================
